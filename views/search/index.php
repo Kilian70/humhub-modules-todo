@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\widgets\LinkPager;
 
 ?>
 
@@ -28,7 +29,6 @@ Suchen
 </form>
 
 </div>
-
 
 <div class="panel-body">
 
@@ -98,3 +98,5 @@ $this->context->contentContainer->createUrl('/todo/task/view', [
 </div>
 
 </div>
+
+<?= LinkPager::widget(['pagination' => $pagination]) ?>

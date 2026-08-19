@@ -7,6 +7,7 @@ use humhub\modules\todo\models\Task;
 use humhub\modules\todo\permissions\ViewTasks;
 use yii\web\ForbiddenHttpException;
 use Yii;
+use yii\data\Pagination;
 
 class SearchController extends ContentContainerController
 {
@@ -58,7 +59,16 @@ class SearchController extends ContentContainerController
          */
         $groupBy = Yii::$app->request->get('group');
 
-        $tasks = $query->all();
+        $pagination = new Pagination([
+            'totalCount' => (clone $query)->count(),
+            'pageSize' => 25,
+            'pageSizeLimit' => [1, 100],
+        ]);
+
+        $tasks = $query
+            ->offset($pagination->offset)
+            ->limit($pagination->limit)
+            ->all();
 
         $tasksByUser = [];
 
@@ -87,6 +97,7 @@ class SearchController extends ContentContainerController
             'keyword' => $keyword,
             'status' => $status,
             'contentContainer' => $this->contentContainer,
+            'pagination' => $pagination,
         ]);
     }
 }

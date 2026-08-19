@@ -16,6 +16,7 @@ use yii\web\NotFoundHttpException;
 use humhub\modules\file\models\File;
 use yii\web\UploadedFile;
 use yii\filters\VerbFilter;
+use yii\data\Pagination;
 use humhub\modules\space\models\Membership;
 use humhub\modules\user\models\User;
 use humhub\modules\todo\services\CalendarSyncService;
@@ -132,7 +133,16 @@ public function actionIndex()
         ]);
     }
 
-    $tasks = $query->all();
+    $pagination = new Pagination([
+        'totalCount' => (clone $query)->count(),
+        'pageSize' => 25,
+        'pageSizeLimit' => [1, 100],
+    ]);
+
+    $tasks = $query
+        ->offset($pagination->offset)
+        ->limit($pagination->limit)
+        ->all();
 
     // 🔹 Gruppierung nach Benutzer
     $tasksByUser = [];
@@ -181,6 +191,7 @@ public function actionIndex()
         'tasksByList' => $orderedTasksByList,
         'groupBy' => $groupBy,
         'contentContainer' => $this->contentContainer,
+        'pagination' => $pagination,
     ]);
 }
 
