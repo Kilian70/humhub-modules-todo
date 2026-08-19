@@ -1,0 +1,267 @@
+<?php
+
+use yii\helpers\Html;
+use yii\widgets\ActiveForm;
+use humhub\modules\user\widgets\UserPickerField;
+use humhub\modules\todo\services\CalendarSyncService;
+use humhub\modules\todo\models\TaskList;
+
+?>
+
+<div class="panel panel-default">
+
+    <!-- HEADER -->
+    <div class="panel-heading d-flex justify-content-between align-items-center">
+
+        <strong>Neue Aufgabe</strong>
+
+        <div>
+            <?= Html::a(
+                'Zurück',
+                $contentContainer->createUrl('/todo/task/index'),
+                ['class' => 'btn btn-sm btn-light']
+            ) ?>
+        </div>
+
+    </div>
+
+
+    <!-- BODY -->
+    <div class="panel-body">
+
+        <?php $form = ActiveForm::begin([
+            'options' => [
+                'data-pjax' => 0,
+                'enctype' => 'multipart/form-data'
+            ]
+        ]); ?>
+
+
+        <?= $form->field($model, 'title')->textInput([
+            'placeholder' => 'Titel der Aufgabe'
+        ]) ?>
+
+        <?php
+        $taskLists = TaskList::findForSpace((int) $contentContainer->id);
+        $taskListInputId = 'todo-task-list-input-create';
+        $taskListMenuId = 'todo-task-list-menu-create';
+        ?>
+
+        <div class="form-group">
+            <label class="control-label" for="<?= $taskListInputId ?>">Aufgabenliste</label>
+
+            <div class="position-relative todo-task-list-picker" data-todo-task-list-picker>
+                <?= Html::activeTextInput($model, 'task_list_name', [
+                    'id' => $taskListInputId,
+                    'class' => 'form-control',
+                    'placeholder' => 'Liste auswählen oder neuen Namen eingeben',
+                    'autocomplete' => 'off',
+                    'data-role' => 'task-list-input',
+                ]) ?>
+
+                <div id="<?= $taskListMenuId ?>"
+                     class="list-group position-absolute w-100 shadow-sm bg-white"
+                     data-role="task-list-menu"
+                     style="display:none;z-index:1050;max-height:280px;overflow-y:auto;left:0;right:0;">
+
+                    <?php if (empty($taskLists)): ?>
+                        <div class="list-group-item text-muted" data-role="empty-list-hint">
+                            Noch keine Aufgabenlisten vorhanden.
+                        </div>
+                    <?php else: ?>
+                        <?php foreach ($taskLists as $taskList): ?>
+                            <button type="button"
+                                    class="list-group-item list-group-item-action d-flex align-items-center gap-2"
+                                    data-role="task-list-option"
+                                    data-name="<?= Html::encode($taskList->name) ?>">
+                                <span aria-hidden="true"
+                                      style="display:inline-block;width:14px;height:14px;border-radius:4px;flex:0 0 14px;background:<?= Html::encode($taskList->color ?: '#6c757d') ?>;"></span>
+                                <span><?= Html::encode($taskList->name) ?></span>
+                            </button>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+
+                    <button type="button"
+                            class="list-group-item list-group-item-action text-primary"
+                            data-role="task-list-create"
+                            style="display:none;">
+                        <i class="fa fa-plus"></i>
+                        <span data-role="task-list-create-label">Neue Aufgabenliste erstellen</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="help-block">
+                Bestehende Liste auswählen oder einen neuen Namen eingeben. Neue Listen werden beim Speichern automatisch angelegt.
+            </div>
+        </div>
+
+        <?php
+        $taskListPickerJs = <<<'JS'
+(function () {
+    document.querySelectorAll('[data-todo-task-list-picker]').forEach(function (picker) {
+        if (picker.dataset.initialized === '1') {
+            return;
+        }
+        picker.dataset.initialized = '1';
+
+        const input = picker.querySelector('[data-role="task-list-input"]');
+        const menu = picker.querySelector('[data-role="task-list-menu"]');
+        const options = Array.from(picker.querySelectorAll('[data-role="task-list-option"]'));
+        const createButton = picker.querySelector('[data-role="task-list-create"]');
+        const createLabel = picker.querySelector('[data-role="task-list-create-label"]');
+
+        function normalize(value) {
+            return (value || '').trim().toLocaleLowerCase();
+        }
+
+        function updateMenu() {
+            const query = normalize(input.value);
+            let exactMatch = false;
+            let visibleCount = 0;
+
+            options.forEach(function (option) {
+                const name = option.dataset.name || '';
+                const normalizedName = normalize(name);
+                const visible = query === '' || normalizedName.includes(query);
+                option.style.display = visible ? '' : 'none';
+
+                if (visible) {
+                    visibleCount++;
+                }
+                if (normalizedName === query && query !== '') {
+                    exactMatch = true;
+                }
+            });
+
+            if (query !== '' && !exactMatch) {
+                createButton.style.display = '';
+                createLabel.textContent = 'Aufgabenliste «' + input.value.trim() + '» erstellen';
+            } else {
+                createButton.style.display = 'none';
+            }
+
+            menu.style.display = '';
+        }
+
+        input.addEventListener('focus', updateMenu);
+        input.addEventListener('click', updateMenu);
+        input.addEventListener('input', updateMenu);
+
+        options.forEach(function (option) {
+            option.addEventListener('click', function () {
+                input.value = option.dataset.name || '';
+                menu.style.display = 'none';
+                input.dispatchEvent(new Event('change', {bubbles: true}));
+            });
+        });
+
+        createButton.addEventListener('click', function () {
+            menu.style.display = 'none';
+            input.focus();
+        });
+
+        document.addEventListener('click', function (event) {
+            if (!picker.contains(event.target)) {
+                menu.style.display = 'none';
+            }
+        });
+
+        input.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                menu.style.display = 'none';
+            }
+        });
+    });
+})();
+JS;
+        $this->registerJs($taskListPickerJs);
+        ?>
+
+
+        <?= $form->field($model, 'description')->textarea([
+            'rows' => 4
+        ]) ?>
+
+
+        <!-- Upload -->
+        <div class="mb-4">
+            <strong>Dateien hinzufügen</strong>
+            <div class="mt-2">
+                <?= $form->field($model, 'uploadFiles[]')
+                    ->fileInput(['multiple' => true])
+                    ->label(false) ?>
+            </div>
+        </div>
+
+
+        <!-- META GRID -->
+        <div class="row">
+
+            <div class="col-md-4">
+                <?= $form->field($model, 'priority')->dropDownList([
+                    'niedrig' => 'Niedrig',
+                    'mittel' => 'Mittel',
+                    'hoch' => 'Hoch',
+                ]) ?>
+            </div>
+
+            <div class="col-md-4">
+                <?= $form->field($model, 'status')->dropDownList([
+                    'offen' => 'Offen',
+                    'in_bearbeitung' => 'In Bearbeitung',
+                    'geschlossen' => 'Geschlossen',
+                ]) ?>
+            </div>
+
+            <div class="col-md-4">
+                <?= $form->field($model, 'due_date')->input('date') ?>
+            </div>
+
+        </div>
+
+        <?php if (CalendarSyncService::isAvailable($contentContainer)): ?>
+            <div class="mt-2">
+                <?= $form->field($model, 'sync_to_calendar')->checkbox([
+                    'label' => 'Fälligkeit als ganztägigen Termin im Kalender eintragen',
+                    'disabled' => !$model->calendar_entry_id && !CalendarSyncService::canCreate($contentContainer),
+                ]) ?>
+                <?php if (!$model->calendar_entry_id && !CalendarSyncService::canCreate($contentContainer)): ?>
+                    <div class="form-text">Für einen neuen Kalendereintrag fehlt dir das Kalender-Recht «Termin erstellen».</div>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+
+
+        <!-- Zuständig -->
+        <div class="mt-3">
+
+            <strong>Zuständig</strong>
+
+            <div class="mt-2">
+
+                <?= $form->field($model, 'user_ids')
+                    ->widget(UserPickerField::class)
+                    ->label(false) ?>
+
+            </div>
+
+        </div>
+
+
+        <!-- FOOTER -->
+        <div class="mt-4 text-end">
+
+            <?= Html::submitButton(
+                'Speichern',
+                ['class' => 'btn btn-primary']
+            ) ?>
+
+        </div>
+
+
+        <?php ActiveForm::end(); ?>
+
+    </div>
+
+</div>

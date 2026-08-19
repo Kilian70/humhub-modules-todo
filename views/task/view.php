@@ -1,0 +1,796 @@
+<?php
+
+use yii\helpers\Html;
+use humhub\modules\user\widgets\Image as UserImage;
+use humhub\modules\user\models\User;
+use humhub\modules\todo\permissions\EditTasks;
+use humhub\modules\todo\services\CalendarSyncService;
+use humhub\modules\comment\widgets\Comments;
+
+use humhub\modules\space\models\Membership;
+use humhub\modules\user\widgets\UserPickerField;
+use yii\helpers\Url;
+
+?>
+
+<?php $canEditTask = $contentContainer->permissionManager->can(new EditTasks()); ?>
+
+<div class="panel panel-default">
+
+    <!-- HEADER -->
+    <div class="panel-heading d-flex justify-content-between align-items-center">
+
+        <strong><?= Html::encode($task->title) ?></strong>
+
+        <div>
+
+            <?= Html::a(
+                'Zurück',
+                $contentContainer->createUrl('/todo/task/index'),
+                ['class' => 'btn btn-sm btn-light']
+            ) ?>
+
+            <?php if ($canEditTask): ?>
+                <?= Html::a(
+                    'Bearbeiten',
+                    $contentContainer->createUrl('/todo/task/update', ['id' => $task->id]),
+                    ['class' => 'btn btn-sm btn-primary']
+                ) ?>
+            <?php endif; ?>
+
+        </div>
+
+    </div>
+
+
+    <!-- BODY -->
+    <div class="panel-body">
+
+
+        <!-- BESCHREIBUNG -->
+        <?php if (!empty($task->description)): ?>
+
+            <div class="mb-4">
+
+                <strong>Beschreibung</strong>
+
+                <div class="mt-1">
+                    <?= nl2br(Html::encode($task->description)) ?>
+                </div>
+
+            </div>
+
+        <?php endif; ?>
+
+
+        <?php
+        $statusClass = match ($task->status) {
+            'in_bearbeitung' => 'badge bg-info text-dark',
+            'geschlossen' => 'badge bg-secondary',
+            default => 'badge bg-light text-dark border',
+        };
+        $statusLabel = match ($task->status) {
+            'in_bearbeitung' => 'IN BEARBEITUNG',
+            'geschlossen' => 'GESCHLOSSEN',
+            default => 'OFFEN',
+        };
+        ?>
+        <div class="mb-3">
+            <span class="<?= $statusClass ?>"><?= $statusLabel ?></span>
+            <?php if ($task->status === 'geschlossen' && $task->closed_at): ?>
+                <span class="small text-muted ms-2">
+                    Geschlossen
+                    <?php if ($task->closedByUser): ?>von <?= Html::encode($task->closedByUser->displayName) ?><?php endif; ?>
+                    am <?= Yii::$app->formatter->asDatetime($task->closed_at) ?>
+                </span>
+            <?php endif; ?>
+        </div>
+
+        <?php if ($task->taskList): ?>
+            <div class="mb-3 small">
+                <span class="badge" style="background-color: <?= Html::encode($task->taskList->color) ?>; color:#fff;">
+                    <?= Html::encode($task->taskList->name) ?>
+                </span>
+            </div>
+        <?php endif; ?>
+
+        <!-- CHECKLISTE -->
+        <?php
+        $canEditChecklist = $canEditTask;
+        $checklistItems = $task->checklistItems;
+        $doneCount = count(array_filter($checklistItems, static fn($item) => (bool) $item->is_done));
+        $spaceMembers = User::find()
+            ->innerJoin('space_membership sm', 'sm.user_id = user.id')
+            ->where([
+                'sm.space_id' => $contentContainer->id,
+                'sm.status' => Membership::STATUS_MEMBER,
+            ])
+            ->orderBy(['user.username' => SORT_ASC])
+            ->all();
+        $spaceUserSearchUrl = Url::to(['/user/search/json', 'space_id' => $contentContainer->id]);
+        $calendarAvailable = CalendarSyncService::isAvailable($contentContainer);
+        $calendarCanCreate = CalendarSyncService::canCreate($contentContainer);
+        ?>
+
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center py-2">
+                <strong>Checkliste</strong>
+                <?php if (!empty($checklistItems)): ?>
+                    <span class="badge bg-secondary"><?= $doneCount ?> / <?= count($checklistItems) ?></span>
+                <?php endif; ?>
+            </div>
+            <div class="card-body p-2">
+                <?php if (empty($checklistItems)): ?>
+                    <p class="text-muted mb-2">Noch keine Checklistenpunkte vorhanden.</p>
+                <?php else: ?>
+                    <div class="mb-2">
+                        <?php foreach ($checklistItems as $index => $item): ?>
+                            <div class="list-group-item <?= $item->is_done ? 'list-group-item-success' : '' ?> border rounded px-2 py-2 mb-1">
+                                <div class="d-flex align-items-start gap-2">
+                                    <?php if ($canEditChecklist): ?>
+                                        <?= Html::beginForm($contentContainer->createUrl('/todo/task/checklist-toggle', ['id' => $task->id, 'itemId' => $item->id]), 'post', ['class' => 'm-0']) ?>
+                                        <?= Html::submitButton($item->is_done ? '<i class="fa fa-check-square"></i>' : '<i class="fa fa-square-o"></i>', [
+                                            'class' => 'btn btn-sm ' . ($item->is_done ? 'btn-success' : 'btn-outline-secondary'),
+                                            'title' => $item->is_done ? 'Wieder öffnen' : 'Abhaken',
+                                            'aria-label' => $item->is_done ? 'Wieder öffnen' : 'Abhaken',
+                                        ]) ?>
+                                        <?= Html::endForm() ?>
+                                    <?php else: ?>
+                                        <span><?= $item->is_done ? '✓' : '○' ?></span>
+                                    <?php endif; ?>
+
+                                    <div class="flex-grow-1 min-width-0">
+                                        <div class="<?= $item->is_done ? 'text-decoration-line-through text-muted' : '' ?>">
+                                            <?= Html::encode($item->title) ?>
+                                        </div>
+
+                                        <?php if ($item->assignedUsers || $item->due_date || ($item->is_done && $item->completedByUser && $item->completed_at)): ?>
+                                            <div class="small text-muted mt-1">
+                                                <?php if ($item->assignedUsers): ?>
+                                                    <span class="me-3"><i class="fa fa-user"></i>
+                                                        <?= Html::encode(implode(', ', array_map(static fn($user) => $user->displayName, $item->assignedUsers))) ?>
+                                                    </span>
+                                                <?php endif; ?>
+                                                <?php if ($item->due_date): ?>
+                                                    <span class="me-3"><i class="fa fa-calendar"></i> Termin: <?= Yii::$app->formatter->asDate($item->due_date) ?><?= $item->sync_to_calendar ? ' · Kalender' : '' ?></span>
+                                                <?php endif; ?>
+                                                <?php if ($item->is_done && $item->completedByUser && $item->completed_at): ?>
+                                                    <span><i class="fa fa-check"></i> Erledigt von <?= Html::encode($item->completedByUser->displayName) ?> am <?= Yii::$app->formatter->asDate($item->completed_at) ?></span>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endif; ?>
+
+                                        <?php if ($canEditChecklist): ?>
+                                            <details class="mt-1">
+                                                <summary class="small text-muted" style="cursor:pointer">Bearbeiten</summary>
+                                                <?= Html::beginForm($contentContainer->createUrl('/todo/task/checklist-edit', ['id' => $task->id, 'itemId' => $item->id]), 'post', ['class' => 'row g-2 mt-1 align-items-end']) ?>
+                                                <div class="col-md-4">
+                                                    <label class="form-label small mb-1">Checklistenpunkt</label>
+                                                    <?= Html::textInput('title', $item->title, ['class' => 'form-control form-control-sm', 'maxlength' => 255, 'required' => true]) ?>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label small mb-1">Zuständig</label>
+                                                    <?= UserPickerField::widget([
+                                                        'name' => 'assigned_user_guids',
+                                                        'selection' => $item->assignedUsers,
+                                                        'defaultResults' => $spaceMembers,
+                                                        'url' => $spaceUserSearchUrl,
+                                                        'placeholder' => 'Benutzer auswählen',
+                                                        'placeholderMore' => 'Benutzer hinzufügen',
+                                                        'minInput' => 1,
+                                                    ]) ?>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="form-label small mb-1">Termin</label>
+                                                    <?= Html::input('date', 'due_date', $item->due_date, ['class' => 'form-control form-control-sm']) ?>
+                                                    <?php if ($calendarAvailable): ?>
+                                                        <div class="form-check mt-1">
+                                                            <?= Html::checkbox('sync_to_calendar', (bool) $item->sync_to_calendar, [
+                                                                'value' => 1,
+                                                                'class' => 'form-check-input',
+                                                                'id' => 'calendar-item-' . $item->id,
+                                                                'disabled' => !$item->calendar_entry_id && !$calendarCanCreate,
+                                                            ]) ?>
+                                                            <label class="form-check-label small" for="calendar-item-<?= $item->id ?>">Kalender</label>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <?= Html::submitButton('Speichern', ['class' => 'btn btn-sm btn-primary w-100']) ?>
+                                                </div>
+                                                <?= Html::endForm() ?>
+                                            </details>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <?php if ($canEditChecklist): ?>
+                                        <div class="d-flex gap-1 flex-shrink-0">
+                                            <?php if ($index > 0): ?>
+                                                <?= Html::beginForm($contentContainer->createUrl('/todo/task/checklist-move', ['id' => $task->id, 'itemId' => $item->id, 'direction' => 'up']), 'post', ['class' => 'm-0']) ?>
+                                                <?= Html::submitButton('<i class="fa fa-arrow-up"></i>', ['class' => 'btn btn-sm btn-outline-secondary', 'title' => 'Nach oben', 'aria-label' => 'Nach oben']) ?>
+                                                <?= Html::endForm() ?>
+                                            <?php endif; ?>
+                                            <?php if ($index < count($checklistItems) - 1): ?>
+                                                <?= Html::beginForm($contentContainer->createUrl('/todo/task/checklist-move', ['id' => $task->id, 'itemId' => $item->id, 'direction' => 'down']), 'post', ['class' => 'm-0']) ?>
+                                                <?= Html::submitButton('<i class="fa fa-arrow-down"></i>', ['class' => 'btn btn-sm btn-outline-secondary', 'title' => 'Nach unten', 'aria-label' => 'Nach unten']) ?>
+                                                <?= Html::endForm() ?>
+                                            <?php endif; ?>
+                                            <?= Html::beginForm($contentContainer->createUrl('/todo/task/checklist-delete', ['id' => $task->id, 'itemId' => $item->id]), 'post', ['class' => 'm-0']) ?>
+                                            <?= Html::submitButton('<i class="fa fa-trash"></i>', ['class' => 'btn btn-sm btn-outline-danger', 'title' => 'Löschen', 'aria-label' => 'Löschen', 'data-confirm' => 'Checklistenpunkt wirklich löschen?']) ?>
+                                            <?= Html::endForm() ?>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($canEditChecklist): ?>
+                    <?= Html::beginForm($contentContainer->createUrl('/todo/task/checklist-add', ['id' => $task->id]), 'post', ['class' => 'row g-2 align-items-end']) ?>
+                    <div class="col-md-4">
+                        <label class="form-label small mb-1">Checklistenpunkt</label>
+                        <?= Html::textInput('title', '', ['class' => 'form-control', 'placeholder' => 'Neuer Checklistenpunkt …', 'maxlength' => 255, 'required' => true]) ?>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small mb-1">Zuständig</label>
+                        <?= UserPickerField::widget([
+                            'name' => 'assigned_user_guids',
+                            'selection' => [],
+                            'defaultResults' => $spaceMembers,
+                            'url' => $spaceUserSearchUrl,
+                            'placeholder' => 'Benutzer auswählen',
+                            'placeholderMore' => 'Benutzer hinzufügen',
+                            'minInput' => 1,
+                        ]) ?>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small mb-1">Termin</label>
+                        <?= Html::input('date', 'due_date', '', ['class' => 'form-control']) ?>
+                        <?php if ($calendarAvailable): ?>
+                            <div class="form-check mt-1">
+                                <?= Html::checkbox('sync_to_calendar', false, [
+                                    'value' => 1,
+                                    'class' => 'form-check-input',
+                                    'id' => 'calendar-item-new',
+                                    'disabled' => !$calendarCanCreate,
+                                ]) ?>
+                                <label class="form-check-label small" for="calendar-item-new">Kalender</label>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    <div class="col-md-2">
+                        <?= Html::submitButton('<i class="fa fa-plus"></i> Hinzufügen', ['class' => 'btn btn-primary w-100']) ?>
+                    </div>
+                    <?= Html::endForm() ?>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <?php
+        $openChecklistCount = 0;
+        foreach ($task->checklistItems as $checklistItem) {
+            if (!$checklistItem->is_done) {
+                $openChecklistCount++;
+            }
+        }
+        ?>
+
+        <!-- META / DIREKT BEARBEITBAR -->
+        <div class="row g-3">
+
+            <div class="col-md-4">
+                <strong>Status</strong><?php if ($canEditTask): ?> <span class="text-muted small"><i class="fa fa-pencil"></i></span><?php endif; ?><br>
+
+                <?php if ($canEditTask): ?>
+                    <?= Html::beginForm(
+                        $contentContainer->createUrl('/todo/task/quick-update', ['id' => $task->id]),
+                        'post',
+                        ['class' => 'mt-1']
+                    ) ?>
+                    <?= Html::hiddenInput('field', 'status') ?>
+                    <?= Html::hiddenInput('confirm_open_checklist', '0', ['class' => 'js-confirm-open-checklist']) ?>
+                    <?= Html::dropDownList(
+                        'value',
+                        $task->status,
+                        [
+                            'offen' => 'Offen',
+                            'in_bearbeitung' => 'In Bearbeitung',
+                            'geschlossen' => 'Geschlossen',
+                        ],
+                        [
+                            'class' => 'form-control input-sm',
+                            'style' => 'max-width:190px;height:34px;cursor:pointer;',
+                            'onchange' => 'return todoConfirmClose(this, ' . (int) $openChecklistCount . ');',
+                            'aria-label' => 'Status ändern',
+                            'data-current-status' => $task->status,
+                        ]
+                    ) ?>
+                    <?= Html::endForm() ?>
+                <?php else: ?>
+                    <?php
+                    $statusText = match ($task->status) {
+                        'in_bearbeitung' => 'In Bearbeitung',
+                        'geschlossen' => 'Geschlossen',
+                        default => 'Offen',
+                    };
+                    ?>
+                    <?= Html::encode($statusText) ?>
+                <?php endif; ?>
+            </div>
+
+            <div class="col-md-4">
+                <strong>Priorität</strong><?php if ($canEditTask): ?> <span class="text-muted small"><i class="fa fa-pencil"></i></span><?php endif; ?><br>
+
+                <?php if ($canEditTask): ?>
+                    <?= Html::beginForm(
+                        $contentContainer->createUrl('/todo/task/quick-update', ['id' => $task->id]),
+                        'post',
+                        ['class' => 'mt-1']
+                    ) ?>
+                    <?= Html::hiddenInput('field', 'priority') ?>
+                    <?= Html::dropDownList(
+                        'value',
+                        $task->priority,
+                        [
+                            'niedrig' => 'Niedrig',
+                            'mittel' => 'Mittel',
+                            'hoch' => 'Hoch',
+                        ],
+                        [
+                            'class' => 'form-control input-sm',
+                            'style' => 'max-width:190px;height:34px;cursor:pointer;',
+                            'onchange' => 'this.form.submit();',
+                            'aria-label' => 'Priorität ändern',
+                        ]
+                    ) ?>
+                    <?= Html::endForm() ?>
+                <?php else: ?>
+                    <?= Html::encode(ucfirst($task->priority)) ?>
+                <?php endif; ?>
+            </div>
+
+            <div class="col-md-4">
+                <strong>Fällig</strong><?php if ($canEditTask): ?> <span class="text-muted small"><i class="fa fa-pencil"></i></span><?php endif; ?><br>
+
+                <?php if ($canEditTask): ?>
+                    <?= Html::beginForm(
+                        $contentContainer->createUrl('/todo/task/quick-update', ['id' => $task->id]),
+                        'post',
+                        ['class' => 'mt-1']
+                    ) ?>
+                    <?= Html::hiddenInput('field', 'due_date') ?>
+                    <div class="d-flex align-items-center gap-2">
+                        <?= Html::input(
+                            'date',
+                            'value',
+                            $task->due_date,
+                            [
+                                'class' => 'form-control input-sm',
+                                'style' => 'max-width:190px;height:34px;',
+                                'onchange' => 'this.form.submit();',
+                                'aria-label' => 'Fälligkeitsdatum ändern',
+                            ]
+                        ) ?>
+                        <?php if ($task->sync_to_calendar): ?>
+                            <span class="small text-muted" title="Mit Kalender synchronisiert">
+                                <i class="fa fa-calendar"></i>
+                            </span>
+                        <?php endif; ?>
+                    </div>
+                    <?= Html::endForm() ?>
+                <?php else: ?>
+                    <?= $task->due_date
+                        ? Yii::$app->formatter->asDate($task->due_date) . ($task->sync_to_calendar ? ' · Kalender' : '')
+                        : '—' ?>
+                <?php endif; ?>
+            </div>
+
+        </div>
+
+
+        <!-- ZUSTÄNDIG -->
+        <?php if (!empty($task->users)): ?>
+
+            <div class="mt-4">
+
+                <strong>Zuständig</strong>
+
+                <div class="mt-2">
+
+                    <?php foreach ($task->users as $user): ?>
+
+                        <div class="d-flex align-items-center mb-1">
+
+                            <?= UserImage::widget([
+                                'user' => $user,
+                                'width' => 24
+                            ]) ?>
+
+                            <span class="ms-2">
+                                <?= Html::encode($user->displayName) ?>
+                            </span>
+
+                        </div>
+
+                    <?php endforeach; ?>
+
+                </div>
+
+            </div>
+
+        <?php endif; ?>
+
+
+        <!-- ERSTELLT -->
+        <?php if ($task->content): ?>
+
+            <?php $creator = User::findOne($task->content->created_by); ?>
+
+            <?php if ($creator): ?>
+
+                <div class="mt-4">
+
+                    <strong>Erstellt</strong>
+
+                    <div class="mt-1 d-flex align-items-center">
+
+                        <?= UserImage::widget([
+                            'user' => $creator,
+                            'width' => 24
+                        ]) ?>
+
+                        <span class="ms-2">
+
+                            <?= Html::encode($creator->displayName) ?>
+
+                            ·
+
+                            <?= Yii::$app->formatter->asDatetime(
+                                $task->content->created_at
+                            ) ?>
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            <?php endif; ?>
+
+        <?php endif; ?>
+
+
+        <!-- LETZTE ÄNDERUNG -->
+        <?php if ($task->content && $task->content->updated_at): ?>
+
+            <div class="mt-2 text-muted">
+
+                zuletzt geändert:
+
+                <?= Yii::$app->formatter->asDatetime(
+                    $task->content->updated_at
+                ) ?>
+
+            </div>
+
+        <?php endif; ?>
+
+
+        <!-- DATEIEN / FOTOS -->
+        <?php $files = $task->files; ?>
+        <?php if (!empty($files)): ?>
+
+            <div class="mt-4">
+                <strong>Dateien & Fotos</strong>
+
+                <div class="mt-2 d-flex flex-column gap-2">
+                    <?php foreach ($files as $file): ?>
+                        <?php
+                        $isImage = str_starts_with((string) $file->mime_type, 'image/');
+                        $displayTitle = trim((string) $file->title);
+                        if ($displayTitle === '') {
+                            $displayTitle = pathinfo($file->file_name, PATHINFO_FILENAME);
+                        }
+                        ?>
+
+                        <div class="border rounded p-2 d-flex gap-3 align-items-start">
+                            <?php if ($isImage): ?>
+                                <?= Html::a(
+                                    Html::img(
+                                        $file->getUrl([], false),
+                                        [
+                                            'alt' => $displayTitle,
+                                            'loading' => 'lazy',
+                                            'style' => 'width:110px;height:80px;object-fit:cover;border-radius:4px;display:block;',
+                                        ]
+                                    ),
+                                    $file->getUrl([], false),
+                                    [
+                                        'target' => '_blank',
+                                        'rel' => 'noopener',
+                                        'class' => 'flex-shrink-0',
+                                        'title' => 'Foto öffnen',
+                                    ]
+                                ) ?>
+                            <?php else: ?>
+                                <div class="flex-shrink-0 d-flex align-items-center justify-content-center bg-light rounded"
+                                     style="width:70px;height:70px;font-size:28px;">
+                                    <i class="fa fa-file-o text-muted"></i>
+                                </div>
+                            <?php endif; ?>
+
+                            <div class="flex-grow-1 min-width-0">
+                                <div class="fw-semibold text-break">
+                                    <?= Html::encode($displayTitle) ?>
+                                </div>
+
+                                <div class="small text-muted text-break mb-2">
+                                    <?= Html::encode($file->file_name) ?>
+                                </div>
+
+                                <?php if ($canEditTask): ?>
+                                    <?= Html::beginForm(
+                                        $contentContainer->createUrl('/todo/task/update-file-title', [
+                                            'id' => $task->id,
+                                            'guid' => $file->guid,
+                                        ]),
+                                        'post',
+                                        ['class' => 'd-flex gap-1 mb-2']
+                                    ) ?>
+                                    <?= Html::textInput('title', $displayTitle, [
+                                        'class' => 'form-control form-control-sm',
+                                        'maxlength' => 255,
+                                        'placeholder' => 'Titel / kurze Beschreibung',
+                                        'aria-label' => 'Titel oder Beschreibung der Datei',
+                                    ]) ?>
+                                    <?= Html::submitButton(
+                                        '<i class="fa fa-save"></i>',
+                                        [
+                                            'class' => 'btn btn-sm btn-outline-secondary',
+                                            'title' => 'Titel speichern',
+                                            'aria-label' => 'Titel speichern',
+                                        ]
+                                    ) ?>
+                                    <?= Html::endForm() ?>
+                                <?php endif; ?>
+
+                                <div class="d-flex gap-1 flex-wrap">
+                                    <?= Html::a(
+                                        $isImage ? 'Öffnen' : 'Download',
+                                        $file->getUrl($isImage ? [] : ['download' => 1], false),
+                                        [
+                                            'class' => 'btn btn-sm btn-outline-primary',
+                                            'target' => $isImage ? '_blank' : null,
+                                            'rel' => $isImage ? 'noopener' : null,
+                                        ]
+                                    ) ?>
+
+                                    <?php if ($canEditTask): ?>
+                                        <?= Html::a(
+                                            'Löschen',
+                                            $contentContainer->createUrl('/todo/task/delete-file', [
+                                                'id' => $task->id,
+                                                'guid' => $file->guid,
+                                            ]),
+                                            [
+                                                'class' => 'btn btn-sm btn-outline-danger',
+                                                'data-confirm' => 'Datei wirklich löschen?',
+                                                'data-method' => 'post',
+                                            ]
+                                        ) ?>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+        <?php endif; ?>
+
+
+        <!-- DATEI DIREKT HINZUFÜGEN -->
+        <?php if ($canEditTask): ?>
+            <div class="mt-4">
+                <?= Html::button(
+                    '<i class="fa fa-paperclip"></i> Datei hinzufügen',
+                    [
+                        'class' => 'btn btn-sm btn-outline-secondary',
+                        'type' => 'button',
+                        'id' => 'todo-file-upload-open',
+                    ]
+                ) ?>
+            </div>
+
+            <div id="todo-file-upload-backdrop" class="todo-file-upload-backdrop" hidden>
+                <div class="todo-file-upload-dialog" role="dialog" aria-modal="true" aria-labelledby="todo-file-upload-title">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <strong id="todo-file-upload-title">Datei hinzufügen</strong>
+                        <?= Html::button('&times;', [
+                            'class' => 'btn btn-sm btn-light',
+                            'type' => 'button',
+                            'id' => 'todo-file-upload-close',
+                            'aria-label' => 'Dialog schliessen',
+                        ]) ?>
+                    </div>
+
+                    <?= Html::beginForm(
+                        $contentContainer->createUrl('/todo/task/upload-file', ['id' => $task->id]),
+                        'post',
+                        ['enctype' => 'multipart/form-data', 'id' => 'todo-file-upload-form']
+                    ) ?>
+
+                    <div class="mb-3">
+                        <?= Html::label('Datei', 'todo-upload-file', ['class' => 'form-label fw-semibold']) ?>
+                        <?= Html::fileInput('uploadFile', null, [
+                            'id' => 'todo-upload-file',
+                            'class' => 'form-control',
+                            'accept' => '.png,.jpg,.jpeg,.pdf,.doc,.docx,.xlsx',
+                            'required' => true,
+                        ]) ?>
+                        <div id="todo-upload-file-name" class="small text-muted mt-1"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <?= Html::label('Titel / kurze Beschreibung (optional)', 'todo-upload-title', ['class' => 'form-label fw-semibold']) ?>
+                        <?= Html::textInput('title', '', [
+                            'id' => 'todo-upload-title',
+                            'class' => 'form-control',
+                            'maxlength' => 255,
+                            'placeholder' => 'z.B. Bühne vor dem Aufbau',
+                        ]) ?>
+                        <div class="small text-muted mt-1">Ohne Titel wird automatisch der Dateiname verwendet.</div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <?= Html::button('Abbrechen', [
+                            'class' => 'btn btn-sm btn-light',
+                            'type' => 'button',
+                            'id' => 'todo-file-upload-cancel',
+                        ]) ?>
+                        <?= Html::submitButton('<i class="fa fa-upload"></i> Hochladen', [
+                            'class' => 'btn btn-sm btn-primary',
+                        ]) ?>
+                    </div>
+
+                    <?= Html::endForm() ?>
+                </div>
+            </div>
+
+            <style>
+                .todo-file-upload-backdrop {
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1055;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 20px;
+                    background: rgba(0, 0, 0, .35);
+                }
+                .todo-file-upload-backdrop[hidden] { display: none !important; }
+                .todo-file-upload-dialog {
+                    width: min(520px, 100%);
+                    max-height: calc(100vh - 40px);
+                    overflow: auto;
+                    background: #fff;
+                    border-radius: 6px;
+                    padding: 18px;
+                    box-shadow: 0 10px 35px rgba(0, 0, 0, .25);
+                }
+            </style>
+
+            <?php
+            $this->registerJs(<<<'JS'
+(function () {
+    const backdrop = document.getElementById('todo-file-upload-backdrop');
+    const openButton = document.getElementById('todo-file-upload-open');
+    const closeButton = document.getElementById('todo-file-upload-close');
+    const cancelButton = document.getElementById('todo-file-upload-cancel');
+    const fileInput = document.getElementById('todo-upload-file');
+    const fileName = document.getElementById('todo-upload-file-name');
+    const titleInput = document.getElementById('todo-upload-title');
+
+    if (!backdrop || !openButton) {
+        return;
+    }
+
+    const openDialog = function () {
+        backdrop.hidden = false;
+        window.setTimeout(function () { fileInput && fileInput.focus(); }, 0);
+    };
+
+    const closeDialog = function () {
+        backdrop.hidden = true;
+        if (fileInput) fileInput.value = '';
+        if (fileName) fileName.textContent = '';
+        if (titleInput) titleInput.value = '';
+        openButton.focus();
+    };
+
+    openButton.addEventListener('click', openDialog);
+    closeButton && closeButton.addEventListener('click', closeDialog);
+    cancelButton && cancelButton.addEventListener('click', closeDialog);
+
+    backdrop.addEventListener('click', function (event) {
+        if (event.target === backdrop) {
+            closeDialog();
+        }
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !backdrop.hidden) {
+            closeDialog();
+        }
+    });
+
+    fileInput && fileInput.addEventListener('change', function () {
+        fileName.textContent = fileInput.files && fileInput.files[0] ? fileInput.files[0].name : '';
+    });
+})();
+JS
+            );
+            ?>
+        <?php endif; ?>
+
+        <!-- KOMMUNIKATION -->
+        <div class="mt-4" id="todo-communication">
+            <strong>Kommunikation</strong>
+            <div class="small text-muted mt-1">
+                Nachrichten, Rückfragen und Absprachen zu dieser Aufgabe.
+            </div>
+
+            <div class="todo-communication-comments mt-2">
+                <?= Comments::widget([
+                    'object' => $task,
+                    'viewMode' => Comments::VIEW_MODE_FULL,
+                ]) ?>
+            </div>
+        </div>
+
+        <style>
+            /* The standard HumHub comment widget is collapsed in wall-preview mode.
+               On the dedicated ToDo detail page communication should always be visible. */
+            #todo-communication .comment-container {
+                display: block !important;
+                margin-top: .5rem !important;
+                border-radius: 6px;
+            }
+            #todo-communication .comment-container:empty {
+                display: none !important;
+            }
+        </style>
+
+
+
+    </div>
+
+</div>
+<?php
+$this->registerJs(<<<'JS'
+window.todoConfirmClose = function (select, openChecklistCount) {
+    if (select.value !== 'geschlossen' || openChecklistCount < 1) {
+        select.form.submit();
+        return true;
+    }
+
+    var label = openChecklistCount === 1 ? 'Checklistenpunkt' : 'Checklistenpunkte';
+    var message = 'Diese Aufgabe enthält noch ' + openChecklistCount + ' offene ' + label + '. Trotzdem schliessen?';
+
+    if (window.confirm(message)) {
+        var confirmField = select.form.querySelector('.js-confirm-open-checklist');
+        if (confirmField) {
+            confirmField.value = '1';
+        }
+        select.form.submit();
+        return true;
+    }
+
+    // Auswahl wieder auf den bisherigen Status zurücksetzen.
+    select.value = select.getAttribute('data-current-status') || 'offen';
+    return false;
+};
+JS
+);
+?>
