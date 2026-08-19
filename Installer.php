@@ -9,11 +9,12 @@ class Installer
 {
     public function onInstall()
     {
-        // Default: deaktiviert (0), aktiviert (1), immer aktiviert (2)
+        // New installations opt in per Space. This avoids exposing task data or
+        // navigation entries before permissions and settings were reviewed.
         ContentContainerModuleManager::setDefaultState(
             'todo',
             Space::class,
-            ContentContainerModuleManager::STATE_ENABLED
+            ContentContainerModuleManager::STATE_DISABLED
         );
     }
 }
