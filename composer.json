@@ -1,0 +1,11 @@
+{
+  "name": "kilian70/humhub-modules-todo",
+  "description": "Space based ToDo and checklist module for HumHub",
+  "type": "humhub-module",
+  "license": "AGPL-3.0-or-later",
+  "config": {
+    "platform": {
+      "php": "8.2"
+    }
+  }
+}
