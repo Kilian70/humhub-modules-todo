@@ -3,6 +3,14 @@
   "description": "Space based ToDo and checklist module for HumHub",
   "type": "humhub-module",
   "license": "AGPL-3.0-or-later",
+  "require": {
+    "php": ">=8.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "humhub\\modules\\todo\\": ""
+    }
+  },
   "config": {
     "platform": {
       "php": "8.2"

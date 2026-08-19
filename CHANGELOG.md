@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.8.6 - 2026-08-19
+
+- Composer-Metadaten um PHP-Anforderung und PSR-4-Autoloading ergänzt
+- Aufgabenübersicht und Suche auf 25 Einträge pro Seite begrenzt
+- neue Installationen aktivieren das Modul nicht mehr ungeprüft in allen Spaces
+- deutsche und englische Übersetzungsgrundlage ergänzt
+- automatisierte Syntax-, Metadaten- und Strukturprüfungen ergänzt
+- GitHub-Actions-Workflow für PHP 8.2 und 8.3 ergänzt
+
 ## 1.8.5 - 2026-08-19
 
 - Warnung beim Schliessen einer Aufgabe mit offenen Checklistenpunkten

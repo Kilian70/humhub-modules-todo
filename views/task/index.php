@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\widgets\LinkPager;
 use humhub\modules\user\widgets\Image as UserImage;
 
 $groupBy = $groupBy ?? Yii::$app->request->get('group', 'list');
@@ -174,6 +175,8 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
         <?php endif; ?>
     </div>
 </div>
+
+<?= LinkPager::widget(['pagination' => $pagination]) ?>
 
 <?php
 $this->registerCss(<<<CSS
