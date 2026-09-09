@@ -1,22 +1,50 @@
-name: HumHub runtime tests
+name: HumHub compatibility smoke tests
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '53 3 * * 1'
+    - cron: '59 3 * * 1'
 
 permissions:
   contents: read
 
 jobs:
-  stable:
-    name: HumHub Stable
-    uses: humhub/module-coding-standards/.github/workflows/codeception-master.yml@main
-    with:
-      module-id: todo
+  compatibility:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - humhub: '1.18.5'
+            ref: 'v1.18.5'
+            php: '8.2'
+          - humhub: '1.19.0-beta.2'
+            ref: 'v1.19.0-beta.2'
+            php: '8.3'
 
-  develop:
-    name: HumHub Develop
-    uses: humhub/module-coding-standards/.github/workflows/codeception-develop.yml@main
-    with:
-      module-id: todo
+    steps:
+      - name: Check out module
+        uses: actions/checkout@v5
+        with:
+          path: todo
+
+      - name: Check out HumHub
+        uses: actions/checkout@v5
+        with:
+          repository: humhub/humhub
+          ref: ${{ matrix.ref }}
+          path: humhub
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer:v2
+          coverage: none
+
+      - name: Install HumHub dependencies
+        working-directory: humhub/protected
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Run compatibility smoke test
+        run: php todo/tests/humhub-compatibility.php humhub "${{ matrix.humhub }}"
