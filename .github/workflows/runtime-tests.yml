@@ -43,7 +43,7 @@ jobs:
           coverage: none
 
       - name: Install HumHub dependencies
-        working-directory: humhub/protected
+        working-directory: humhub
         run: composer install --no-interaction --prefer-dist --no-progress
 
       - name: Run compatibility smoke test
