@@ -113,6 +113,63 @@ $canWorkOnTask = $task->canWorkOn();
             </div>
         <?php endif; ?>
 
+        <?php if ($task->parentTask): ?>
+            <div class="mb-3 small">
+                <i class="fa fa-level-up"></i>
+                Hauptaufgabe:
+                <?= Html::a(
+                    Html::encode($task->parentTask->title),
+                    $contentContainer->createUrl('/todo/task/view', ['id' => $task->parentTask->id])
+                ) ?>
+            </div>
+        <?php endif; ?>
+
+        <?php
+        $subtasks = $task->subtasks;
+        $completedSubtasks = count(array_filter($subtasks, static fn($subtask) => $subtask->status === 'geschlossen'));
+        $canCreateSubtasks = $contentContainer->permissionManager->can(new \humhub\modules\todo\permissions\CreateTasks());
+        ?>
+        <details class="card mb-4" <?= empty($subtasks) ? '' : 'open' ?>>
+            <summary class="card-header py-2" style="cursor:pointer;list-style:none;">
+                <span class="d-flex justify-content-between align-items-center">
+                    <strong><i class="fa fa-sitemap"></i> Unteraufgaben</strong>
+                    <span class="badge bg-secondary"><?= $completedSubtasks ?> / <?= count($subtasks) ?></span>
+                </span>
+            </summary>
+            <div class="card-body p-2">
+                <?php if (empty($subtasks)): ?>
+                    <p class="text-muted mb-2">Noch keine Unteraufgaben vorhanden.</p>
+                <?php else: ?>
+                    <div class="list-group mb-2">
+                        <?php foreach ($subtasks as $subtask): ?>
+                            <?php
+                            $subtaskStatus = match ($subtask->status) {
+                                'geschlossen' => ['success', 'Erledigt'],
+                                'in_bearbeitung' => ['info', 'In Bearbeitung'],
+                                default => ['secondary', 'Offen'],
+                            };
+                            ?>
+                            <?= Html::a(
+                                '<span>' . Html::encode($subtask->title) . '</span>'
+                                . '<span class="ms-2">'
+                                . ($subtask->due_date ? '<small class="text-muted me-2"><i class="fa fa-calendar"></i> ' . Yii::$app->formatter->asDate($subtask->due_date) . '</small>' : '')
+                                . '<span class="badge bg-' . $subtaskStatus[0] . '">' . $subtaskStatus[1] . '</span></span>',
+                                $contentContainer->createUrl('/todo/task/view', ['id' => $subtask->id]),
+                                ['class' => 'list-group-item list-group-item-action d-flex justify-content-between align-items-center']
+                            ) ?>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+                <?php if ($canCreateSubtasks): ?>
+                    <?= Html::a(
+                        '<i class="fa fa-plus"></i> Unteraufgabe erstellen',
+                        $contentContainer->createUrl('/todo/task/create', ['parent_id' => $task->id]),
+                        ['class' => 'btn btn-sm btn-primary']
+                    ) ?>
+                <?php endif; ?>
+            </div>
+        </details>
+
         <!-- CHECKLISTE -->
         <?php
         $canEditChecklist = $canWorkOnTask;

@@ -42,6 +42,7 @@ final class RecurringTaskService
             'due_date' => $nextDate,
             'sync_to_calendar' => $source->sync_to_calendar,
             'task_list_id' => $source->task_list_id,
+            'parent_task_id' => $source->parent_task_id,
             'recurrence_type' => $source->recurrence_type,
             'recurrence_interval' => $source->recurrence_interval,
             'recurrence_end_date' => $source->recurrence_end_date,

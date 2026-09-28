@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.12.0 - 2026-09-28
+
+- vollständige Aufgaben können als Unteraufgaben einer Hauptaufgabe angelegt werden
+- Unteraufgaben behalten eigene Zuständige, Termine, Erinnerungen, Dateien und Kommunikation
+- einklappbare Unteraufgabenübersicht mit Status und Fortschritt ergänzt
+- Rücksprung von der Unteraufgabe zur Hauptaufgabe ergänzt
+- Unteraufgaben erscheinen nicht doppelt in der normalen Space-Aufgabenliste
+- Space-übergreifende Verknüpfungen und zyklische Aufgabenhierarchien werden verhindert
+- wiederkehrende Unteraufgaben bleiben derselben Hauptaufgabe zugeordnet
+
 ## 1.11.0 - 2026-09-28
 
 - tägliche, wöchentliche, monatliche und jährliche Wiederholungen ergänzt
