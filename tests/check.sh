@@ -69,6 +69,7 @@ foreach ([
     "models/TaskDependency.php",
     "services/TaskDependencyService.php",
     "migrations/m260928_200000_task_dependencies.php",
+    "notifications/TaskUnblocked.php",
 ] as $file) {
     if (!is_file($file)) {
         fwrite(STDERR, "Missing task history component: {$file}\n");
