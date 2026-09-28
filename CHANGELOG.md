@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.8.7 - 2026-09-28
+
+- Kompatibilität mit der geänderten Space-Modul-API in HumHub 1.19 hergestellt
+- aktive Menüerkennung an die aktuelle HumHub-API angepasst
+- Kommentarbereich für HumHub 1.18 und 1.19 kompatibel gemacht
+- Dashboard-Abfragen für MySQL im Strict Mode korrigiert
+- vollständige Deinstallation entfernt ToDo-Tabellen und zugehörige HumHub-Inhalte
+- zusätzliche Regressionstests für die HumHub-1.19-Kompatibilität ergänzt
+
 ## 1.8.6 - 2026-08-19
 
 - Composer-Metadaten um PHP-Anforderung und PSR-4-Autoloading ergänzt

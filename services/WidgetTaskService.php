@@ -12,7 +12,7 @@ class WidgetTaskService
         return Task::find()
             ->contentContainer($space)
             ->andWhere(['!=', 'todo_task.status', 'geschlossen'])
-            ->orderBy(new \yii\db\Expression('CASE WHEN todo_task.due_date IS NULL OR todo_task.due_date = "" THEN 1 ELSE 0 END ASC, todo_task.due_date ASC, todo_task.id DESC'))
+            ->orderBy(new \yii\db\Expression('CASE WHEN todo_task.due_date IS NULL THEN 1 ELSE 0 END ASC, todo_task.due_date ASC, todo_task.id DESC'))
             ->limit($limit)
             ->all();
     }
@@ -27,7 +27,7 @@ class WidgetTaskService
             ->joinWith('taskUsers')
             ->andWhere(['todo_task_user.user_id' => Yii::$app->user->id])
             ->andWhere(['!=', 'todo_task.status', 'geschlossen'])
-            ->orderBy(new \yii\db\Expression('CASE WHEN todo_task.due_date IS NULL OR todo_task.due_date = "" THEN 1 ELSE 0 END ASC, todo_task.due_date ASC, todo_task.id DESC'))
+            ->orderBy(new \yii\db\Expression('CASE WHEN todo_task.due_date IS NULL THEN 1 ELSE 0 END ASC, todo_task.due_date ASC, todo_task.id DESC'))
             ->distinct();
 
         if ($hardLimit !== null) {
