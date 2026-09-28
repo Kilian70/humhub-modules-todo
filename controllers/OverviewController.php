@@ -3,7 +3,7 @@
 namespace humhub\modules\todo\controllers;
 
 use humhub\components\Controller;
-use humhub\modules\todo\services\WidgetTaskService;
+use humhub\modules\todo\services\OverviewTaskService;
 use Yii;
 
 class OverviewController extends Controller
@@ -14,8 +14,6 @@ class OverviewController extends Controller
             return $this->redirect(['/user/auth/login']);
         }
 
-        return $this->render('index', [
-            'tasks' => WidgetTaskService::getMyTasks(100, 100),
-        ]);
+        return $this->render('index', OverviewTaskService::getOverview(Yii::$app->request->get()));
     }
 }
