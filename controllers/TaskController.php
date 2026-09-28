@@ -52,6 +52,8 @@ class TaskController extends ContentContainerController
                 'duplicate' => ['POST'],
                 'archive' => ['POST'],
                 'restore' => ['POST'],
+                'restore-trash' => ['POST'],
+                'permanent-delete' => ['POST'],
             ],
         ];
 
@@ -84,18 +86,25 @@ public function actionIndex()
         ->contentContainer($this->contentContainer)
         ->andWhere(['todo_task.parent_task_id' => null]);
 
-    $showArchive = Yii::$app->request->get('archive') === '1';
+    $showTrash = Yii::$app->request->get('trash') === '1';
+    $showArchive = !$showTrash && Yii::$app->request->get('archive') === '1';
+    if ($showTrash) {
+        $query->andWhere(['not', ['todo_task.deleted_at' => null]]);
+        $viewMode = 'list';
+    } else {
+        $query->andWhere(['todo_task.deleted_at' => null]);
+    }
     if ($showArchive) {
         $query->andWhere(['not', ['todo_task.archived_at' => null]]);
         $viewMode = 'list';
-    } else {
+    } elseif (!$showTrash) {
         $query->andWhere(['todo_task.archived_at' => null]);
     }
 
     // Geschlossene Aufgaben werden separat angezeigt.
     $done = Yii::$app->request->get('done');
 
-    if ($showArchive) {
+    if ($showArchive || $showTrash) {
         // The archive contains completed tasks regardless of the current work view.
     } elseif ($viewMode === 'kanban') {
         // The board displays every workflow state side by side.
@@ -273,6 +282,7 @@ public function actionIndex()
         'spaceUsers' => Membership::getSpaceMembersQuery($this->contentContainer)->all(),
         'taskLabels' => TaskLabel::findForSpace((int) $this->contentContainer->id),
         'showArchive' => $showArchive,
+        'showTrash' => $showTrash,
     ]);
 }
 
@@ -362,7 +372,7 @@ public function actionUpdate($id)
 	
     $model = Task::find()
         ->contentContainer($this->contentContainer)
-        ->where(['todo_task.id' => $id])
+        ->andWhere(['todo_task.id' => $id, 'todo_task.deleted_at' => null])
         ->one();
 
     if (!$model) {
@@ -672,7 +682,7 @@ public function actionKanbanOrder()
     $validIds = Task::find()
         ->contentContainer($this->contentContainer)
         ->select('todo_task.id')
-        ->andWhere(['todo_task.id' => $taskIds, 'todo_task.parent_task_id' => null])
+        ->andWhere(['todo_task.id' => $taskIds, 'todo_task.parent_task_id' => null, 'todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
         ->column();
     sort($validIds);
     $submittedIds = $taskIds;
@@ -701,7 +711,7 @@ public function actionDelete($id)
 
     $model = Task::find()
         ->contentContainer($this->contentContainer)
-        ->where(['todo_task.id' => $id])
+        ->andWhere(['todo_task.id' => $id, 'todo_task.deleted_at' => null])
         ->one();
 
     if (!$model) {
@@ -712,12 +722,41 @@ public function actionDelete($id)
         throw new \yii\web\ForbiddenHttpException();
     }
 
-    $model->delete();
+    if ($model->deleted_at === null) {
+        $model->updateAttributes([
+            'deleted_at' => date('Y-m-d H:i:s'),
+            'deleted_by' => Yii::$app->user->id,
+        ]);
+        TaskHistoryService::record($model, 'trashed', Yii::t('TodoModule.base', 'Aufgabe in den Papierkorb verschoben'));
+    }
 
    return $this->redirect(
     Yii::$app->request->referrer
     ?: $this->contentContainer->createUrl('/todo/task/index')
 );
+}
+
+public function actionRestoreTrash($id)
+{
+    $model = $this->findTaskForArchive((int) $id);
+    if (!$model->canDelete()) {
+        throw new \yii\web\ForbiddenHttpException();
+    }
+    if ($model->deleted_at !== null) {
+        $model->updateAttributes(['deleted_at' => null, 'deleted_by' => null]);
+        TaskHistoryService::record($model, 'trash_restored', Yii::t('TodoModule.base', 'Aufgabe aus dem Papierkorb wiederhergestellt'));
+    }
+    return $this->redirect($this->contentContainer->createUrl('/todo/task/view', ['id' => $model->id]));
+}
+
+public function actionPermanentDelete($id)
+{
+    $model = $this->findTaskForArchive((int) $id);
+    if (!$this->contentContainer->isAdmin() || $model->deleted_at === null) {
+        throw new \yii\web\ForbiddenHttpException();
+    }
+    $model->content->hardDelete();
+    return $this->redirect($this->contentContainer->createUrl('/todo/task/index', ['trash' => 1]));
 }
 
 public function actionArchive($id)
@@ -779,7 +818,7 @@ public function actionDuplicate($id)
 
     $source = Task::find()
         ->contentContainer($this->contentContainer)
-        ->andWhere(['todo_task.id' => (int) $id])
+        ->andWhere(['todo_task.id' => (int) $id, 'todo_task.deleted_at' => null])
         ->one();
     if (!$source || !$source->canView()) {
         throw new NotFoundHttpException();
@@ -808,7 +847,7 @@ public function actionView($id)
 
     $task = Task::find()
         ->contentContainer($this->contentContainer)
-        ->andWhere(['todo_task.id' => $id])
+        ->andWhere(['todo_task.id' => $id, 'todo_task.deleted_at' => null])
         ->one();
 
     if (!$task) {

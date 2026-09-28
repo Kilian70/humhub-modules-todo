@@ -28,7 +28,7 @@ final class AutoArchiveService
             $cutoff = date('Y-m-d H:i:s', strtotime('-' . $days . ' days'));
             $tasks = Task::find()
                 ->contentContainer($space)
-                ->andWhere(['todo_task.status' => 'geschlossen', 'todo_task.archived_at' => null])
+                ->andWhere(['todo_task.status' => 'geschlossen', 'todo_task.archived_at' => null, 'todo_task.deleted_at' => null])
                 ->andWhere(['not', ['todo_task.closed_at' => null]])
                 ->andWhere(['<=', 'todo_task.closed_at', $cutoff])
                 ->each();

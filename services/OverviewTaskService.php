@@ -19,6 +19,7 @@ final class OverviewTaskService
             ->joinWith('content')
             ->leftJoin('todo_task_user overview_tu', 'overview_tu.task_id = todo_task.id')
             ->with(['users', 'parentTask'])
+            ->andWhere(['todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
             ->distinct();
 
         if ($filters['scope'] === 'assigned') {
@@ -70,7 +71,7 @@ final class OverviewTaskService
 
     private static function getVisibleSpaces(int $userId): array
     {
-        $tasks = Task::find()->joinWith('content')
+        $tasks = Task::find()->joinWith('content')->andWhere(['todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
             ->leftJoin('todo_task_user overview_space_tu', 'overview_space_tu.task_id = todo_task.id')
             ->andWhere(['or', ['overview_space_tu.user_id' => $userId], ['content.created_by' => $userId]])
             ->distinct()->limit(self::MAX_RESULTS)->all();

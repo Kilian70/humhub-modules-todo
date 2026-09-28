@@ -23,6 +23,7 @@ class ReminderService
 
         $tasks = Task::find()
             ->with(['users', 'content.createdBy'])
+            ->andWhere(['todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
             ->andWhere(['!=', 'todo_task.status', 'geschlossen'])
             ->andWhere(['not', ['todo_task.due_date' => null]])
             ->andWhere(['<=', 'todo_task.due_date', $latestDueDate])

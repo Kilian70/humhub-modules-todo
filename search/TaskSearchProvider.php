@@ -14,7 +14,7 @@ class TaskSearchProvider implements SearchProvider
     public function search($query, SearchResultSet $resultSet)
     {
 
-        $taskQuery = Task::find()->readable();
+        $taskQuery = Task::find()->readable()->andWhere(['todo_task.deleted_at' => null, 'todo_task.archived_at' => null]);
 
         if ($resultSet->contentContainer !== null) {
             $taskQuery->contentContainer($resultSet->contentContainer);
