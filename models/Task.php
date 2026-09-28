@@ -45,6 +45,7 @@ class Task extends ContentActiveRecord implements ViewableInterface
     public $wallEntryClass = \humhub\modules\todo\widgets\WallEntry::class;
 
     public $user_ids = [];
+    public $label_ids = [];
 
     /** Name of the selected/new task list, resolved by the controller per Space. */
     public $task_list_name = '';
@@ -81,6 +82,7 @@ class Task extends ContentActiveRecord implements ViewableInterface
             [['task_list_name'], 'string', 'max' => 100],
 
             [['user_ids'], 'each', 'rule' => ['string', 'max' => 36]],
+            [['label_ids'], 'each', 'rule' => ['integer']],
 
             [['uploadFiles'], 'file',
                 'maxFiles' => 10,
@@ -140,6 +142,7 @@ class Task extends ContentActiveRecord implements ViewableInterface
             'due_date' => Yii::t('TodoModule.base', 'Fällig'),
             'sync_to_calendar' => Yii::t('TodoModule.base', 'Im Kalender eintragen'),
             'user_ids' => Yii::t('TodoModule.base', 'Zuständig'),
+            'label_ids' => Yii::t('TodoModule.base', 'Labels'),
             'status' => Yii::t('TodoModule.base', 'Status'),
             'uploadFiles' => Yii::t('TodoModule.base', 'Dateien'),
             'recurrence_type' => Yii::t('TodoModule.base', 'Wiederholung'),
@@ -335,6 +338,13 @@ class Task extends ContentActiveRecord implements ViewableInterface
         return $this->hasMany(TaskUser::class, ['task_id' => 'id']);
     }
 
+    public function getLabels()
+    {
+        return $this->hasMany(TaskLabel::class, ['id' => 'label_id'])
+            ->viaTable('todo_task_label_map', ['task_id' => 'id'])
+            ->orderBy(['todo_task_label.sort_order' => SORT_ASC, 'todo_task_label.name' => SORT_ASC]);
+    }
+
     public function getChecklistItems()
     {
         return $this->hasMany(ChecklistItem::class, ['task_id' => 'id'])
@@ -381,6 +391,7 @@ class Task extends ContentActiveRecord implements ViewableInterface
         parent::afterFind();
 
         $this->user_ids = array_map(fn($user) => $user->guid, $this->users);
+        $this->label_ids = array_map(static fn($label) => (int) $label->id, $this->labels);
         $this->task_list_name = $this->taskList ? $this->taskList->name : '';
     }
 
@@ -414,10 +425,16 @@ public function afterSave($insert, $changedAttributes)
      * Alte User sichern
      */
     $oldUserIds = [];
+    $oldLabelIds = [];
 
     if (!$insert) {
         $oldUserIds = TaskUser::find()
             ->select('user_id')
+            ->where(['task_id' => $this->id])
+            ->column();
+        $oldLabelIds = (new \yii\db\Query())
+            ->select('label_id')
+            ->from('todo_task_label_map')
             ->where(['task_id' => $this->id])
             ->column();
     }
@@ -427,6 +444,7 @@ public function afterSave($insert, $changedAttributes)
      * Alte Zuordnungen löschen
      */
     TaskUser::deleteAll(['task_id' => $this->id]);
+    Yii::$app->db->createCommand()->delete('todo_task_label_map', ['task_id' => $this->id])->execute();
 
 
     /**
@@ -449,6 +467,22 @@ public function afterSave($insert, $changedAttributes)
 
                 $newUserIds[] = $user->id;
             }
+        }
+    }
+
+    $newLabelIds = [];
+    if (is_array($this->label_ids)) {
+        $spaceId = (int) ($this->content?->container?->id ?? 0);
+        $validLabelIds = TaskLabel::find()
+            ->select('id')
+            ->where(['space_id' => $spaceId, 'id' => array_map('intval', $this->label_ids)])
+            ->column();
+        foreach ($validLabelIds as $labelId) {
+            Yii::$app->db->createCommand()->insert('todo_task_label_map', [
+                'task_id' => $this->id,
+                'label_id' => (int) $labelId,
+            ])->execute();
+            $newLabelIds[] = (int) $labelId;
         }
     }
 
@@ -481,6 +515,12 @@ public function afterSave($insert, $changedAttributes)
     }
     foreach (User::findAll(['id' => $removedUserIds]) as $user) {
         TaskHistoryService::record($this, 'assignee_removed', $user->displayName . ' wurde entfernt');
+    }
+    if (!$insert && (
+        array_values(array_diff($oldLabelIds, $newLabelIds)) !== []
+        || array_values(array_diff($newLabelIds, $oldLabelIds)) !== []
+    )) {
+        TaskHistoryService::record($this, 'labels_updated', 'Labels geändert');
     }
 
 

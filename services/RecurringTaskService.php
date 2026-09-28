@@ -47,6 +47,7 @@ final class RecurringTaskService
             'recurrence_interval' => $source->recurrence_interval,
             'recurrence_end_date' => $source->recurrence_end_date,
             'user_ids' => array_map(static fn($user) => $user->guid, $source->users),
+            'label_ids' => array_map(static fn($label) => (int) $label->id, $source->labels),
         ]);
         $next->content->container = $source->content->container;
 

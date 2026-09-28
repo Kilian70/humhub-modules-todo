@@ -7,6 +7,7 @@ use humhub\modules\content\components\ContentContainerController;
 use humhub\modules\todo\models\Task;
 use humhub\modules\todo\models\ChecklistItem;
 use humhub\modules\todo\models\TaskList;
+use humhub\modules\todo\models\TaskLabel;
 use humhub\modules\todo\models\TaskDependency;
 use humhub\modules\todo\permissions\ViewTasks;
 use humhub\modules\todo\permissions\CreateTasks;
@@ -115,6 +116,13 @@ public function actionIndex()
         $query->joinWith('taskUsers')
             ->andWhere(['todo_task_user.user_id' => $assigneeId]);
     }
+
+    $labelId = (int) Yii::$app->request->get('label_id', 0);
+    if ($labelId > 0) {
+        $query->joinWith('labels')
+            ->andWhere(['todo_task_label.id' => $labelId]);
+    }
+    $query->distinct();
 
     // 🔽 SORTIERUNG
     $groupBy = Yii::$app->request->get('group', 'list');
@@ -233,6 +241,7 @@ public function actionIndex()
         'viewMode' => $viewMode,
         'taskLists' => TaskList::findForSpace((int) $this->contentContainer->id),
         'spaceUsers' => Membership::getSpaceMembersQuery($this->contentContainer)->all(),
+        'taskLabels' => TaskLabel::findForSpace((int) $this->contentContainer->id),
     ]);
 }
 

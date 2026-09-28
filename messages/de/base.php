@@ -1,6 +1,15 @@
 <?php
 
 return [
+    'Hinzufügen' => 'Hinzufügen',
+    'Label' => 'Label',
+    'Labels' => 'Labels',
+    'Labels helfen, Aufgaben unabhängig von ihrer Aufgabenliste zu kennzeichnen und zu filtern.' => 'Labels helfen, Aufgaben unabhängig von ihrer Aufgabenliste zu kennzeichnen und zu filtern.',
+    'Labels verwalten' => 'Labels verwalten',
+    'Label wirklich löschen? Die Aufgaben bleiben erhalten.' => 'Label wirklich löschen? Die Aufgaben bleiben erhalten.',
+    'Name des neuen Labels' => 'Name des neuen Labels',
+    'Neues Label' => 'Neues Label',
+    'Noch keine Labels vorhanden.' => 'Noch keine Labels vorhanden.',
     'Ansicht' => 'Ansicht',
     'Aufgabe nicht gefunden.' => 'Aufgabe nicht gefunden.',
     'Der Status konnte nicht geändert werden.' => 'Der Status konnte nicht geändert werden.',

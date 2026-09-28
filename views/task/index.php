@@ -14,6 +14,7 @@ $filterParams = [
     'priority' => Yii::$app->request->get('priority'),
     'list_id' => Yii::$app->request->get('list_id'),
     'assignee_id' => Yii::$app->request->get('assignee_id'),
+    'label_id' => Yii::$app->request->get('label_id'),
 ];
 
 $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $currentDone, $isMy, $groupBy) {
@@ -47,6 +48,9 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
                 <span class="<?= $priorityClass ?>"><?= ucfirst(Html::encode($task->priority)) ?></span>
                 <span class="<?= $statusClass ?>"><?= $statusLabel ?></span>
                 <?php if ($isOverdue): ?><span class="badge bg-danger"><?= Yii::t('TodoModule.base', 'ÜBERFÄLLIG') ?></span><?php endif; ?>
+                <?php foreach ($task->labels as $label): ?>
+                    <span class="badge" style="background:<?= Html::encode($label->color) ?>;color:#fff;"><?= Html::encode($label->name) ?></span>
+                <?php endforeach; ?>
             </div>
             <div class="small text-muted d-flex flex-wrap align-items-center gap-2 mt-1">
                 <?php if ($task->due_date): ?>
@@ -129,6 +133,9 @@ $kanbanCard = function ($task) use ($contentContainer) {
             <span class="badge <?= $priorityClass ?>"><?= Html::encode(Yii::t('TodoModule.base', ucfirst($task->priority))) ?></span>
             <?php if ($isOverdue): ?><span class="badge bg-danger"><?= Yii::t('TodoModule.base', 'ÜBERFÄLLIG') ?></span><?php endif; ?>
             <?php if ($task->getOpenBlockingTasks()->exists()): ?><span class="badge bg-warning text-dark"><?= Yii::t('TodoModule.base', 'BLOCKIERT') ?></span><?php endif; ?>
+            <?php foreach ($task->labels as $label): ?>
+                <span class="badge" style="background:<?= Html::encode($label->color) ?>;color:#fff;"><?= Html::encode($label->name) ?></span>
+            <?php endforeach; ?>
         </div>
         <?php if ($task->due_date || !empty($task->users)): ?>
         <div class="todo-kanban-meta">
@@ -175,6 +182,7 @@ $kanbanCard = function ($task) use ($contentContainer) {
             </div>
             <?php if ($contentContainer->permissionManager->can(new \humhub\modules\todo\permissions\EditTasks())): ?>
                 <?= Html::a(Yii::t('TodoModule.base', 'Aufgabenlisten verwalten'), $contentContainer->createUrl('/todo/task-list/index'), ['class' => 'btn btn-default btn-sm']) ?>
+                <?= Html::a(Yii::t('TodoModule.base', 'Labels'), $contentContainer->createUrl('/todo/label/index'), ['class' => 'btn btn-default btn-sm']) ?>
             <?php endif; ?>
             <?= Html::a(Yii::t('TodoModule.base', 'Vorlagen'), $contentContainer->createUrl('/todo/template/index'), ['class' => 'btn btn-default btn-sm']) ?>
             <?php if ($contentContainer->permissionManager->can(new \humhub\modules\todo\permissions\CreateTasks())): ?>
@@ -186,33 +194,37 @@ $kanbanCard = function ($task) use ($contentContainer) {
 
 <div class="panel panel-default">
     <div class="panel-body">
-        <?php if ($viewMode === 'kanban'): ?>
         <details class="todo-kanban-filters mb-3">
             <summary class="btn btn-sm btn-default"><i class="fa fa-filter"></i> <?= Yii::t('TodoModule.base', 'Filter') ?></summary>
             <form method="get" class="row g-2 mt-2 align-items-end">
-                <input type="hidden" name="view" value="kanban">
+                <input type="hidden" name="view" value="<?= Html::encode($viewMode) ?>">
+                <?php if ($viewMode === 'list'): ?><input type="hidden" name="group" value="<?= Html::encode($groupBy) ?>"><?php endif; ?>
                 <?php if ($isMy): ?><input type="hidden" name="my" value="1"><?php endif; ?>
-                <div class="col-sm-4">
+                <div class="col-sm-3">
                     <label class="control-label"><?= Yii::t('TodoModule.base', 'Priorität') ?></label>
                     <?= Html::dropDownList('priority', Yii::$app->request->get('priority'), ['' => Yii::t('TodoModule.base', 'Alle'), 'hoch' => Yii::t('TodoModule.base', 'Hoch'), 'mittel' => Yii::t('TodoModule.base', 'Mittel'), 'niedrig' => Yii::t('TodoModule.base', 'Niedrig')], ['class' => 'form-control']) ?>
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-3">
                     <label class="control-label"><?= Yii::t('TodoModule.base', 'Aufgabenliste') ?></label>
                     <?php $listOptions = []; foreach ($taskLists as $list) $listOptions[$list->id] = $list->name; ?>
                     <?= Html::dropDownList('list_id', Yii::$app->request->get('list_id'), ['' => Yii::t('TodoModule.base', 'Alle')] + $listOptions, ['class' => 'form-control']) ?>
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-3">
                     <label class="control-label"><?= Yii::t('TodoModule.base', 'Zuständig') ?></label>
                     <?php $userOptions = []; foreach ($spaceUsers as $user) $userOptions[$user->id] = $user->displayName; ?>
                     <?= Html::dropDownList('assignee_id', Yii::$app->request->get('assignee_id'), ['' => Yii::t('TodoModule.base', 'Alle')] + $userOptions, ['class' => 'form-control']) ?>
                 </div>
+                <div class="col-sm-3">
+                    <label class="control-label"><?= Yii::t('TodoModule.base', 'Label') ?></label>
+                    <?php $labelOptions = []; foreach ($taskLabels as $label) $labelOptions[$label->id] = $label->name; ?>
+                    <?= Html::dropDownList('label_id', Yii::$app->request->get('label_id'), ['' => Yii::t('TodoModule.base', 'Alle')] + $labelOptions, ['class' => 'form-control']) ?>
+                </div>
                 <div class="col-12 d-flex gap-1">
                     <button class="btn btn-primary btn-sm"><?= Yii::t('TodoModule.base', 'Filtern') ?></button>
-                    <?= Html::a(Yii::t('TodoModule.base', 'Zurücksetzen'), $contentContainer->createUrl('/todo/task/index', ['view' => 'kanban', 'my' => $isMy]), ['class' => 'btn btn-default btn-sm']) ?>
+                    <?= Html::a(Yii::t('TodoModule.base', 'Zurücksetzen'), $contentContainer->createUrl('/todo/task/index', ['view' => $viewMode, 'group' => $groupBy, 'my' => $isMy]), ['class' => 'btn btn-default btn-sm']) ?>
                 </div>
             </form>
         </details>
-        <?php endif; ?>
         <div class="mb-2 d-flex flex-wrap gap-1">
             <?= Html::a(Yii::t('TodoModule.base', 'Alle Tasks'), $contentContainer->createUrl('/todo/task/index', ['group' => $groupBy, 'view' => $viewMode]), ['class' => 'btn btn-sm ' . (!$isMy && !$currentDone ? 'btn-primary' : 'btn-outline-secondary')]) ?>
             <?= Html::a(Yii::t('TodoModule.base', 'Meine Tasks'), $contentContainer->createUrl('/todo/task/index', ['my' => 1, 'done' => $currentDone, 'group' => $groupBy, 'view' => $viewMode]), ['class' => 'btn btn-sm ' . ($isMy ? 'btn-primary' : 'btn-outline-secondary')]) ?>
