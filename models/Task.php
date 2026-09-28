@@ -318,7 +318,15 @@ public function afterSave($insert, $changedAttributes)
         && $changedAttributes['due_date'] != $this->due_date
     ) {
         $this->reminder_sent_at = null;
-        $this->updateAttributes(['reminder_sent_at']);
+        $this->upcoming_reminder_sent_at = null;
+        $this->due_reminder_sent_at = null;
+        $this->overdue_reminder_sent_at = null;
+        $this->updateAttributes([
+            'reminder_sent_at',
+            'upcoming_reminder_sent_at',
+            'due_reminder_sent_at',
+            'overdue_reminder_sent_at',
+        ]);
     }
 
 
