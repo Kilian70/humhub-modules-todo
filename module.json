@@ -2,7 +2,7 @@
   "id": "todo",
   "name": "ToDo",
   "description": "Pendenzenliste im Space",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "class": "humhub\\modules\\todo\\Module",
   "contentContainerTypes": [
     "humhub\\modules\\space\\models\\Space"

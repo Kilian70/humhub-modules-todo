@@ -69,7 +69,8 @@ class Task extends ContentActiveRecord implements ViewableInterface
             [['closed_by'], 'integer'],
             [['closed_at'], 'safe'],
             [['sync_to_calendar'], 'boolean'],
-            [['task_list_id'], 'integer'],
+            [['task_list_id', 'parent_task_id'], 'integer'],
+            [['parent_task_id'], 'validateParentTask'],
             [['recurrence_interval'], 'default', 'value' => 1],
             [['recurrence_interval'], 'integer', 'min' => 1, 'max' => 365],
             [['recurrence_type'], 'in', 'range' => array_merge([null, ''], \humhub\modules\todo\services\RecurrencePolicy::TYPES)],
@@ -85,6 +86,35 @@ class Task extends ContentActiveRecord implements ViewableInterface
                 'skipOnEmpty' => true
             ],
         ];
+    }
+
+    public function validateParentTask(string $attribute): void
+    {
+        if (!$this->$attribute) {
+            return;
+        }
+        if ($this->id && (int) $this->$attribute === (int) $this->id) {
+            $this->addError($attribute, 'Eine Aufgabe kann nicht ihre eigene Hauptaufgabe sein.');
+            return;
+        }
+
+        $parent = self::findOne((int) $this->$attribute);
+        $containerId = $this->content ? (int) $this->content->contentcontainer_id : 0;
+        if (!$parent || !$parent->content || (int) $parent->content->contentcontainer_id !== $containerId) {
+            $this->addError($attribute, 'Die Hauptaufgabe gehört nicht zu diesem Space.');
+            return;
+        }
+
+        // Walking upwards also prevents indirect cycles on manipulated requests.
+        $seen = $this->id ? [(int) $this->id => true] : [];
+        while ($parent) {
+            if (isset($seen[(int) $parent->id])) {
+                $this->addError($attribute, 'Die Aufgabenhierarchie darf keinen Kreis enthalten.');
+                return;
+            }
+            $seen[(int) $parent->id] = true;
+            $parent = $parent->parentTask;
+        }
     }
 
 
@@ -103,6 +133,7 @@ class Task extends ContentActiveRecord implements ViewableInterface
             'recurrence_type' => Yii::t('TodoModule.base', 'Wiederholung'),
             'recurrence_interval' => Yii::t('TodoModule.base', 'Intervall'),
             'recurrence_end_date' => Yii::t('TodoModule.base', 'Enddatum'),
+            'parent_task_id' => Yii::t('TodoModule.base', 'Hauptaufgabe'),
         ];
     }
 
@@ -298,6 +329,17 @@ class Task extends ContentActiveRecord implements ViewableInterface
             ->orderBy(['sort_order' => SORT_ASC, 'id' => SORT_ASC]);
     }
 
+    public function getParentTask()
+    {
+        return $this->hasOne(self::class, ['id' => 'parent_task_id']);
+    }
+
+    public function getSubtasks()
+    {
+        return $this->hasMany(self::class, ['parent_task_id' => 'id'])
+            ->orderBy(['status' => SORT_ASC, 'due_date' => SORT_ASC, 'id' => SORT_ASC]);
+    }
+
     public function getHistoryEntries()
     {
         return $this->hasMany(TaskHistory::class, ['task_id' => 'id'])
@@ -383,6 +425,9 @@ public function afterSave($insert, $changedAttributes)
 
     if ($insert) {
         TaskHistoryService::record($this, 'created', 'Aufgabe erstellt');
+        if ($this->parentTask) {
+            TaskHistoryService::record($this->parentTask, 'subtask_created', 'Unteraufgabe erstellt: ' . $this->title);
+        }
     } else {
         $labels = [
             'title' => 'Titel geändert',

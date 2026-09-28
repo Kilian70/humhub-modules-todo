@@ -13,12 +13,14 @@ use humhub\modules\todo\models\TaskList;
     <!-- HEADER -->
     <div class="panel-heading d-flex justify-content-between align-items-center">
 
-        <strong>Neue Aufgabe</strong>
+        <strong><?= $parentTask ? 'Neue Unteraufgabe' : 'Neue Aufgabe' ?></strong>
 
         <div>
             <?= Html::a(
                 'Zurück',
-                $contentContainer->createUrl('/todo/task/index'),
+                $parentTask
+                    ? $contentContainer->createUrl('/todo/task/view', ['id' => $parentTask->id])
+                    : $contentContainer->createUrl('/todo/task/index'),
                 ['class' => 'btn btn-sm btn-light']
             ) ?>
         </div>
@@ -35,6 +37,17 @@ use humhub\modules\todo\models\TaskList;
                 'enctype' => 'multipart/form-data'
             ]
         ]); ?>
+
+        <?= Html::activeHiddenInput($model, 'parent_task_id') ?>
+
+        <?php if ($parentTask): ?>
+            <div class="alert alert-info">
+                Unteraufgabe von <?= Html::a(
+                    Html::encode($parentTask->title),
+                    $contentContainer->createUrl('/todo/task/view', ['id' => $parentTask->id])
+                ) ?>
+            </div>
+        <?php endif; ?>
 
 
         <?= $form->field($model, 'title')->textInput([

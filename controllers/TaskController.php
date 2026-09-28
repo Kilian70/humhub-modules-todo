@@ -58,7 +58,8 @@ public function actionIndex()
     }
 
     $query = Task::find()
-        ->contentContainer($this->contentContainer);
+        ->contentContainer($this->contentContainer)
+        ->andWhere(['todo_task.parent_task_id' => null]);
 
     // Geschlossene Aufgaben werden separat angezeigt.
     $done = Yii::$app->request->get('done');
@@ -210,6 +211,21 @@ public function actionCreate()
 
     $model->content->container = $this->contentContainer;
 
+    $parentTask = null;
+    $parentId = (int) Yii::$app->request->get('parent_id');
+    if ($parentId > 0) {
+        $parentTask = Task::find()
+            ->contentContainer($this->contentContainer)
+            ->andWhere(['todo_task.id' => $parentId])
+            ->one();
+        if (!$parentTask) {
+            throw new NotFoundHttpException('Hauptaufgabe nicht gefunden.');
+        }
+        $model->parent_task_id = $parentTask->id;
+        $model->task_list_id = $parentTask->task_list_id;
+        $model->task_list_name = $parentTask->taskList ? $parentTask->taskList->name : '';
+    }
+
     $prefillListId = (int) Yii::$app->request->get('list_id');
     if ($prefillListId > 0) {
         $prefillList = TaskList::findOne(['id' => $prefillListId, 'space_id' => $this->contentContainer->id]);
@@ -219,6 +235,16 @@ public function actionCreate()
     }
 
     if ($model->load(Yii::$app->request->post())) {
+
+        if ($model->parent_task_id) {
+            $parentTask = Task::find()
+                ->contentContainer($this->contentContainer)
+                ->andWhere(['todo_task.id' => (int) $model->parent_task_id])
+                ->one();
+            if (!$parentTask) {
+                throw new HttpException(400, 'Ungültige Hauptaufgabe.');
+            }
+        }
 
         $this->resolveTaskList($model);
 
@@ -243,6 +269,7 @@ public function actionCreate()
     return $this->render('create', [
         'model' => $model,
         'contentContainer' => $this->contentContainer,
+        'parentTask' => $parentTask,
     ]);
 }
 
