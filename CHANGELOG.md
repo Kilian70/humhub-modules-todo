@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.16.2 - 2026-09-28
+
+- Bezeichnungen der persönlichen Menüpositionen präzisiert
+- irreführende Zusage «direkt nach der Übersicht» entfernt
+- Hinweis ergänzt, dass andere Module die genaue Reihenfolge im Hauptmenü beeinflussen
+
 ## 1.16.1 - 2026-09-28
 
 - dauerhaft sichtbaren Hauptmenüpunkt «Meine ToDos» ergänzt
