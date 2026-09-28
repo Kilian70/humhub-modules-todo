@@ -80,6 +80,9 @@ foreach ([
     "models/MenuSettingsForm.php",
     "controllers/MenuSettingsController.php",
     "views/menu-settings/index.php",
+    "models/TaskNotificationPreference.php",
+    "services/TaskNotificationPreferenceService.php",
+    "migrations/m260929_030000_task_notification_preferences.php",
 ] as $file) {
     if (!is_file($file)) {
         fwrite(STDERR, "Missing task history component: {$file}\n");
