@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.29.0 - 2026-09-28
+
+- Werkzeugleiste der Aufgabenansicht übersichtlicher gegliedert
+- Aufgabenlisten, Labels und Vorlagen im Menü „Verwalten“ zusammengefasst
+- CSV sowie Drucken/PDF im Menü „Exportieren“ gebündelt
+- Filter vollständig als „Alle Aufgaben“ und „Meine Aufgaben“ deutsch benannt
+- Aufgabenliste zusätzlich auf Kanban-Karten eingeblendet
+- benötigte Kanban-Beziehungen effizient gemeinsam geladen
+- mobile Darstellung an die neuen Dropdown-Menüs angepasst
+
 ## 1.28.1 - 2026-09-28
 
 - Erinnerungsverarbeitung gegen gleichzeitig laufende Cron-Prozesse abgesichert

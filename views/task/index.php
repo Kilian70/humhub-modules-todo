@@ -184,11 +184,16 @@ $kanbanCard = function ($task) use ($contentContainer) {
                 <span class="badge" style="background:<?= Html::encode($label->color) ?>;color:#fff;"><?= Html::encode($label->name) ?></span>
             <?php endforeach; ?>
         </div>
-        <?php if ($task->due_date || !empty($task->users)): ?>
+        <?php if ($task->taskList || $task->due_date || !empty($task->users)): ?>
         <div class="todo-kanban-meta">
-            <?php if ($task->due_date): ?>
-                <span class="<?= $isOverdue ? 'text-danger fw-bold' : '' ?>"><i class="fa fa-calendar"></i> <?= Yii::$app->formatter->asDate($task->due_date) ?></span>
-            <?php endif; ?>
+            <span class="d-flex flex-wrap gap-2">
+                <?php if ($task->taskList): ?>
+                    <span><i class="fa fa-list"></i> <?= Html::encode($task->taskList->name) ?></span>
+                <?php endif; ?>
+                <?php if ($task->due_date): ?>
+                    <span class="<?= $isOverdue ? 'text-danger fw-bold' : '' ?>"><i class="fa fa-calendar"></i> <?= Yii::$app->formatter->asDate($task->due_date) ?></span>
+                <?php endif; ?>
+            </span>
             <?php if (!empty($task->users)): ?>
                 <span class="todo-kanban-users">
                     <?php foreach ($task->users as $user): ?>
@@ -228,20 +233,36 @@ $kanbanCard = function ($task) use ($contentContainer) {
                 <?= Html::a('<i class="fa fa-columns"></i> ' . Yii::t('TodoModule.base', 'Kanban'), $contentContainer->createUrl('/todo/task/index', array_filter($filterParams + ['view' => 'kanban'])), ['class' => 'btn btn-sm ' . ($viewMode === 'kanban' ? 'btn-primary' : 'btn-default')]) ?>
             </div>
             <?php if ($contentContainer->permissionManager->can(new \humhub\modules\todo\permissions\EditTasks())): ?>
-                <?= Html::a(Yii::t('TodoModule.base', 'Aufgabenlisten verwalten'), $contentContainer->createUrl('/todo/task-list/index'), ['class' => 'btn btn-default btn-sm']) ?>
-                <?= Html::a(Yii::t('TodoModule.base', 'Labels'), $contentContainer->createUrl('/todo/label/index'), ['class' => 'btn btn-default btn-sm']) ?>
+                <div class="btn-group dropdown todo-toolbar-dropdown">
+                    <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa fa-cog"></i> <?= Yii::t('TodoModule.base', 'Verwalten') ?>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><?= Html::a('<i class="fa fa-list"></i> ' . Yii::t('TodoModule.base', 'Aufgabenlisten verwalten'), $contentContainer->createUrl('/todo/task-list/index'), ['class' => 'dropdown-item']) ?></li>
+                        <li><?= Html::a('<i class="fa fa-tags"></i> ' . Yii::t('TodoModule.base', 'Labels'), $contentContainer->createUrl('/todo/label/index'), ['class' => 'dropdown-item']) ?></li>
+                        <li><?= Html::a('<i class="fa fa-clone"></i> ' . Yii::t('TodoModule.base', 'Vorlagen'), $contentContainer->createUrl('/todo/template/index'), ['class' => 'dropdown-item']) ?></li>
+                    </ul>
+                </div>
+            <?php else: ?>
+                <?= Html::a('<i class="fa fa-clone"></i> ' . Yii::t('TodoModule.base', 'Vorlagen'), $contentContainer->createUrl('/todo/template/index'), ['class' => 'btn btn-default btn-sm']) ?>
             <?php endif; ?>
-            <?= Html::a(Yii::t('TodoModule.base', 'Vorlagen'), $contentContainer->createUrl('/todo/template/index'), ['class' => 'btn btn-default btn-sm']) ?>
-            <?= Html::a('<i class="fa fa-download"></i> ' . Yii::t('TodoModule.base', 'CSV-Export'), $contentContainer->createUrl('/todo/task/export', $exportParams), [
-                'class' => 'btn btn-default btn-sm',
-                'title' => Yii::t('TodoModule.base', 'Aktuell gefilterte Aufgaben als CSV exportieren'),
-            ]) ?>
-            <?= Html::a('<i class="fa fa-print"></i> ' . Yii::t('TodoModule.base', 'Drucken/PDF'), $contentContainer->createUrl('/todo/task/print', $exportParams), [
-                'class' => 'btn btn-default btn-sm',
-                'target' => '_blank',
-                'rel' => 'noopener',
-                'title' => Yii::t('TodoModule.base', 'Aktuell gefilterte Aufgaben drucken oder als PDF speichern'),
-            ]) ?>
+            <div class="btn-group dropdown todo-toolbar-dropdown">
+                <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-download"></i> <?= Yii::t('TodoModule.base', 'Exportieren') ?>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><?= Html::a('<i class="fa fa-file-text-o"></i> ' . Yii::t('TodoModule.base', 'CSV-Export'), $contentContainer->createUrl('/todo/task/export', $exportParams), [
+                        'class' => 'dropdown-item',
+                        'title' => Yii::t('TodoModule.base', 'Aktuell gefilterte Aufgaben als CSV exportieren'),
+                    ]) ?></li>
+                    <li><?= Html::a('<i class="fa fa-print"></i> ' . Yii::t('TodoModule.base', 'Drucken/PDF'), $contentContainer->createUrl('/todo/task/print', $exportParams), [
+                        'class' => 'dropdown-item',
+                        'target' => '_blank',
+                        'rel' => 'noopener',
+                        'title' => Yii::t('TodoModule.base', 'Aktuell gefilterte Aufgaben drucken oder als PDF speichern'),
+                    ]) ?></li>
+                </ul>
+            </div>
             <?php if ($contentContainer->permissionManager->can(new \humhub\modules\todo\permissions\CreateTasks())): ?>
                 <?= Html::a(Yii::t('TodoModule.base', 'Neue Aufgabe'), $contentContainer->createUrl('/todo/task/create'), ['class' => 'btn btn-success btn-sm']) ?>
             <?php endif; ?>
@@ -283,8 +304,8 @@ $kanbanCard = function ($task) use ($contentContainer) {
             </form>
         </details>
         <div class="mb-2 d-flex flex-wrap gap-1">
-            <?= Html::a(Yii::t('TodoModule.base', 'Alle Tasks'), $contentContainer->createUrl('/todo/task/index', ['group' => $groupBy, 'view' => $viewMode]), ['class' => 'btn btn-sm ' . (!$isMy && !$currentDone && !$showArchive && !$showTrash ? 'btn-primary' : 'btn-outline-secondary')]) ?>
-            <?= Html::a(Yii::t('TodoModule.base', 'Meine Tasks'), $contentContainer->createUrl('/todo/task/index', ['my' => 1, 'done' => $currentDone, 'group' => $groupBy, 'view' => $viewMode]), ['class' => 'btn btn-sm ' . ($isMy ? 'btn-primary' : 'btn-outline-secondary')]) ?>
+            <?= Html::a(Yii::t('TodoModule.base', 'Alle Aufgaben'), $contentContainer->createUrl('/todo/task/index', ['group' => $groupBy, 'view' => $viewMode]), ['class' => 'btn btn-sm ' . (!$isMy && !$currentDone && !$showArchive && !$showTrash ? 'btn-primary' : 'btn-outline-secondary')]) ?>
+            <?= Html::a(Yii::t('TodoModule.base', 'Meine Aufgaben'), $contentContainer->createUrl('/todo/task/index', ['my' => 1, 'done' => $currentDone, 'group' => $groupBy, 'view' => $viewMode]), ['class' => 'btn btn-sm ' . ($isMy ? 'btn-primary' : 'btn-outline-secondary')]) ?>
             <?php if ($viewMode === 'list'): ?><?= Html::a(Yii::t('TodoModule.base', 'Erledigt'), $contentContainer->createUrl('/todo/task/index', ['done' => 1, 'my' => $isMy, 'group' => $groupBy, 'view' => $viewMode]), ['class' => 'btn btn-sm ' . ($currentDone ? 'btn-primary' : 'btn-outline-secondary')]) ?><?php endif; ?>
             <?= Html::a('<i class="fa fa-archive"></i> ' . Yii::t('TodoModule.base', 'Archiv'), $contentContainer->createUrl('/todo/task/index', ['archive' => 1, 'group' => 'date']), ['class' => 'btn btn-sm ' . ($showArchive ? 'btn-primary' : 'btn-outline-secondary')]) ?>
             <?= Html::a('<i class="fa fa-trash"></i> ' . Yii::t('TodoModule.base', 'Papierkorb'), $contentContainer->createUrl('/todo/task/index', ['trash' => 1, 'group' => 'date']), ['class' => 'btn btn-sm ' . ($showTrash ? 'btn-primary' : 'btn-outline-secondary')]) ?>
@@ -388,6 +409,8 @@ $this->registerCss(<<<CSS
 .todo-task-toolbar { min-width:0; }
 .todo-task-search { width:200px; max-width:100%; }
 .todo-task-search input { width:100%; min-width:0; }
+.todo-toolbar-dropdown .dropdown-menu { min-width:210px; }
+.todo-toolbar-dropdown .dropdown-item i { width:18px; text-align:center; margin-right:4px; }
 .todo-kanban-board { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; align-items:start; }
 .todo-kanban-column { background:#f3f5f7; border:1px solid #dfe3e7; border-radius:6px; min-width:0; }
 .todo-kanban-column > header { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; }
@@ -413,13 +436,15 @@ $this->registerCss(<<<CSS
         margin-top:10px;
     }
     .todo-task-toolbar > .btn,
-    .todo-task-toolbar > .btn-group { width:100%; min-width:0; }
+    .todo-task-toolbar > .btn-group,
+    .todo-task-toolbar > .dropdown { width:100%; min-width:0; }
     .todo-task-toolbar > .btn {
         white-space:normal;
         overflow-wrap:anywhere;
     }
     .todo-task-toolbar > .btn-group { display:flex; }
     .todo-task-toolbar > .btn-group > .btn { flex:1 1 50%; min-width:0; }
+    .todo-task-toolbar > .todo-toolbar-dropdown > .btn { width:100%; }
     .todo-kanban-board { grid-template-columns:1fr; }
     .todo-kanban-card[draggable="true"] { cursor:default; }
     .todo-kanban-mobile-status { display:block; }

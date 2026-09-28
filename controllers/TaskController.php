@@ -211,6 +211,7 @@ public function actionIndex()
     ]);
 
     $tasks = $query
+        ->with(['users', 'taskLabels', 'taskList'])
         ->offset($pagination->offset)
         ->limit($pagination->limit)
         ->all();
