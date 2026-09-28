@@ -76,6 +76,9 @@ foreach ([
     "controllers/TemplateController.php",
     "migrations/m260928_220000_task_templates.php",
     "services/OverviewTaskService.php",
+    "models/MenuSettingsForm.php",
+    "controllers/MenuSettingsController.php",
+    "views/menu-settings/index.php",
 ] as $file) {
     if (!is_file($file)) {
         fwrite(STDERR, "Missing task history component: {$file}\n");

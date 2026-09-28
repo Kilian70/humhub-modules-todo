@@ -5,6 +5,8 @@ use humhub\modules\comment\models\Comment;
 use humhub\modules\dashboard\widgets\Sidebar as DashboardSidebar;
 use humhub\modules\space\widgets\Sidebar as SpaceSidebar;
 use humhub\widgets\BaseStack;
+use humhub\widgets\TopMenu;
+use humhub\modules\user\widgets\AccountSettingsMenu;
 use yii\db\BaseActiveRecord;
 use humhub\modules\todo\Events;
 use humhub\modules\todo\Module;
@@ -14,6 +16,16 @@ return [
     'class' => Module::class,
     'namespace' => 'humhub\\modules\\todo',
     'events' => [
+        [
+            'class' => TopMenu::class,
+            'event' => TopMenu::EVENT_INIT,
+            'callback' => [Events::class, 'onTopMenuInit'],
+        ],
+        [
+            'class' => AccountSettingsMenu::class,
+            'event' => AccountSettingsMenu::EVENT_INIT,
+            'callback' => [Events::class, 'onAccountSettingsMenuInit'],
+        ],
         [
             'class' => DashboardSidebar::class,
             'event' => BaseStack::EVENT_INIT,

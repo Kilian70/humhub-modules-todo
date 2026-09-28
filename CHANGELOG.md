@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.16.1 - 2026-09-28
+
+- dauerhaft sichtbaren Hauptmenüpunkt «Meine ToDos» ergänzt
+- die globale Aufgabenübersicht ist dadurch unabhängig vom Dashboard-Widget erreichbar
+- der Menüpunkt wird in der Aufgabenübersicht als aktiv markiert und für Gäste ausgeblendet
+- jeder Benutzer kann den Menüpunkt in den Kontoeinstellungen ein- oder ausblenden
+- die persönliche Position kann auf vorne, Mitte oder hinten gestellt werden
+
 ## 1.16.0 - 2026-09-28
 
 - zentrale persönliche Aufgabenübersicht über alle sichtbaren Spaces ausgebaut
