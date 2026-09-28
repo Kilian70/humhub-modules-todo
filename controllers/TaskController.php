@@ -13,6 +13,7 @@ use humhub\modules\todo\permissions\CreateTasks;
 use humhub\modules\todo\permissions\EditTasks;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 use humhub\modules\file\models\File;
 use yii\web\UploadedFile;
 use yii\filters\VerbFilter;
@@ -42,6 +43,7 @@ class TaskController extends ContentContainerController
                 'checklist-delete' => ['POST'],
                 'checklist-edit' => ['POST'],
                 'change-status' => ['POST'],
+                'kanban-status' => ['POST'],
                 'quick-update' => ['POST'],
                 'dependency-add' => ['POST'],
                 'dependency-remove' => ['POST'],
@@ -63,6 +65,17 @@ public function actionIndex()
         throw new \yii\web\ForbiddenHttpException();
     }
 
+    $viewMode = (string) Yii::$app->request->get('view', '');
+    $viewSettings = Yii::$app->getModule('todo')->settings->contentContainer(Yii::$app->user->identity);
+    if (in_array($viewMode, ['list', 'kanban'], true)) {
+        $viewSettings->set('taskViewMode', $viewMode);
+    } else {
+        $viewMode = (string) $viewSettings->get('taskViewMode', 'list');
+    }
+    if (!in_array($viewMode, ['list', 'kanban'], true)) {
+        $viewMode = 'list';
+    }
+
     $query = Task::find()
         ->contentContainer($this->contentContainer)
         ->andWhere(['todo_task.parent_task_id' => null]);
@@ -70,7 +83,9 @@ public function actionIndex()
     // Geschlossene Aufgaben werden separat angezeigt.
     $done = Yii::$app->request->get('done');
 
-    if ($done) {
+    if ($viewMode === 'kanban') {
+        // The board displays every workflow state side by side.
+    } elseif ($done) {
         $query->andWhere(['todo_task.status' => 'geschlossen']);
     } else {
         $query->andWhere(['todo_task.status' => ['offen', 'in_bearbeitung']]);
@@ -83,6 +98,22 @@ public function actionIndex()
 
         $query->joinWith('taskUsers')
             ->andWhere(['todo_task_user.user_id' => $userId]);
+    }
+
+    $priority = (string) Yii::$app->request->get('priority', '');
+    if (in_array($priority, ['niedrig', 'mittel', 'hoch'], true)) {
+        $query->andWhere(['todo_task.priority' => $priority]);
+    }
+
+    $taskListId = (int) Yii::$app->request->get('list_id', 0);
+    if ($taskListId > 0) {
+        $query->andWhere(['todo_task.task_list_id' => $taskListId]);
+    }
+
+    $assigneeId = (int) Yii::$app->request->get('assignee_id', 0);
+    if ($assigneeId > 0) {
+        $query->joinWith('taskUsers')
+            ->andWhere(['todo_task_user.user_id' => $assigneeId]);
     }
 
     // 🔽 SORTIERUNG
@@ -142,7 +173,7 @@ public function actionIndex()
 
     $pagination = new Pagination([
         'totalCount' => (clone $query)->count(),
-        'pageSize' => 25,
+        'pageSize' => $viewMode === 'kanban' ? 100 : 25,
         'pageSizeLimit' => [1, 100],
     ]);
 
@@ -199,6 +230,9 @@ public function actionIndex()
         'groupBy' => $groupBy,
         'contentContainer' => $this->contentContainer,
         'pagination' => $pagination,
+        'viewMode' => $viewMode,
+        'taskLists' => TaskList::findForSpace((int) $this->contentContainer->id),
+        'spaceUsers' => Membership::getSpaceMembersQuery($this->contentContainer)->all(),
     ]);
 }
 
@@ -505,6 +539,71 @@ public function actionChangeStatus($id)
     return $this->redirect(
         $this->contentContainer->createUrl('/todo/task/view', ['id' => $model->id])
     );
+}
+
+public function actionKanbanStatus($id)
+{
+    Yii::$app->response->format = Response::FORMAT_JSON;
+
+    if (!$this->contentContainer) {
+        Yii::$app->response->statusCode = 404;
+        return ['success' => false, 'message' => Yii::t('TodoModule.base', 'Kein Space gefunden.')];
+    }
+
+    $model = Task::find()
+        ->contentContainer($this->contentContainer)
+        ->andWhere(['todo_task.id' => (int) $id, 'todo_task.parent_task_id' => null])
+        ->one();
+
+    if (!$model) {
+        Yii::$app->response->statusCode = 404;
+        return ['success' => false, 'message' => Yii::t('TodoModule.base', 'Aufgabe nicht gefunden.')];
+    }
+    if (!$model->canWorkOn()) {
+        Yii::$app->response->statusCode = 403;
+        return ['success' => false, 'message' => Yii::t('TodoModule.base', 'Du darfst den Status dieser Aufgabe nicht ändern.')];
+    }
+
+    $newStatus = (string) Yii::$app->request->post('status');
+    if (!in_array($newStatus, ['offen', 'in_bearbeitung', 'geschlossen'], true)) {
+        Yii::$app->response->statusCode = 400;
+        return ['success' => false, 'message' => Yii::t('TodoModule.base', 'Ungültiger Status.')];
+    }
+
+    $oldStatus = $model->status;
+    if ($newStatus === $oldStatus) {
+        return ['success' => true];
+    }
+
+    if ($newStatus === 'geschlossen') {
+        $openChecklistCount = (int) ChecklistItem::find()
+            ->where(['task_id' => $model->id, 'is_done' => 0])
+            ->count();
+        if ($openChecklistCount > 0 && Yii::$app->request->post('confirm_open_checklist') !== '1') {
+            Yii::$app->response->statusCode = 409;
+            return [
+                'success' => false,
+                'requiresConfirmation' => true,
+                'message' => Yii::t('TodoModule.base', 'Diese Aufgabe enthält noch {count} offene Checklistenpunkte. Trotzdem schliessen?', ['count' => $openChecklistCount]),
+            ];
+        }
+    }
+
+    $model->status = $newStatus;
+    if ($newStatus === 'geschlossen') {
+        $model->closed_at = date('Y-m-d H:i:s');
+        $model->closed_by = Yii::$app->user->id;
+    } elseif ($oldStatus === 'geschlossen') {
+        $model->closed_at = null;
+        $model->closed_by = null;
+    }
+
+    if (!$model->save()) {
+        Yii::$app->response->statusCode = 422;
+        return ['success' => false, 'message' => implode(' ', $model->getFirstErrors()) ?: Yii::t('TodoModule.base', 'Der Status konnte nicht geändert werden.')];
+    }
+
+    return ['success' => true];
 }
 
 public function actionDelete($id)
