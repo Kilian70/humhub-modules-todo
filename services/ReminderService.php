@@ -46,6 +46,23 @@ class ReminderService
                 continue;
             }
 
+            $attribute = match ($type) {
+                ReminderPolicy::UPCOMING => 'upcoming_reminder_sent_at',
+                ReminderPolicy::DUE => 'due_reminder_sent_at',
+                default => 'overdue_reminder_sent_at',
+            };
+
+            // Atomically claim this reminder stage. Concurrent cron processes
+            // must not enqueue the same reminder more than once.
+            $claimedAt = date('Y-m-d H:i:s');
+            if (Task::updateAll(
+                [$attribute => $claimedAt],
+                ['and', ['id' => $task->id], [$attribute => null]]
+            ) !== 1) {
+                continue;
+            }
+            $task->$attribute = $claimedAt;
+
             $recipients = [];
             foreach ($task->users as $user) {
                 if ($user instanceof User) {
@@ -59,32 +76,42 @@ class ReminderService
             $systemUser = User::findOne(1);
             $container = $task->content?->container;
             if (!$systemUser || !$container || $recipients === []) {
+                self::releaseClaim($task, $attribute, $claimedAt);
                 continue;
             }
 
             $sent = false;
-            foreach ($recipients as $user) {
-                if (!$task->content->canView($user)
-                    || !$container->getPermissionManager($user)->can(new ViewTasks())) {
-                    continue;
-                }
-                if (!TaskNotificationPreferenceService::allows($task, (int) $user->id, TaskNotificationPreferenceService::EVENT_REMINDER)) {
-                    continue;
-                }
+            try {
+                foreach ($recipients as $user) {
+                    if (!$task->content->canView($user)
+                        || !$container->getPermissionManager($user)->can(new ViewTasks())) {
+                        continue;
+                    }
+                    if (!TaskNotificationPreferenceService::allows($task, (int) $user->id, TaskNotificationPreferenceService::EVENT_REMINDER)) {
+                        continue;
+                    }
 
-                TaskReminder::instance()->from($systemUser)->about($task)->send($user);
-                $sent = true;
+                    TaskReminder::instance()->from($systemUser)->about($task)->send($user);
+                    $sent = true;
+                }
+            } catch (\Throwable $e) {
+                self::releaseClaim($task, $attribute, $claimedAt);
+                Yii::error($e, __METHOD__);
+                continue;
             }
 
-            if ($sent) {
-                $attribute = match ($type) {
-                    ReminderPolicy::UPCOMING => 'upcoming_reminder_sent_at',
-                    ReminderPolicy::DUE => 'due_reminder_sent_at',
-                    default => 'overdue_reminder_sent_at',
-                };
-                $task->$attribute = date('Y-m-d H:i:s');
-                $task->updateAttributes([$attribute]);
+            if (!$sent) {
+                self::releaseClaim($task, $attribute, $claimedAt);
             }
         }
+    }
+
+    private static function releaseClaim(Task $task, string $attribute, string $claimedAt): void
+    {
+        Task::updateAll(
+            [$attribute => null],
+            ['id' => $task->id, $attribute => $claimedAt]
+        );
+        $task->$attribute = null;
     }
 }

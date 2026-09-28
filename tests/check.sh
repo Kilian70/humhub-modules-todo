@@ -58,6 +58,11 @@ if (str_contains($overviewSources, "getOpenBlockingTasks()->exists()")) {
     fwrite(STDERR, "Overview contains a per-task blocker query\n");
     exit(1);
 }
+$reminderSource = file_get_contents("services/ReminderService.php");
+if (!str_contains($reminderSource, "Atomically claim this reminder stage") || !str_contains($reminderSource, "releaseClaim")) {
+    fwrite(STDERR, "Missing concurrent reminder claim protection\n");
+    exit(1);
+}
 $moduleSource = file_get_contents("Module.php");
 $wallEntrySource = file_get_contents("widgets/WallEntry.php");
 if (!str_contains($moduleSource, "function getContentClasses") || !str_contains($moduleSource, "new CreateTasks()")) {

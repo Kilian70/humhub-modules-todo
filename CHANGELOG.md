@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.28.1 - 2026-09-28
+
+- Erinnerungsverarbeitung gegen gleichzeitig laufende Cron-Prozesse abgesichert
+- jede Erinnerungsstufe wird vor dem Einreihen atomar reserviert
+- fehlgeschlagene oder empfängerlose Reservierungen werden zuverlässig freigegeben
+- parallele Stundenläufe mit 300 fälligen Aufgaben ohne Doppelverarbeitung und Deadlocks getestet
+- Konkurrenztests für Wiederholungen und Kanban-Reihenfolgen erfolgreich durchgeführt
+
 ## 1.28.0 - 2026-09-28
 
 - „ToDo“ in das HumHub-Erstellen-Menü des Space-Streams integriert
