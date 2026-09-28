@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.9.0 - 2026-09-28
+
+- einklappbares Aktivitätsprotokoll in der Aufgabendetailansicht ergänzt
+- Erstellen und Ändern von Aufgaben sowie Zuweisungen werden protokolliert
+- Status-, Checklisten- und Dateiaktionen werden mit Benutzer und Zeitpunkt festgehalten
+- Verlauf ist auf die neuesten 100 Einträge begrenzt und standardmäßig geschlossen
+- Verlaufsdaten werden bei der Moduldeinstallation vollständig entfernt
+
 ## 1.8.9 - 2026-09-28
 
 - Berechtigungsentscheidungen in einer zentralen, testbaren Regel zusammengeführt

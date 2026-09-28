@@ -16,6 +16,7 @@ use humhub\modules\todo\permissions\DeleteTasks;
 use humhub\modules\todo\permissions\ViewTasks;
 use humhub\modules\todo\services\CalendarSyncService;
 use humhub\modules\todo\services\TaskAuthorizationService;
+use humhub\modules\todo\services\TaskHistoryService;
 use humhub\modules\todo\models\TaskList;
 use humhub\modules\user\helpers\UserHelper;
 use yii\helpers\FileHelper;
@@ -288,6 +289,12 @@ class Task extends ContentActiveRecord implements ViewableInterface
             ->orderBy(['sort_order' => SORT_ASC, 'id' => SORT_ASC]);
     }
 
+    public function getHistoryEntries()
+    {
+        return $this->hasMany(TaskHistory::class, ['task_id' => 'id'])
+            ->orderBy(['created_at' => SORT_DESC, 'id' => SORT_DESC]);
+    }
+
 
     public function afterFind()
     {
@@ -355,6 +362,34 @@ public function afterSave($insert, $changedAttributes)
                 $newUserIds[] = $user->id;
             }
         }
+    }
+
+    if ($insert) {
+        TaskHistoryService::record($this, 'created', 'Aufgabe erstellt');
+    } else {
+        $labels = [
+            'title' => 'Titel geändert',
+            'description' => 'Beschreibung geändert',
+            'priority' => 'Priorität geändert',
+            'status' => 'Status geändert',
+            'due_date' => 'Fälligkeit geändert',
+            'task_list_id' => 'Aufgabenliste geändert',
+            'sync_to_calendar' => 'Kalendersynchronisierung geändert',
+        ];
+        foreach ($labels as $attribute => $message) {
+            if (array_key_exists($attribute, $changedAttributes) && $changedAttributes[$attribute] != $this->$attribute) {
+                TaskHistoryService::record($this, 'task_updated', $message);
+            }
+        }
+    }
+
+    $addedUserIds = array_diff($newUserIds, $oldUserIds);
+    $removedUserIds = array_diff($oldUserIds, $newUserIds);
+    foreach (User::findAll(['id' => $addedUserIds]) as $user) {
+        TaskHistoryService::record($this, 'assignee_added', $user->displayName . ' wurde zugewiesen');
+    }
+    foreach (User::findAll(['id' => $removedUserIds]) as $user) {
+        TaskHistoryService::record($this, 'assignee_removed', $user->displayName . ' wurde entfernt');
     }
 
 

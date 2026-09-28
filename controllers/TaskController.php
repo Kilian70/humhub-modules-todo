@@ -19,6 +19,7 @@ use yii\data\Pagination;
 use humhub\modules\space\models\Membership;
 use humhub\modules\user\models\User;
 use humhub\modules\todo\services\CalendarSyncService;
+use humhub\modules\todo\services\TaskHistoryService;
 
 class TaskController extends ContentContainerController
 {
@@ -551,7 +552,9 @@ public function actionDeleteFile($id, $guid)
         throw new NotFoundHttpException();
     }
 
+    $fileTitle = trim((string) $file->title) ?: $file->file_name;
     $file->delete();
+    TaskHistoryService::record($model, 'file_deleted', 'Datei gelöscht: ' . $fileTitle);
 
     Yii::$app->session->setFlash(
         'success',
@@ -611,6 +614,7 @@ public function actionUploadFile($id)
     if (!$model->saveUploadedFile($uploadedFile, $title !== '' ? $title : null)) {
         Yii::$app->session->setFlash('error', Yii::t('TodoModule.base', 'Die Datei konnte nicht gespeichert werden.'));
     } else {
+        TaskHistoryService::record($model, 'file_added', 'Datei hinzugefügt: ' . ($title !== '' ? $title : $uploadedFile->name));
         Yii::$app->session->setFlash('success', Yii::t('TodoModule.base', 'Datei hinzugefügt.'));
     }
 
@@ -655,6 +659,7 @@ public function actionUpdateFileTitle($id, $guid)
         $title = pathinfo($file->file_name, PATHINFO_FILENAME);
     }
 
+    $oldTitle = trim((string) $file->title) ?: $file->file_name;
     $file->title = $title;
 
     if (!$file->save(true, ['title'])) {
@@ -663,6 +668,9 @@ public function actionUpdateFileTitle($id, $guid)
             Yii::t('TodoModule.base', 'Der Dateititel konnte nicht gespeichert werden.')
         );
     } else {
+        if ($oldTitle !== $title) {
+            TaskHistoryService::record($model, 'file_updated', 'Datei umbenannt: ' . $oldTitle . ' → ' . $title);
+        }
         Yii::$app->session->setFlash(
             'success',
             Yii::t('TodoModule.base', 'Dateititel gespeichert.')
@@ -713,6 +721,8 @@ public function actionUpdateFileTitle($id, $guid)
                     );
                 }
 
+                TaskHistoryService::record($task, 'checklist_added', 'Checklistenpunkt hinzugefügt: ' . $item->title);
+
                 $transaction->commit();
             } catch (\Throwable $e) {
                 $transaction->rollBack();
@@ -734,6 +744,7 @@ public function actionUpdateFileTitle($id, $guid)
         }
 
         $dueDate = trim((string) Yii::$app->request->post('due_date'));
+        $oldTitle = $item->title;
         $item->title = $title;
         $item->due_date = $dueDate !== '' ? $dueDate : null;
         $item->sync_to_calendar = (bool) Yii::$app->request->post('sync_to_calendar', false);
@@ -756,6 +767,15 @@ public function actionUpdateFileTitle($id, $guid)
                 );
             }
 
+
+            TaskHistoryService::record(
+                $task,
+                'checklist_updated',
+                $oldTitle === $item->title
+                    ? 'Checklistenpunkt bearbeitet: ' . $item->title
+                    : 'Checklistenpunkt umbenannt: ' . $oldTitle . ' → ' . $item->title
+            );
+
             $transaction->commit();
         } catch (\Throwable $e) {
             $transaction->rollBack();
@@ -770,7 +790,8 @@ public function actionUpdateFileTitle($id, $guid)
         $task = $this->findTaskForChecklist($id);
         $item = $this->findChecklistItem($task, $itemId);
 
-        if ($item->is_done) {
+        $wasDone = (bool) $item->is_done;
+        if ($wasDone) {
             $item->is_done = false;
             $item->completed_by = null;
             $item->completed_at = null;
@@ -781,6 +802,11 @@ public function actionUpdateFileTitle($id, $guid)
         }
 
         $item->save(false, ['is_done', 'completed_by', 'completed_at']);
+        TaskHistoryService::record(
+            $task,
+            $wasDone ? 'checklist_reopened' : 'checklist_completed',
+            ($wasDone ? 'Checklistenpunkt wieder geöffnet: ' : 'Checklistenpunkt erledigt: ') . $item->title
+        );
 
         return $this->redirect($this->contentContainer->createUrl('/todo/task/view', ['id' => $task->id]));
     }
@@ -811,6 +837,7 @@ public function actionUpdateFileTitle($id, $guid)
                 $other->sort_order = $currentOrder;
                 $item->save(false, ['sort_order']);
                 $other->save(false, ['sort_order']);
+                TaskHistoryService::record($task, 'checklist_moved', 'Checklistenpunkt verschoben: ' . $item->title);
                 $transaction->commit();
             } catch (\Throwable $e) {
                 $transaction->rollBack();
@@ -825,7 +852,9 @@ public function actionUpdateFileTitle($id, $guid)
     {
         $task = $this->findTaskForChecklist($id);
         $item = $this->findChecklistItem($task, $itemId);
+        $itemTitle = $item->title;
         $item->delete();
+        TaskHistoryService::record($task, 'checklist_deleted', 'Checklistenpunkt gelöscht: ' . $itemTitle);
 
         return $this->redirect($this->contentContainer->createUrl('/todo/task/view', ['id' => $task->id]));
     }
