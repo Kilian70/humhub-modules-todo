@@ -1,6 +1,15 @@
 <?php
 
 return [
+    'Hinzufügen' => 'Add',
+    'Label' => 'Label',
+    'Labels' => 'Labels',
+    'Labels helfen, Aufgaben unabhängig von ihrer Aufgabenliste zu kennzeichnen und zu filtern.' => 'Labels help identify and filter tasks independently of their task list.',
+    'Labels verwalten' => 'Manage labels',
+    'Label wirklich löschen? Die Aufgaben bleiben erhalten.' => 'Really delete this label? The tasks will be retained.',
+    'Name des neuen Labels' => 'Name of the new label',
+    'Neues Label' => 'New label',
+    'Noch keine Labels vorhanden.' => 'No labels available yet.',
     'Ansicht' => 'View',
     'Aufgabe nicht gefunden.' => 'Task not found.',
     'Der Status konnte nicht geändert werden.' => 'The status could not be changed.',

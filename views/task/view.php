@@ -108,6 +108,9 @@ $canCreateTask = $contentContainer->permissionManager->can(new \humhub\modules\t
             <?php if ($task->getOpenBlockingTasks()->exists()): ?>
                 <span class="badge bg-warning text-dark ms-1"><i class="fa fa-lock"></i> BLOCKIERT</span>
             <?php endif; ?>
+            <?php foreach ($task->labels as $label): ?>
+                <span class="badge ms-1" style="background:<?= Html::encode($label->color) ?>;color:#fff;"><?= Html::encode($label->name) ?></span>
+            <?php endforeach; ?>
             <?php if ($task->status === 'geschlossen' && $task->closed_at): ?>
                 <span class="small text-muted ms-2">
                     Geschlossen
