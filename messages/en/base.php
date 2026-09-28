@@ -1,6 +1,16 @@
 <?php
 
 return [
+    'Ansicht' => 'View',
+    'Aufgabe nicht gefunden.' => 'Task not found.',
+    'Der Status konnte nicht geändert werden.' => 'The status could not be changed.',
+    'Du darfst den Status dieser Aufgabe nicht ändern.' => 'You are not allowed to change the status of this task.',
+    'Filter' => 'Filters',
+    'Kanban' => 'Kanban',
+    'Kein Space gefunden.' => 'No space found.',
+    'Liste' => 'List',
+    'Ungültiger Status.' => 'Invalid status.',
+    'Diese Aufgabe enthält noch {count} offene Checklistenpunkte. Trotzdem schliessen?' => 'This task still has {count} open checklist items. Close it anyway?',
     'Alle' => 'All',
     'Alle sichtbar' => 'All visible',
     'Alle sichtbaren' => 'All visible',
