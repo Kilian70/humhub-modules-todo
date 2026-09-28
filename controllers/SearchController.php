@@ -17,7 +17,8 @@ class SearchController extends ContentContainerController
             throw new ForbiddenHttpException();
         }
 
-        $query = Task::find()->contentContainer($this->contentContainer);
+        $query = Task::find()->contentContainer($this->contentContainer)
+            ->andWhere(['todo_task.deleted_at' => null, 'todo_task.archived_at' => null]);
 
         /**
          * Filter: Meine Tasks

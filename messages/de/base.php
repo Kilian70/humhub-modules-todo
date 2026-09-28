@@ -191,4 +191,10 @@ return [
     'Nach 90 Tagen' => 'Nach 90 Tagen',
     'Es werden nur erledigte Aufgaben mit einem Abschlussdatum archiviert. Sie können im Archiv jederzeit wiederhergestellt werden.' => 'Es werden nur erledigte Aufgaben mit einem Abschlussdatum archiviert. Sie können im Archiv jederzeit wiederhergestellt werden.',
     'Aufgabe nach {days} Tagen automatisch archiviert' => 'Aufgabe nach {days} Tagen automatisch archiviert',
+    'Papierkorb' => 'Papierkorb',
+    'Endgültig löschen' => 'Endgültig löschen',
+    'Aufgabe endgültig löschen? Dies kann nicht rückgängig gemacht werden.' => 'Aufgabe endgültig löschen? Dies kann nicht rückgängig gemacht werden.',
+    'Aufgabe in den Papierkorb verschoben' => 'Aufgabe in den Papierkorb verschoben',
+    'Aufgabe aus dem Papierkorb wiederhergestellt' => 'Aufgabe aus dem Papierkorb wiederhergestellt',
+    'Aufgaben im Papierkorb werden nach 30 Tagen automatisch endgültig gelöscht.' => 'Aufgaben im Papierkorb werden nach 30 Tagen automatisch endgültig gelöscht.',
 ];

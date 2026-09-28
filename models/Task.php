@@ -69,8 +69,8 @@ class Task extends ContentActiveRecord implements ViewableInterface
             [['priority'], 'in', 'range' => ['niedrig', 'mittel', 'hoch']],
             [['status'], 'in', 'range' => ['offen', 'in_bearbeitung', 'geschlossen']],
             [['status'], 'validateBlockingTasks'],
-            [['closed_by', 'archived_by'], 'integer'],
-            [['closed_at', 'archived_at'], 'safe'],
+            [['closed_by', 'archived_by', 'deleted_by'], 'integer'],
+            [['closed_at', 'archived_at', 'deleted_at'], 'safe'],
             [['sync_to_calendar'], 'boolean'],
             [['task_list_id', 'parent_task_id'], 'integer'],
             [['parent_task_id'], 'validateParentTask'],
@@ -161,6 +161,11 @@ class Task extends ContentActiveRecord implements ViewableInterface
     public function getArchivedByUser()
     {
         return $this->hasOne(User::class, ['id' => 'archived_by']);
+    }
+
+    public function getDeletedByUser()
+    {
+        return $this->hasOne(User::class, ['id' => 'deleted_by']);
     }
 
     /**
@@ -696,10 +701,12 @@ public function afterSave($insert, $changedAttributes)
 			'task_id' => $this->id
 		]);
 	
-		Activity::deleteAll([
-			'object_model' => self::class,
-			'object_id' => $this->id
-		]);
+		$activityTable = Activity::getTableSchema();
+		if (isset($activityTable->columns['object_model'], $activityTable->columns['object_id'])) {
+			Activity::deleteAll(['object_model' => self::class, 'object_id' => $this->id]);
+		} elseif (isset($activityTable->columns['content_id']) && $this->content_id) {
+			Activity::deleteAll(['content_id' => $this->content_id]);
+		}
 	
 		parent::afterDelete();
 	}

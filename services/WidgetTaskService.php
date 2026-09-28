@@ -11,6 +11,7 @@ class WidgetTaskService
     {
         return Task::find()
             ->contentContainer($space)
+            ->andWhere(['todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
             ->andWhere(['!=', 'todo_task.status', 'geschlossen'])
             ->orderBy(new \yii\db\Expression('CASE WHEN todo_task.due_date IS NULL THEN 1 ELSE 0 END ASC, todo_task.due_date ASC, todo_task.id DESC'))
             ->limit($limit)
@@ -25,6 +26,7 @@ class WidgetTaskService
 
         $query = Task::find()
             ->joinWith('taskUsers')
+            ->andWhere(['todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
             ->andWhere(['todo_task_user.user_id' => Yii::$app->user->id])
             ->andWhere(['!=', 'todo_task.status', 'geschlossen'])
             ->orderBy(new \yii\db\Expression('CASE WHEN todo_task.due_date IS NULL THEN 1 ELSE 0 END ASC, todo_task.due_date ASC, todo_task.id DESC'))
