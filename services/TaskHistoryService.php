@@ -16,7 +16,9 @@ final class TaskHistoryService
 
         $history = new TaskHistory([
             'task_id' => (int) $task->id,
-            'user_id' => Yii::$app->user->isGuest ? null : (int) Yii::$app->user->id,
+            'user_id' => !Yii::$app->has('user') || Yii::$app->user->isGuest
+                ? null
+                : (int) Yii::$app->user->id,
             'event' => $event,
             'message' => mb_substr(trim($message), 0, 500),
             'created_at' => date('Y-m-d H:i:s'),

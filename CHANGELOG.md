@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.22.0 - 2026-09-28
+
+- automatische Archivierung pro Space ergänzt
+- wahlweise nach 30, 60 oder 90 Tagen; standardmässig ausgeschaltet
+- nur erledigte Aufgaben mit vorhandenem Abschlussdatum werden berücksichtigt
+- automatisch archivierte Aufgaben bleiben vollständig wiederherstellbar
+- automatische Archivierung wird als Systemeintrag im Aktivitätsprotokoll dokumentiert
+- bestehende Space-Widget-Einstellungen werden nun zuverlässig im richtigen Space-Kontext gespeichert
+
 ## 1.21.0 - 2026-09-28
 
 - geschlossene Aufgaben können archiviert werden
