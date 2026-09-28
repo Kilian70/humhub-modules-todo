@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.27.1 - 2026-09-28
+
+- unklare Aufgabenzähler wie „(1 | 2)“ aus dem Space-Menü entfernt
+- der Menüeintrag heißt jetzt unabhängig von der Aufgabenanzahl immer schlicht „ToDo“
+- zwei unnötige Datenbankabfragen beim Aufbau des Space-Menüs entfallen
+- die rote Warnmarkierung für eigene überfällige Aufgaben bleibt erhalten
+- quadratisches Modulbild für die HumHub-Modulverwaltung ergänzt
+
 ## 1.27.0 - 2026-09-28
 
 - übersichtliche Druckansicht für Aufgaben ergänzt

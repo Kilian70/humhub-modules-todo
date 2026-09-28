@@ -51,24 +51,6 @@ public function init()
         }
 
 
-			// Meine offenen Tasks
-			$myCount = Task::find()
-				->contentContainer($space)
-				->joinWith('taskUsers')
-				->andWhere(['todo_task_user.user_id' => Yii::$app->user->id])
-				->andWhere(['!=', 'todo_task.status', 'geschlossen'])
-				->andWhere(['todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
-				->count();
-			
-			
-			// Alle offenen Tasks im Space
-			$allCount = Task::find()
-				->contentContainer($space)
-				->andWhere(['!=', 'todo_task.status', 'geschlossen'])
-				->andWhere(['todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
-				->count();
-			
-			
 			// Überfällige eigene Tasks prüfen
 			$overdueMyTasks = Task::find()
 				->contentContainer($space)
@@ -80,26 +62,6 @@ public function init()
 				->count();
 			
 			
-			// Label erzeugen
-			$label = 'ToDo';
-			
-			if ($allCount > 0) {
-			
-				if ($myCount == 0) {
-			
-					$label .= " ({$allCount})";
-			
-				} elseif ($myCount == $allCount) {
-			
-					$label .= " ({$myCount})";
-			
-				} else {
-			
-					$label .= " ({$myCount} | {$allCount})";
-				}
-			}
-			
-			
 			// Icon bestimmen (nur eigene überfällige Tasks markieren)
 			$icon = $overdueMyTasks > 0
 				? 'exclamation-circle'
@@ -108,7 +70,7 @@ public function init()
 			
 			// Menüeintrag setzen
 			$menu->addEntry(new MenuLink([
-				'label' => $label,
+				'label' => 'ToDo',
 				'url' => $space->createUrl('/todo/task/index'),
 				'icon' => $icon,
 				'htmlOptions' => $overdueMyTasks > 0 ? ['class' => 'text-danger'] : [],

@@ -54,6 +54,10 @@ foreach (["README.md", "CHANGELOG.md", "LICENSE", "SECURITY.md", "CONTRIBUTING.m
         exit(1);
     }
 }
+if (!is_file("resources/module_image.png") || filesize("resources/module_image.png") === 0) {
+    fwrite(STDERR, "Missing module image\n");
+    exit(1);
+}
 if (!is_file("migrations/uninstall.php")) {
     fwrite(STDERR, "Missing uninstall migration\n");
     exit(1);
