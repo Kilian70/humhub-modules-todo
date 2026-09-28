@@ -39,6 +39,7 @@ if ($humhubVersion === '' || version_compare($humhubVersion, $manifest['humhub']
 foreach ([
     humhub\modules\todo\Module::class,
     humhub\modules\todo\Events::class,
+    humhub\modules\todo\models\Task::class,
     humhub\modules\todo\permissions\ViewTasks::class,
     humhub\modules\todo\permissions\CreateTasks::class,
     humhub\modules\todo\permissions\EditTasks::class,
