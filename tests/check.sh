@@ -12,6 +12,7 @@ composer validate --strict --no-check-publish
 
 php tests/authorization.php
 php tests/reminder-policy.php
+php tests/recurrence-policy.php
 
 if grep -RInE "due_date = ['\"]{2}|->isModuleEnabled\(|MenuLink::isActiveState\(" --include='*.php' .; then
     echo "Obsolete HumHub API usage or invalid DATE comparison found" >&2
@@ -61,6 +62,9 @@ foreach ([
     "migrations/m260928_120000_task_history.php",
     "services/ReminderPolicy.php",
     "migrations/m260928_140000_reminder_stages.php",
+    "services/RecurrencePolicy.php",
+    "services/RecurringTaskService.php",
+    "migrations/m260928_160000_recurring_tasks.php",
 ] as $file) {
     if (!is_file($file)) {
         fwrite(STDERR, "Missing task history component: {$file}\n");

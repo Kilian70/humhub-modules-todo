@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.11.0 - 2026-09-28
+
+- tägliche, wöchentliche, monatliche und jährliche Wiederholungen ergänzt
+- frei wählbares Wiederholungsintervall und optionales Enddatum ergänzt
+- beim Abschliessen wird genau eine neue offene Folgeaufgabe erzeugt
+- Zuständige und Checkliste werden übernommen; Checklisten-Termine werden passend verschoben
+- Monatsenden und Schaltjahre werden kalendergerecht behandelt
+- Erzeugung und Ende einer Aufgabenserie werden im Aktivitätsprotokoll dokumentiert
+- automatische Tests für Datumsberechnung und Serienende ergänzt
+
 ## 1.10.0 - 2026-09-28
 
 - konfigurierbare Vorwarnung bis zu 30 Tage vor Fälligkeit ergänzt

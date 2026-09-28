@@ -231,6 +231,26 @@ JS;
 
         </div>
 
+        <div class="row mt-2">
+            <div class="col-md-4">
+                <?= $form->field($model, 'recurrence_type')->dropDownList([
+                    '' => 'Keine Wiederholung',
+                    'daily' => 'Täglich',
+                    'weekly' => 'Wöchentlich',
+                    'monthly' => 'Monatlich',
+                    'yearly' => 'Jährlich',
+                ], ['id' => 'recurrence-type']) ?>
+            </div>
+            <div class="col-md-4 recurrence-options">
+                <?= $form->field($model, 'recurrence_interval')->input('number', ['min' => 1, 'max' => 365])
+                    ->hint('Zum Beispiel 2 = alle zwei Wochen') ?>
+            </div>
+            <div class="col-md-4 recurrence-options">
+                <?= $form->field($model, 'recurrence_end_date')->input('date')->hint('Optional') ?>
+            </div>
+        </div>
+        <?php $this->registerJs("(function(){var type=document.getElementById('recurrence-type');if(!type)return;function toggle(){document.querySelectorAll('.recurrence-options').forEach(function(el){el.style.display=type.value?'':'none';});}type.addEventListener('change',toggle);toggle();})();"); ?>
+
         <?php if (CalendarSyncService::isAvailable($contentContainer)): ?>
             <div class="mt-2">
                 <?= $form->field($model, 'sync_to_calendar')->checkbox([
