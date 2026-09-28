@@ -12,6 +12,7 @@ use humhub\modules\file\components\FileManager;
 use humhub\modules\file\models\File;
 use humhub\modules\todo\permissions\CreateTasks;
 use humhub\modules\todo\permissions\EditTasks;
+use humhub\modules\todo\permissions\DeleteTasks;
 use humhub\modules\todo\permissions\ViewTasks;
 use humhub\modules\todo\services\CalendarSyncService;
 use humhub\modules\todo\models\TaskList;
@@ -175,6 +176,52 @@ class Task extends ContentActiveRecord implements ViewableInterface
         }
 
         return $container->getPermissionManager($user)->can(new ViewTasks());
+    }
+
+    public function isCreatedBy($user = null): bool
+    {
+        $user = UserHelper::getUserByParam($user);
+        return $user !== null
+            && $this->content !== null
+            && (int) $this->content->created_by === (int) $user->id;
+    }
+
+    public function isAssignedTo($user = null): bool
+    {
+        $user = UserHelper::getUserByParam($user);
+        if ($user === null || !$this->id) {
+            return false;
+        }
+
+        return TaskUser::find()
+            ->where(['task_id' => $this->id, 'user_id' => $user->id])
+            ->exists();
+    }
+
+    /** Full task editing: managers or the person who created the task. */
+    public function canManage($user = null): bool
+    {
+        $user = UserHelper::getUserByParam($user);
+        $container = $this->content?->container;
+
+        return $container !== null
+            && ($container->getPermissionManager($user)->can(new EditTasks()) || $this->isCreatedBy($user));
+    }
+
+    /** Workflow editing: full managers plus assigned people. */
+    public function canWorkOn($user = null): bool
+    {
+        return $this->canManage($user) || $this->isAssignedTo($user);
+    }
+
+    /** Deleting: users with DeleteTasks or the person who created the task. */
+    public function canDelete($user = null): bool
+    {
+        $user = UserHelper::getUserByParam($user);
+        $container = $this->content?->container;
+
+        return $container !== null
+            && ($container->getPermissionManager($user)->can(new DeleteTasks()) || $this->isCreatedBy($user));
     }
 
     /**

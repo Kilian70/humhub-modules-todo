@@ -55,7 +55,9 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
             </div>
         </div>
 
+        <?php if ($task->canManage() || $task->canDelete()): ?>
         <div class="d-flex gap-1 flex-shrink-0" data-task-actions>
+            <?php if ($task->canManage()): ?>
             <?= Html::a(
                 '<i class="fa fa-pencil"></i>',
                 $contentContainer->createUrl('/todo/task/update', ['id' => $task->id]),
@@ -67,6 +69,8 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
                     'onkeydown' => 'event.stopPropagation();',
                 ]
             ) ?>
+            <?php endif; ?>
+            <?php if ($task->canDelete()): ?>
             <?= Html::a(
                 '<i class="fa fa-trash"></i>',
                 $contentContainer->createUrl('/todo/task/delete', [
@@ -85,7 +89,9 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
                     'onkeydown' => 'event.stopPropagation();',
                 ]
             ) ?>
+            <?php endif; ?>
         </div>
+        <?php endif; ?>
     </div>
     <?php
 };
@@ -104,7 +110,9 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
             <?php if ($contentContainer->permissionManager->can(new \humhub\modules\todo\permissions\EditTasks())): ?>
                 <?= Html::a('Aufgabenlisten verwalten', $contentContainer->createUrl('/todo/task-list/index'), ['class' => 'btn btn-default btn-sm']) ?>
             <?php endif; ?>
-            <?= Html::a('Neue Aufgabe', $contentContainer->createUrl('/todo/task/create'), ['class' => 'btn btn-success btn-sm']) ?>
+            <?php if ($contentContainer->permissionManager->can(new \humhub\modules\todo\permissions\CreateTasks())): ?>
+                <?= Html::a('Neue Aufgabe', $contentContainer->createUrl('/todo/task/create'), ['class' => 'btn btn-success btn-sm']) ?>
+            <?php endif; ?>
         </div>
     </div>
 </div>
@@ -135,6 +143,7 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
                     <summary class="panel-heading d-flex align-items-center justify-content-between" style="cursor:pointer; list-style:none; border-left:4px solid <?= Html::encode($color) ?>;">
                         <span><strong><?= Html::encode($name) ?></strong> <span class="text-muted">(<?= count($groupTasks) ?>)</span></span>
                         <span class="d-flex align-items-center gap-1">
+                            <?php if ($contentContainer->permissionManager->can(new \humhub\modules\todo\permissions\CreateTasks())): ?>
                             <?= Html::a(
                                 '<i class="fa fa-plus"></i>',
                                 $list
@@ -146,6 +155,7 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
                                     'onclick' => 'event.stopPropagation();',
                                 ]
                             ) ?>
+                            <?php endif; ?>
                             <i class="fa fa-chevron-down text-muted"></i>
                         </span>
                     </summary>

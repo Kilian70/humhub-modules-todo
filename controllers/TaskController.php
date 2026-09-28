@@ -10,7 +10,6 @@ use humhub\modules\todo\models\TaskList;
 use humhub\modules\todo\permissions\ViewTasks;
 use humhub\modules\todo\permissions\CreateTasks;
 use humhub\modules\todo\permissions\EditTasks;
-use humhub\modules\todo\permissions\DeleteTasks;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use humhub\modules\file\models\File;
@@ -253,10 +252,6 @@ public function actionUpdate($id)
 		throw new HttpException(404, 'Kein Space gefunden.');
 	}
 	
-    if (!$this->contentContainer->permissionManager->can(new EditTasks())) {
-        throw new \yii\web\ForbiddenHttpException();
-    }
-
     $model = Task::find()
         ->contentContainer($this->contentContainer)
         ->where(['todo_task.id' => $id])
@@ -264,6 +259,10 @@ public function actionUpdate($id)
 
     if (!$model) {
         throw new HttpException(404, 'Task nicht gefunden.');
+    }
+
+    if (!$model->canManage()) {
+        throw new \yii\web\ForbiddenHttpException();
     }
 
     $oldStatus = $model->status;
@@ -317,10 +316,6 @@ public function actionQuickUpdate($id)
         throw new HttpException(404, 'Kein Space gefunden.');
     }
 
-    if (!$this->contentContainer->permissionManager->can(new EditTasks())) {
-        throw new \yii\web\ForbiddenHttpException();
-    }
-
     $model = Task::find()
         ->contentContainer($this->contentContainer)
         ->andWhere(['todo_task.id' => (int) $id])
@@ -335,6 +330,9 @@ public function actionQuickUpdate($id)
 
     switch ($field) {
         case 'status':
+            if (!$model->canWorkOn()) {
+                throw new \yii\web\ForbiddenHttpException();
+            }
             $value = (string) $value;
             if (!in_array($value, ['offen', 'in_bearbeitung', 'geschlossen'], true)) {
                 throw new HttpException(400, 'Ungültiger Status.');
@@ -373,6 +371,9 @@ public function actionQuickUpdate($id)
             break;
 
         case 'priority':
+            if (!$model->canManage()) {
+                throw new \yii\web\ForbiddenHttpException();
+            }
             $value = (string) $value;
             if (!in_array($value, ['niedrig', 'mittel', 'hoch'], true)) {
                 throw new HttpException(400, 'Ungültige Priorität.');
@@ -381,6 +382,9 @@ public function actionQuickUpdate($id)
             break;
 
         case 'due_date':
+            if (!$model->canManage()) {
+                throw new \yii\web\ForbiddenHttpException();
+            }
             $value = trim((string) $value);
             if ($value === '') {
                 $model->due_date = null;
@@ -420,10 +424,6 @@ public function actionChangeStatus($id)
         throw new HttpException(404, 'Kein Space gefunden.');
     }
 
-    if (!$this->contentContainer->permissionManager->can(new EditTasks())) {
-        throw new \yii\web\ForbiddenHttpException();
-    }
-
     $model = Task::find()
         ->contentContainer($this->contentContainer)
         ->andWhere(['todo_task.id' => (int) $id])
@@ -431,6 +431,10 @@ public function actionChangeStatus($id)
 
     if (!$model) {
         throw new NotFoundHttpException();
+    }
+
+    if (!$model->canWorkOn()) {
+        throw new \yii\web\ForbiddenHttpException();
     }
 
     $newStatus = (string) Yii::$app->request->post('status');
@@ -476,10 +480,6 @@ public function actionDelete($id)
 		throw new HttpException(404, 'Kein Space gefunden.');
 	}
 
-    if (!$this->contentContainer->permissionManager->can(new DeleteTasks())) {
-        throw new \yii\web\ForbiddenHttpException();
-    }
-
     $model = Task::find()
         ->contentContainer($this->contentContainer)
         ->where(['todo_task.id' => $id])
@@ -489,8 +489,8 @@ public function actionDelete($id)
         throw new HttpException(404, 'Task nicht gefunden.');
     }
 
-    if (!$model->content->canEdit()) {
-        throw new HttpException(403);
+    if (!$model->canDelete()) {
+        throw new \yii\web\ForbiddenHttpException();
     }
 
     $model->delete();
@@ -533,10 +533,6 @@ public function actionDeleteFile($id, $guid)
         throw new HttpException(404, 'Kein Space gefunden.');
     }
 
-    if (!$this->contentContainer->permissionManager->can(new EditTasks())) {
-        throw new \yii\web\ForbiddenHttpException();
-    }
-
     $model = Task::find()
         ->contentContainer($this->contentContainer)
         ->where(['todo_task.id' => $id])
@@ -544,6 +540,10 @@ public function actionDeleteFile($id, $guid)
 
     if (!$model) {
         throw new NotFoundHttpException();
+    }
+
+    if (!$model->canManage()) {
+        throw new \yii\web\ForbiddenHttpException();
     }
 
     $file = File::findOne(['guid' => $guid]);
@@ -572,10 +572,6 @@ public function actionUploadFile($id)
         throw new HttpException(404, 'Kein Space gefunden.');
     }
 
-    if (!$this->contentContainer->permissionManager->can(new EditTasks())) {
-        throw new \yii\web\ForbiddenHttpException();
-    }
-
     $model = Task::find()
         ->contentContainer($this->contentContainer)
         ->where(['todo_task.id' => $id])
@@ -583,6 +579,10 @@ public function actionUploadFile($id)
 
     if (!$model) {
         throw new NotFoundHttpException();
+    }
+
+    if (!$model->canManage()) {
+        throw new \yii\web\ForbiddenHttpException();
     }
 
     $uploadedFile = UploadedFile::getInstanceByName('uploadFile');
@@ -628,10 +628,6 @@ public function actionUpdateFileTitle($id, $guid)
         throw new HttpException(404, 'Kein Space gefunden.');
     }
 
-    if (!$this->contentContainer->permissionManager->can(new EditTasks())) {
-        throw new \yii\web\ForbiddenHttpException();
-    }
-
     $model = Task::find()
         ->contentContainer($this->contentContainer)
         ->where(['todo_task.id' => $id])
@@ -639,6 +635,10 @@ public function actionUpdateFileTitle($id, $guid)
 
     if (!$model) {
         throw new NotFoundHttpException();
+    }
+
+    if (!$model->canManage()) {
+        throw new \yii\web\ForbiddenHttpException();
     }
 
     $file = File::findOne(['guid' => $guid]);
@@ -847,7 +847,7 @@ public function actionUpdateFileTitle($id, $guid)
             // Anyone who may create/edit the task may create a list inline.
             $canCreateList = $model->isNewRecord
                 ? $this->contentContainer->permissionManager->can(new CreateTasks())
-                : $this->contentContainer->permissionManager->can(new EditTasks());
+                : $model->canManage();
 
             if (!$canCreateList) {
                 throw new \yii\web\ForbiddenHttpException('Keine Berechtigung zum Erstellen einer Aufgabenliste.');
@@ -868,10 +868,6 @@ public function actionUpdateFileTitle($id, $guid)
             throw new HttpException(404, 'Kein Space gefunden.');
         }
 
-        if (!$this->contentContainer->permissionManager->can(new EditTasks())) {
-            throw new \yii\web\ForbiddenHttpException();
-        }
-
         $task = Task::find()
             ->contentContainer($this->contentContainer)
             ->andWhere(['todo_task.id' => $id])
@@ -879,6 +875,10 @@ public function actionUpdateFileTitle($id, $guid)
 
         if (!$task) {
             throw new NotFoundHttpException();
+        }
+
+        if (!$task->canWorkOn()) {
+            throw new \yii\web\ForbiddenHttpException();
         }
 
         return $task;

@@ -3,6 +3,7 @@
 namespace humhub\modules\todo\permissions;
 
 use humhub\libs\BasePermission;
+use humhub\modules\space\models\Space;
 
 class DeleteTasks extends BasePermission
 {
@@ -12,7 +13,10 @@ class DeleteTasks extends BasePermission
 
     protected $title = 'ToDo löschen';
 
-    protected $description = 'Erlaubt das Löschen von Aufgaben';
+    protected $description = 'Erlaubt das Löschen aller Aufgaben';
 
-    protected $defaultState = self::STATE_DENY;
+    protected $defaultAllowedGroups = [
+        Space::USERGROUP_OWNER,
+        Space::USERGROUP_ADMIN,
+    ];
 }
