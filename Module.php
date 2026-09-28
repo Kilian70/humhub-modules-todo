@@ -9,6 +9,7 @@ use humhub\modules\content\components\ContentContainerActiveRecord;
 use humhub\modules\space\models\Space;
 use humhub\modules\space\widgets\Menu;
 use humhub\modules\ui\menu\MenuLink;
+use humhub\helpers\ControllerHelper;
 use humhub\modules\todo\models\Task;
 use humhub\modules\todo\permissions\ViewTasks;
 use humhub\modules\todo\search\TaskSearchProvider;
@@ -33,7 +34,7 @@ public function init()
 
         if (
             !$space ||
-            !$space->isModuleEnabled('todo') ||
+            !$space->moduleManager->isEnabled('todo') ||
             !$space->permissionManager->can(new ViewTasks())
         ) {
             return;
@@ -99,7 +100,7 @@ public function init()
 				'icon' => $icon,
 				'htmlOptions' => $overdueMyTasks > 0 ? ['class' => 'text-danger'] : [],
 				'sortOrder' => 300,
-				'isActive' => MenuLink::isActiveState('todo', 'task'),
+				'isActive' => ControllerHelper::isActivePath('todo', 'task'),
 			]));
         });
     }

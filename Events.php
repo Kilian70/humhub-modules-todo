@@ -33,7 +33,7 @@ class Events
     public static function onSpaceSidebarInit(Event $event): void
     {
         $space = $event->sender->space ?? null;
-        if (!$space || !$space->isModuleEnabled('todo')) {
+        if (!$space || !$space->moduleManager->isEnabled('todo')) {
             return;
         }
 
