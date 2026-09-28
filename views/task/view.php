@@ -9,6 +9,7 @@ use humhub\modules\comment\widgets\Comments;
 use humhub\modules\space\models\Membership;
 use humhub\modules\user\widgets\UserPickerField;
 use yii\helpers\Url;
+use yii\helpers\ArrayHelper;
 
 ?>
 
@@ -79,6 +80,9 @@ $canWorkOnTask = $task->canWorkOn();
         ?>
         <div class="mb-3">
             <span class="<?= $statusClass ?>"><?= $statusLabel ?></span>
+            <?php if ($task->getOpenBlockingTasks()->exists()): ?>
+                <span class="badge bg-warning text-dark ms-1"><i class="fa fa-lock"></i> BLOCKIERT</span>
+            <?php endif; ?>
             <?php if ($task->status === 'geschlossen' && $task->closed_at): ?>
                 <span class="small text-muted ms-2">
                     Geschlossen
@@ -122,6 +126,67 @@ $canWorkOnTask = $task->canWorkOn();
                     $contentContainer->createUrl('/todo/task/view', ['id' => $task->parentTask->id])
                 ) ?>
             </div>
+        <?php endif; ?>
+
+        <?php $blockingTasks = $task->blockingTasks; ?>
+        <?php if (!empty($blockingTasks) || $canEditTask): ?>
+            <details class="card mb-4" <?= !empty($blockingTasks) ? 'open' : '' ?>>
+                <summary class="card-header py-2" style="cursor:pointer;list-style:none;">
+                    <strong><i class="fa fa-link"></i> Voraussetzungen</strong>
+                    <?php if ($task->getOpenBlockingTasks()->exists()): ?>
+                        <span class="badge bg-warning text-dark ms-1">blockiert</span>
+                    <?php endif; ?>
+                </summary>
+                <div class="card-body p-2">
+                    <?php if (empty($blockingTasks)): ?>
+                        <p class="text-muted mb-2">Keine Voraussetzungen festgelegt.</p>
+                    <?php else: ?>
+                        <div class="list-group mb-2">
+                            <?php foreach ($blockingTasks as $blockingTask): ?>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>
+                                        <?= Html::a(
+                                            Html::encode($blockingTask->title),
+                                            $contentContainer->createUrl('/todo/task/view', ['id' => $blockingTask->id])
+                                        ) ?>
+                                        <span class="badge bg-<?= $blockingTask->status === 'geschlossen' ? 'success' : 'warning text-dark' ?> ms-1">
+                                            <?= $blockingTask->status === 'geschlossen' ? 'Erledigt' : 'Offen' ?>
+                                        </span>
+                                    </span>
+                                    <?php if ($canEditTask): ?>
+                                        <?= Html::beginForm($contentContainer->createUrl('/todo/task/dependency-remove', [
+                                            'id' => $task->id,
+                                            'blockingTaskId' => $blockingTask->id,
+                                        ]), 'post', ['class' => 'd-inline']) ?>
+                                        <?= Html::submitButton('<i class="fa fa-times"></i>', [
+                                            'class' => 'btn btn-sm btn-danger',
+                                            'title' => 'Voraussetzung entfernen',
+                                        ]) ?>
+                                        <?= Html::endForm() ?>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if ($canEditTask && !empty($dependencyCandidates)): ?>
+                        <?= Html::beginForm($contentContainer->createUrl('/todo/task/dependency-add', ['id' => $task->id]), 'post', [
+                            'class' => 'd-flex gap-2 align-items-end',
+                        ]) ?>
+                        <div class="flex-grow-1">
+                            <label class="control-label" for="todo-blocking-task">Aufgabe auswählen</label>
+                            <?= Html::dropDownList(
+                                'blocking_task_id',
+                                null,
+                                ArrayHelper::map($dependencyCandidates, 'id', 'title'),
+                                ['id' => 'todo-blocking-task', 'class' => 'form-control']
+                            ) ?>
+                        </div>
+                        <?= Html::submitButton('<i class="fa fa-plus"></i> Hinzufügen', ['class' => 'btn btn-sm btn-primary mb-1']) ?>
+                        <?= Html::endForm() ?>
+                    <?php endif; ?>
+                </div>
+            </details>
         <?php endif; ?>
 
         <?php

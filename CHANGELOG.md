@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.13.0 - 2026-09-28
+
+- Aufgaben können andere Aufgaben als Voraussetzung erhalten
+- offene Voraussetzungen kennzeichnen die abhängige Aufgabe sichtbar als blockiert
+- blockierte Aufgaben können erst nach Abschluss aller Voraussetzungen geschlossen werden
+- Voraussetzungen lassen sich direkt in der Aufgabendetailansicht hinzufügen und entfernen
+- zyklische und Space-übergreifende Abhängigkeiten werden verhindert
+- Änderungen an Voraussetzungen werden im Aktivitätsprotokoll dokumentiert
+- Abhängigkeiten werden bei der vollständigen Moduldeinstallation entfernt
+
 ## 1.12.0 - 2026-09-28
 
 - vollständige Aufgaben können als Unteraufgaben einer Hauptaufgabe angelegt werden
