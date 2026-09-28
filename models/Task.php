@@ -15,6 +15,7 @@ use humhub\modules\todo\permissions\EditTasks;
 use humhub\modules\todo\permissions\DeleteTasks;
 use humhub\modules\todo\permissions\ViewTasks;
 use humhub\modules\todo\services\CalendarSyncService;
+use humhub\modules\todo\services\TaskAuthorizationService;
 use humhub\modules\todo\models\TaskList;
 use humhub\modules\user\helpers\UserHelper;
 use yii\helpers\FileHelper;
@@ -204,14 +205,23 @@ class Task extends ContentActiveRecord implements ViewableInterface
         $user = UserHelper::getUserByParam($user);
         $container = $this->content?->container;
 
-        return $container !== null
-            && ($container->getPermissionManager($user)->can(new EditTasks()) || $this->isCreatedBy($user));
+        return $container !== null && TaskAuthorizationService::canManage(
+            $container->getPermissionManager($user)->can(new EditTasks()),
+            $this->isCreatedBy($user)
+        );
     }
 
     /** Workflow editing: full managers plus assigned people. */
     public function canWorkOn($user = null): bool
     {
-        return $this->canManage($user) || $this->isAssignedTo($user);
+        $user = UserHelper::getUserByParam($user);
+        $container = $this->content?->container;
+
+        return $container !== null && TaskAuthorizationService::canWorkOn(
+            $container->getPermissionManager($user)->can(new EditTasks()),
+            $this->isCreatedBy($user),
+            $this->isAssignedTo($user)
+        );
     }
 
     /** Deleting: users with DeleteTasks or the person who created the task. */
@@ -220,8 +230,10 @@ class Task extends ContentActiveRecord implements ViewableInterface
         $user = UserHelper::getUserByParam($user);
         $container = $this->content?->container;
 
-        return $container !== null
-            && ($container->getPermissionManager($user)->can(new DeleteTasks()) || $this->isCreatedBy($user));
+        return $container !== null && TaskAuthorizationService::canDelete(
+            $container->getPermissionManager($user)->can(new DeleteTasks()),
+            $this->isCreatedBy($user)
+        );
     }
 
     /**

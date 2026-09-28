@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.8.9 - 2026-09-28
+
+- Berechtigungsentscheidungen in einer zentralen, testbaren Regel zusammengeführt
+- automatische Rollenmatrix für Ersteller, Zuständige, fremde Mitglieder, Moderation, Administration und Gäste ergänzt
+- Berechtigungstests in die lokale Qualitätsprüfung und GitHub Actions aufgenommen
+
 ## 1.8.8 - 2026-09-28
 
 - Space-Mitglieder dürfen standardmäßig ToDos anzeigen und erstellen
