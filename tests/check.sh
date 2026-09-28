@@ -54,6 +54,12 @@ if (!is_file("migrations/uninstall.php")) {
     fwrite(STDERR, "Missing uninstall migration\n");
     exit(1);
 }
+foreach (["models/TaskHistory.php", "services/TaskHistoryService.php", "migrations/m260928_120000_task_history.php"] as $file) {
+    if (!is_file($file)) {
+        fwrite(STDERR, "Missing task history component: {$file}\n");
+        exit(1);
+    }
+}
 foreach (["de", "en"] as $language) {
     $messages = require "messages/{$language}/base.php";
     if (!is_array($messages) || $messages === []) {
