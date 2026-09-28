@@ -18,7 +18,8 @@ use yii\helpers\ArrayHelper;
 $canEditTask = $task->canManage();
 $canWorkOnTask = $task->canWorkOn();
 $canCreateTask = $contentContainer->permissionManager->can(new \humhub\modules\todo\permissions\CreateTasks());
-$notificationMode = TaskNotificationPreferenceService::getMode((int) $task->id, (int) Yii::$app->user->id);
+$notificationMode = TaskNotificationPreferenceService::getOverrideMode((int) $task->id, (int) Yii::$app->user->id);
+$notificationDefault = TaskNotificationPreferenceService::getDefaultMode((int) Yii::$app->user->id);
 ?>
 
 <div class="panel panel-default">
@@ -616,6 +617,14 @@ $notificationMode = TaskNotificationPreferenceService::getMode((int) $task->id, 
             <div class="panel-body">
                 <?= Html::beginForm($contentContainer->createUrl('/todo/task/notification-preference', ['id' => $task->id]), 'post') ?>
                 <?= Html::dropDownList('mode', $notificationMode, [
+                    TaskNotificationPreferenceService::INHERIT => Yii::t('TodoModule.base', 'Persönlichen Standard verwenden: {setting}', [
+                        '{setting}' => Yii::t('TodoModule.base', [
+                            TaskNotificationPreferenceService::ALL => 'Alle ToDo-Benachrichtigungen',
+                            TaskNotificationPreferenceService::IMPORTANT => 'Nur Kommentare und Zuweisungen',
+                            TaskNotificationPreferenceService::REMINDERS => 'Nur Erinnerungen',
+                            TaskNotificationPreferenceService::MUTED => 'Stumm',
+                        ][$notificationDefault]),
+                    ]),
                     TaskNotificationPreferenceService::ALL => Yii::t('TodoModule.base', 'Alle ToDo-Benachrichtigungen'),
                     TaskNotificationPreferenceService::IMPORTANT => Yii::t('TodoModule.base', 'Nur Kommentare und Zuweisungen'),
                     TaskNotificationPreferenceService::REMINDERS => Yii::t('TodoModule.base', 'Nur Erinnerungen'),
