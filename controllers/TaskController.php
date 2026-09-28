@@ -7,6 +7,7 @@ use humhub\modules\content\components\ContentContainerController;
 use humhub\modules\todo\models\Task;
 use humhub\modules\todo\models\ChecklistItem;
 use humhub\modules\todo\models\TaskList;
+use humhub\modules\todo\models\TaskDependency;
 use humhub\modules\todo\permissions\ViewTasks;
 use humhub\modules\todo\permissions\CreateTasks;
 use humhub\modules\todo\permissions\EditTasks;
@@ -20,6 +21,7 @@ use humhub\modules\space\models\Membership;
 use humhub\modules\user\models\User;
 use humhub\modules\todo\services\CalendarSyncService;
 use humhub\modules\todo\services\TaskHistoryService;
+use humhub\modules\todo\services\TaskDependencyService;
 
 class TaskController extends ContentContainerController
 {
@@ -40,6 +42,8 @@ class TaskController extends ContentContainerController
                 'checklist-edit' => ['POST'],
                 'change-status' => ['POST'],
                 'quick-update' => ['POST'],
+                'dependency-add' => ['POST'],
+                'dependency-remove' => ['POST'],
             ],
         ];
 
@@ -552,7 +556,45 @@ public function actionView($id)
     return $this->render('view', [
         'task' => $task,
         'contentContainer' => $this->contentContainer,
+        'dependencyCandidates' => Task::find()
+            ->contentContainer($this->contentContainer)
+            ->andWhere(['<>', 'todo_task.id', $task->id])
+            ->andWhere(['not in', 'todo_task.id', $task->getBlockingTasks()->select('todo_task.id')])
+            ->orderBy(['todo_task.title' => SORT_ASC])
+            ->limit(200)
+            ->all(),
     ]);
+}
+
+public function actionDependencyAdd($id)
+{
+    $task = $this->findManageableTask($id);
+    $blockingTaskId = (int) Yii::$app->request->post('blocking_task_id');
+    $blockingTask = Task::find()
+        ->contentContainer($this->contentContainer)
+        ->andWhere(['todo_task.id' => $blockingTaskId])
+        ->one();
+
+    if (!$blockingTask || TaskDependencyService::wouldCreateCycle((int) $task->id, $blockingTaskId)) {
+        Yii::$app->session->setFlash('error', 'Diese Abhängigkeit ist ungültig oder würde einen Kreis erzeugen.');
+    } else {
+        $dependency = new TaskDependency(['task_id' => $task->id, 'blocking_task_id' => $blockingTaskId]);
+        if ($dependency->save()) {
+            TaskHistoryService::record($task, 'dependency_added', 'Voraussetzung hinzugefügt: ' . $blockingTask->title);
+        }
+    }
+
+    return $this->redirect($this->contentContainer->createUrl('/todo/task/view', ['id' => $task->id]));
+}
+
+public function actionDependencyRemove($id, $blockingTaskId)
+{
+    $task = $this->findManageableTask($id);
+    $blockingTask = Task::findOne((int) $blockingTaskId);
+    if (TaskDependency::deleteAll(['task_id' => $task->id, 'blocking_task_id' => (int) $blockingTaskId])) {
+        TaskHistoryService::record($task, 'dependency_removed', 'Voraussetzung entfernt: ' . ($blockingTask?->title ?? '#' . $blockingTaskId));
+    }
+    return $this->redirect($this->contentContainer->createUrl('/todo/task/view', ['id' => $task->id]));
 }
 
 public function actionDeleteFile($id, $guid)
@@ -937,6 +979,24 @@ public function actionUpdateFileTitle($id, $guid)
             throw new \yii\web\ForbiddenHttpException();
         }
 
+        return $task;
+    }
+
+    private function findManageableTask($id): Task
+    {
+        if (!$this->contentContainer) {
+            throw new HttpException(404, 'Kein Space gefunden.');
+        }
+        $task = Task::find()
+            ->contentContainer($this->contentContainer)
+            ->andWhere(['todo_task.id' => (int) $id])
+            ->one();
+        if (!$task) {
+            throw new NotFoundHttpException();
+        }
+        if (!$task->canManage()) {
+            throw new \yii\web\ForbiddenHttpException();
+        }
         return $task;
     }
 
