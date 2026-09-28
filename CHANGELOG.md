@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.21.0 - 2026-09-28
+
+- geschlossene Aufgaben können archiviert werden
+- archivierte Aufgaben verschwinden aus Liste und Kanban, ohne gelöscht zu werden
+- eigene Archivansicht mit Filtern ergänzt
+- archivierte Aufgaben können vollständig wiederhergestellt werden
+- Dateien, Kommentare, Checklisten und Aktivitätsverlauf bleiben erhalten
+- Archivieren und Wiederherstellen werden im Aktivitätsprotokoll dokumentiert
+
 ## 1.20.0 - 2026-09-28
 
 - Kanban-Karten lassen sich innerhalb einer Spalte per Drag-and-drop sortieren
