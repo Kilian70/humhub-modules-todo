@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'Aktuell gefilterte Aufgaben als CSV exportieren' => 'Export currently filtered tasks as CSV',
+    'CSV-Export' => 'CSV export',
+    'Erstellt am' => 'Created at',
+    'Erstellt von' => 'Created by',
     'Alle ToDo-Benachrichtigungen' => 'All ToDo notifications',
     'Benachrichtigungseinstellung konnte nicht gespeichert werden.' => 'The notification setting could not be saved.',
     'Benachrichtigungseinstellung gespeichert.' => 'Notification setting saved.',

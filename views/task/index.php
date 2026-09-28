@@ -18,6 +18,8 @@ $filterParams = [
     'assignee_id' => Yii::$app->request->get('assignee_id'),
     'label_id' => Yii::$app->request->get('label_id'),
 ];
+$exportParams = Yii::$app->request->getQueryParams();
+unset($exportParams['r'], $exportParams['cguid'], $exportParams['page'], $exportParams['per-page']);
 
 $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $currentDone, $isMy, $groupBy, $showArchive, $showTrash) {
     $isOverdue = !empty($task->due_date) && $task->due_date < date('Y-m-d') && $task->status !== 'geschlossen';
@@ -230,6 +232,10 @@ $kanbanCard = function ($task) use ($contentContainer) {
                 <?= Html::a(Yii::t('TodoModule.base', 'Labels'), $contentContainer->createUrl('/todo/label/index'), ['class' => 'btn btn-default btn-sm']) ?>
             <?php endif; ?>
             <?= Html::a(Yii::t('TodoModule.base', 'Vorlagen'), $contentContainer->createUrl('/todo/template/index'), ['class' => 'btn btn-default btn-sm']) ?>
+            <?= Html::a('<i class="fa fa-download"></i> ' . Yii::t('TodoModule.base', 'CSV-Export'), $contentContainer->createUrl('/todo/task/export', $exportParams), [
+                'class' => 'btn btn-default btn-sm',
+                'title' => Yii::t('TodoModule.base', 'Aktuell gefilterte Aufgaben als CSV exportieren'),
+            ]) ?>
             <?php if ($contentContainer->permissionManager->can(new \humhub\modules\todo\permissions\CreateTasks())): ?>
                 <?= Html::a(Yii::t('TodoModule.base', 'Neue Aufgabe'), $contentContainer->createUrl('/todo/task/create'), ['class' => 'btn btn-success btn-sm']) ?>
             <?php endif; ?>

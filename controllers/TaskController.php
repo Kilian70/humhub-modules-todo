@@ -26,6 +26,7 @@ use humhub\modules\todo\services\TaskHistoryService;
 use humhub\modules\todo\services\TaskDependencyService;
 use humhub\modules\todo\services\TaskDuplicationService;
 use humhub\modules\todo\services\TaskNotificationPreferenceService;
+use humhub\modules\todo\services\TaskExportService;
 
 class TaskController extends ContentContainerController
 {
@@ -285,6 +286,22 @@ public function actionIndex()
         'taskLabels' => TaskLabel::findForSpace((int) $this->contentContainer->id),
         'showArchive' => $showArchive,
         'showTrash' => $showTrash,
+    ]);
+}
+
+public function actionExport()
+{
+    if (!$this->contentContainer
+        || !$this->contentContainer->permissionManager->can(new ViewTasks())) {
+        throw new \yii\web\ForbiddenHttpException();
+    }
+
+    $content = TaskExportService::export($this->contentContainer, Yii::$app->request->get());
+    $spaceName = preg_replace('/[^a-z0-9_-]+/i', '-', (string) $this->contentContainer->name);
+    $filename = 'todo-' . trim($spaceName, '-') . '-' . date('Y-m-d') . '.csv';
+    return Yii::$app->response->sendContentAsFile($content, $filename, [
+        'mimeType' => 'text/csv; charset=UTF-8',
+        'inline' => false,
     ]);
 }
 
