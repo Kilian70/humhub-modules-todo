@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.8.8 - 2026-09-28
+
+- Space-Mitglieder dürfen standardmäßig ToDos anzeigen und erstellen
+- Ersteller dürfen ihre eigenen ToDos vollständig bearbeiten und löschen
+- zugewiesene Personen dürfen Status und Checkliste der Aufgabe bearbeiten
+- Moderatoren, Administratoren und Besitzer dürfen alle Aufgaben bearbeiten
+- nur Besitzer und Administratoren dürfen standardmäßig alle Aufgaben löschen
+- Gäste erhalten keine standardmäßigen ToDo-Schreibrechte mehr
+
 ## 1.8.7 - 2026-09-28
 
 - Kompatibilität mit der geänderten Space-Modul-API in HumHub 1.19 hergestellt
