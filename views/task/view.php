@@ -742,10 +742,16 @@ JS
             </div>
 
             <div class="todo-communication-comments mt-2">
-                <?= Comments::widget([
-                    'object' => $task,
-                    'viewMode' => Comments::VIEW_MODE_FULL,
-                ]) ?>
+                <?php
+                // HumHub 1.19 changed the comment widget from an ActiveRecord
+                // object to its Content model. Keep the module compatible with
+                // both the 1.18 and 1.19 APIs.
+                $commentWidgetConfig = property_exists(Comments::class, 'content')
+                    ? ['content' => $task->content]
+                    : ['object' => $task];
+                $commentWidgetConfig['viewMode'] = Comments::VIEW_MODE_FULL;
+                ?>
+                <?= Comments::widget($commentWidgetConfig) ?>
             </div>
         </div>
 

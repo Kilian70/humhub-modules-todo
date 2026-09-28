@@ -10,6 +10,11 @@ find . -type f -name '*.php' -not -path './vendor/*' -print0 \
 
 composer validate --strict --no-check-publish
 
+if grep -RInE "due_date = ['\"]{2}|->isModuleEnabled\(|MenuLink::isActiveState\(" --include='*.php' .; then
+    echo "Obsolete HumHub API usage or invalid DATE comparison found" >&2
+    exit 1
+fi
+
 php -r '
 $module = json_decode(file_get_contents("module.json"), true, 512, JSON_THROW_ON_ERROR);
 $composer = json_decode(file_get_contents("composer.json"), true, 512, JSON_THROW_ON_ERROR);
@@ -35,6 +40,10 @@ foreach (["README.md", "CHANGELOG.md", "LICENSE", "SECURITY.md", "CONTRIBUTING.m
         fwrite(STDERR, "Missing required repository file: {$file}\n");
         exit(1);
     }
+}
+if (!is_file("migrations/uninstall.php")) {
+    fwrite(STDERR, "Missing uninstall migration\n");
+    exit(1);
 }
 foreach (["de", "en"] as $language) {
     $messages = require "messages/{$language}/base.php";

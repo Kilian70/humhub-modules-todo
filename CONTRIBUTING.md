@@ -11,6 +11,13 @@ Beiträge zum ToDo-Modul sind willkommen.
 5. Benutzerrelevante Änderungen im `CHANGELOG.md` ergänzen.
 6. Einen Pull Request mit Beschreibung und Testhinweisen erstellen.
 
+## Sichere Deinstallationstests
+
+Für Installations- und Deinstallationstests muss das Modul als separate Kopie oder
+in einem eigenen Test-Checkout unter `protected/modules/todo` liegen. Dafür keinen
+Symlink auf den echten Entwicklungsordner verwenden: HumHub kann beim Entfernen
+des Moduls dem Symlink folgen und dadurch den verknüpften Ordner löschen.
+
 Bitte keine Zugangsdaten, personenbezogenen Daten, Datenbankexporte oder Dateien aus
 produktiven HumHub-Installationen committen.
 

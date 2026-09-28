@@ -15,7 +15,7 @@ class SpaceTasks extends Widget
     {
         if (
             !$this->space ||
-            !$this->space->isModuleEnabled('todo') ||
+            !$this->space->moduleManager->isEnabled('todo') ||
             !$this->space->permissionManager->can(new ViewTasks())
         ) {
             return '';
