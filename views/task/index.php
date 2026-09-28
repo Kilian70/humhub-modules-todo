@@ -48,7 +48,7 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
                 <span class="<?= $priorityClass ?>"><?= ucfirst(Html::encode($task->priority)) ?></span>
                 <span class="<?= $statusClass ?>"><?= $statusLabel ?></span>
                 <?php if ($isOverdue): ?><span class="badge bg-danger"><?= Yii::t('TodoModule.base', 'ÜBERFÄLLIG') ?></span><?php endif; ?>
-                <?php foreach ($task->labels as $label): ?>
+                <?php foreach ($task->taskLabels as $label): ?>
                     <span class="badge" style="background:<?= Html::encode($label->color) ?>;color:#fff;"><?= Html::encode($label->name) ?></span>
                 <?php endforeach; ?>
             </div>
@@ -133,7 +133,7 @@ $kanbanCard = function ($task) use ($contentContainer) {
             <span class="badge <?= $priorityClass ?>"><?= Html::encode(Yii::t('TodoModule.base', ucfirst($task->priority))) ?></span>
             <?php if ($isOverdue): ?><span class="badge bg-danger"><?= Yii::t('TodoModule.base', 'ÜBERFÄLLIG') ?></span><?php endif; ?>
             <?php if ($task->getOpenBlockingTasks()->exists()): ?><span class="badge bg-warning text-dark"><?= Yii::t('TodoModule.base', 'BLOCKIERT') ?></span><?php endif; ?>
-            <?php foreach ($task->labels as $label): ?>
+            <?php foreach ($task->taskLabels as $label): ?>
                 <span class="badge" style="background:<?= Html::encode($label->color) ?>;color:#fff;"><?= Html::encode($label->name) ?></span>
             <?php endforeach; ?>
         </div>

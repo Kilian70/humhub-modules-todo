@@ -119,7 +119,7 @@ public function actionIndex()
 
     $labelId = (int) Yii::$app->request->get('label_id', 0);
     if ($labelId > 0) {
-        $query->joinWith('labels')
+        $query->joinWith('taskLabels')
             ->andWhere(['todo_task_label.id' => $labelId]);
     }
     $query->distinct();

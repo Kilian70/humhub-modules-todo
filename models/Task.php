@@ -338,7 +338,7 @@ class Task extends ContentActiveRecord implements ViewableInterface
         return $this->hasMany(TaskUser::class, ['task_id' => 'id']);
     }
 
-    public function getLabels()
+    public function getTaskLabels()
     {
         return $this->hasMany(TaskLabel::class, ['id' => 'label_id'])
             ->viaTable('todo_task_label_map', ['task_id' => 'id'])
@@ -391,7 +391,7 @@ class Task extends ContentActiveRecord implements ViewableInterface
         parent::afterFind();
 
         $this->user_ids = array_map(fn($user) => $user->guid, $this->users);
-        $this->label_ids = array_map(static fn($label) => (int) $label->id, $this->labels);
+        $this->label_ids = array_map(static fn($label) => (int) $label->id, $this->taskLabels);
         $this->task_list_name = $this->taskList ? $this->taskList->name : '';
     }
 
