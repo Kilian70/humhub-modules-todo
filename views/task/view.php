@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use humhub\modules\user\widgets\Image as UserImage;
 use humhub\modules\user\models\User;
 use humhub\modules\todo\services\CalendarSyncService;
+use humhub\modules\todo\services\TaskNotificationPreferenceService;
 use humhub\modules\comment\widgets\Comments;
 
 use humhub\modules\space\models\Membership;
@@ -17,6 +18,7 @@ use yii\helpers\ArrayHelper;
 $canEditTask = $task->canManage();
 $canWorkOnTask = $task->canWorkOn();
 $canCreateTask = $contentContainer->permissionManager->can(new \humhub\modules\todo\permissions\CreateTasks());
+$notificationMode = TaskNotificationPreferenceService::getMode((int) $task->id, (int) Yii::$app->user->id);
 ?>
 
 <div class="panel panel-default">
@@ -605,6 +607,27 @@ $canCreateTask = $contentContainer->permissionManager->can(new \humhub\modules\t
             </div>
 
         <?php endif; ?>
+
+        <details class="panel panel-default mt-4" id="todo-notifications">
+            <summary class="panel-heading" style="cursor:pointer;">
+                <i class="fa fa-bell-o"></i>
+                <strong><?= Yii::t('TodoModule.base', 'Meine Benachrichtigungen') ?></strong>
+            </summary>
+            <div class="panel-body">
+                <?= Html::beginForm($contentContainer->createUrl('/todo/task/notification-preference', ['id' => $task->id]), 'post') ?>
+                <?= Html::dropDownList('mode', $notificationMode, [
+                    TaskNotificationPreferenceService::ALL => Yii::t('TodoModule.base', 'Alle ToDo-Benachrichtigungen'),
+                    TaskNotificationPreferenceService::IMPORTANT => Yii::t('TodoModule.base', 'Nur Kommentare und Zuweisungen'),
+                    TaskNotificationPreferenceService::REMINDERS => Yii::t('TodoModule.base', 'Nur Erinnerungen'),
+                    TaskNotificationPreferenceService::MUTED => Yii::t('TodoModule.base', 'Stumm'),
+                ], ['class' => 'form-control']) ?>
+                <p class="help-block mb-2">
+                    <?= Yii::t('TodoModule.base', 'Diese Auswahl gilt nur für dich und nur für diese Aufgabe. Erwähnungen und HumHub-Follower bleiben unverändert.') ?>
+                </p>
+                <?= Html::submitButton(Yii::t('TodoModule.base', 'Speichern'), ['class' => 'btn btn-sm btn-primary']) ?>
+                <?= Html::endForm() ?>
+            </div>
+        </details>
 
 
         <!-- ERSTELLT -->

@@ -19,6 +19,7 @@ use humhub\modules\todo\services\CalendarSyncService;
 use humhub\modules\todo\services\TaskAuthorizationService;
 use humhub\modules\todo\services\TaskHistoryService;
 use humhub\modules\todo\services\RecurringTaskService;
+use humhub\modules\todo\services\TaskNotificationPreferenceService;
 use humhub\modules\todo\models\TaskList;
 use humhub\modules\user\helpers\UserHelper;
 use yii\helpers\FileHelper;
@@ -580,6 +581,10 @@ public function afterSave($insert, $changedAttributes)
          */
         foreach ($users as $user) {
 
+            if (!TaskNotificationPreferenceService::allows($this, (int) $user->id, TaskNotificationPreferenceService::EVENT_ACTIVITY)) {
+                continue;
+            }
+
             Yii::$app->notification->send(
 				new \humhub\modules\todo\notifications\TaskCompleted([
 					'originator' => Yii::$app->user->identity,
@@ -612,6 +617,9 @@ public function afterSave($insert, $changedAttributes)
             }
 
             foreach ($recipientIds as $recipient) {
+                if (!TaskNotificationPreferenceService::allows($unblockedTask, (int) $recipient->id, TaskNotificationPreferenceService::EVENT_ACTIVITY)) {
+                    continue;
+                }
                 Yii::$app->notification->send(new TaskUnblocked([
                     'originator' => Yii::$app->user->identity,
                     'source' => $unblockedTask,
@@ -637,6 +645,10 @@ public function afterSave($insert, $changedAttributes)
         $user = User::findOne($userId);
 
         if ($user) {
+
+            if (!TaskNotificationPreferenceService::allows($this, (int) $user->id, TaskNotificationPreferenceService::EVENT_ASSIGNMENT)) {
+                continue;
+            }
 
             Yii::$app->notification->send(
                 new TaskAssigned([
