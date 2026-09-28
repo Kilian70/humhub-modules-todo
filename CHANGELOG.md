@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.14.0 - 2026-09-28
+
+- Zuständige werden benachrichtigt, sobald die letzte offene Voraussetzung erledigt ist
+- falls keine andere zuständige Person vorhanden ist, wird der Ersteller informiert
+- die Person, welche die Voraussetzung abschliesst, erhält keine unnötige Eigenbenachrichtigung
+- die automatische Freigabe wird im Aktivitätsprotokoll der abhängigen Aufgabe dokumentiert
+- Benachrichtigungen respektieren weiterhin Sichtbarkeit und ToDo-Anzeigerecht
+
 ## 1.13.0 - 2026-09-28
 
 - Aufgaben können andere Aufgaben als Voraussetzung erhalten

@@ -6,6 +6,7 @@ return [
     'Aufgabe überfällig' => 'Task overdue',
     'Aufgabe heute fällig' => 'Task due today',
     'Aufgabe morgen fällig' => 'Task due tomorrow',
+    'Eine Aufgabe ist jetzt freigegeben' => 'A task is now unblocked',
     'Aufgabenliste' => 'Task list',
     'Benachrichtigungen für ToDo-Aufgaben' => 'Notifications for ToDo tasks',
     'Beschreibung' => 'Description',
@@ -38,6 +39,7 @@ return [
     'System' => 'System',
     'Titel' => 'Title',
     'ToDo' => 'ToDo',
+    'ToDo-Aufgabe freigegeben' => 'ToDo task unblocked',
     'Zuständig' => 'Assignees',
     'Zuständig:' => 'Assignees:',
     'überfällig' => 'overdue',
@@ -48,4 +50,5 @@ return [
     '{user} hat dir eine Aufgabe zugewiesen' => '{user} assigned a task to you',
     '{user} hat dir eine Aufgabe zugewiesen: {title}' => '{user} assigned a task to you: {title}',
     '{user} hat ToDo "{title}" erstellt' => '{user} created ToDo "{title}"',
+    'Die Aufgabe «{title}» ist nicht mehr blockiert.' => 'The task “{title}” is no longer blocked.',
 ];

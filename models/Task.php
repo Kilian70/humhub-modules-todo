@@ -5,6 +5,7 @@ namespace humhub\modules\todo\models;
 use Yii;
 use humhub\modules\content\components\ContentActiveRecord;
 use humhub\modules\todo\notifications\TaskAssigned;
+use humhub\modules\todo\notifications\TaskUnblocked;
 use humhub\modules\user\models\User;
 use humhub\modules\activity\models\Activity;
 use humhub\interfaces\ViewableInterface;
@@ -536,6 +537,36 @@ public function afterSave($insert, $changedAttributes)
 				]),
 				$user
 			);
+        }
+
+        foreach ($this->blockedTasks as $unblockedTask) {
+            if ($unblockedTask->status === 'geschlossen' || $unblockedTask->getOpenBlockingTasks()->exists()) {
+                continue;
+            }
+
+            TaskHistoryService::record(
+                $unblockedTask,
+                'dependency_unblocked',
+                'Alle Voraussetzungen sind erledigt – Aufgabe freigegeben'
+            );
+
+            $recipientIds = [];
+            foreach ($unblockedTask->users as $recipient) {
+                if ((int) $recipient->id !== (int) Yii::$app->user->id) {
+                    $recipientIds[(int) $recipient->id] = $recipient;
+                }
+            }
+            $creator = $unblockedTask->content->createdBy;
+            if ($creator && (int) $creator->id !== (int) Yii::$app->user->id) {
+                $recipientIds[(int) $creator->id] = $creator;
+            }
+
+            foreach ($recipientIds as $recipient) {
+                Yii::$app->notification->send(new TaskUnblocked([
+                    'originator' => Yii::$app->user->identity,
+                    'source' => $unblockedTask,
+                ]), $recipient);
+            }
         }
     }
 
