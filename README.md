@@ -64,7 +64,7 @@ php protected/yii cron/run
 
 ## Version
 
-Aktuelle Modulversion: **1.9.0**. Änderungen sind im [CHANGELOG.md](CHANGELOG.md)
+Aktuelle Modulversion: **1.10.0**. Änderungen sind im [CHANGELOG.md](CHANGELOG.md)
 dokumentiert.
 
 ## Mitwirken und Sicherheit

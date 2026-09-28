@@ -29,6 +29,23 @@ $this->title = 'ToDo – Einstellungen';
             </div>
         </div>
 
+        <hr>
+        <h4>Erinnerungen</h4>
+        <p class="text-muted">
+            Jede Erinnerungsstufe wird pro Aufgabe nur einmal versendet. Wird das Fälligkeitsdatum geändert,
+            werden die Stufen für diese Aufgabe zurückgesetzt.
+        </p>
+        <?= $form->field($model, 'remindersEnabled')->checkbox() ?>
+        <div class="row">
+            <div class="col-md-6">
+                <?= $form->field($model, 'reminderDaysBefore')->input('number', ['min' => 0, 'max' => 30]) ?>
+                <div class="form-text text-muted">0 deaktiviert die Vorwarnung; Standard sind 3 Tage.</div>
+            </div>
+        </div>
+        <?= $form->field($model, 'upcomingReminderEnabled')->checkbox() ?>
+        <?= $form->field($model, 'dueReminderEnabled')->checkbox() ?>
+        <?= $form->field($model, 'overdueReminderEnabled')->checkbox() ?>
+
         <div class="mt-3">
             <?= Html::submitButton('Speichern', ['class' => 'btn btn-primary']) ?>
         </div>
