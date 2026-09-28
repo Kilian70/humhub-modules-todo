@@ -46,10 +46,10 @@ class TemplateController extends ContentContainerController
         }
         $template = TaskTemplateService::fromTask($task, (int) $this->contentContainer->id);
         if (!$template->save()) {
-            Yii::$app->session->setFlash('error', 'Die Vorlage konnte nicht gespeichert werden.');
+            Yii::$app->session->setFlash('error', Yii::t('TodoModule.base', 'Die Vorlage konnte nicht gespeichert werden.'));
         } else {
             TaskHistoryService::record($task, 'template_created', 'Als Vorlage gespeichert: ' . $template->title);
-            Yii::$app->session->setFlash('success', 'Aufgabe wurde als Vorlage gespeichert.');
+            Yii::$app->session->setFlash('success', Yii::t('TodoModule.base', 'Aufgabe wurde als Vorlage gespeichert.'));
         }
         return $this->redirect($this->contentContainer->createUrl('/todo/template/index'));
     }
@@ -59,7 +59,7 @@ class TemplateController extends ContentContainerController
         $template = $this->findTemplate($id);
         $this->requireTemplateManagement($template);
         if ($template->load(Yii::$app->request->post()) && $template->save()) {
-            Yii::$app->session->setFlash('success', 'Vorlage gespeichert.');
+            Yii::$app->session->setFlash('success', Yii::t('TodoModule.base', 'Vorlage gespeichert.'));
             return $this->redirect($this->contentContainer->createUrl('/todo/template/index'));
         }
         return $this->render('update', ['model' => $template, 'contentContainer' => $this->contentContainer]);
@@ -71,7 +71,7 @@ class TemplateController extends ContentContainerController
         $template = $this->findTemplate($id);
         $task = TaskTemplateService::createTask($template, $this->contentContainer);
         if (!$task) {
-            Yii::$app->session->setFlash('error', 'Die Aufgabe konnte nicht aus der Vorlage erstellt werden.');
+            Yii::$app->session->setFlash('error', Yii::t('TodoModule.base', 'Die Aufgabe konnte nicht aus der Vorlage erstellt werden.'));
             return $this->redirect($this->contentContainer->createUrl('/todo/template/index'));
         }
         return $this->redirect($this->contentContainer->createUrl('/todo/task/update', ['id' => $task->id]));
@@ -82,7 +82,7 @@ class TemplateController extends ContentContainerController
         $template = $this->findTemplate($id);
         $this->requireTemplateManagement($template);
         $template->delete();
-        Yii::$app->session->setFlash('success', 'Vorlage gelöscht.');
+        Yii::$app->session->setFlash('success', Yii::t('TodoModule.base', 'Vorlage gelöscht.'));
         return $this->redirect($this->contentContainer->createUrl('/todo/template/index'));
     }
 

@@ -34,7 +34,7 @@ class Events
 
         $event->sender->addEntry(new MenuLink([
             'id' => 'todo-overview',
-            'label' => 'Meine ToDos',
+            'label' => Yii::t('TodoModule.base', 'Meine ToDos'),
             'url' => ['/todo/overview/index'],
             'icon' => 'check-square-o',
             'sortOrder' => $positions[$position] ?? $positions['front'],
@@ -48,7 +48,7 @@ class Events
             return;
         }
         $event->sender->addEntry(new MenuLink([
-            'label' => 'ToDo-Menü',
+            'label' => Yii::t('TodoModule.base', 'ToDo-Menü'),
             'url' => ['/todo/menu-settings/index'],
             'sortOrder' => 450,
             'isActive' => ControllerHelper::isActivePath('todo', 'menu-settings'),

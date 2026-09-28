@@ -27,6 +27,16 @@ public function init()
 
     Yii::setAlias('@todo', __DIR__);
 
+    $translations = ['TodoModule.*' => [
+        'class' => \yii\i18n\PhpMessageSource::class,
+        'basePath' => '@todo/messages',
+        'sourceLanguage' => 'de',
+        'fileMap' => [
+            'TodoModule.base' => 'base.php',
+        ],
+    ]] + Yii::$app->i18n->translations;
+    Yii::$app->i18n->translations = $translations;
+
     Event::on(Menu::class, Menu::EVENT_INIT, function ($event) {
 
         $menu = $event->sender;
