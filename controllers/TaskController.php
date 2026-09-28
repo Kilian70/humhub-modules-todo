@@ -45,6 +45,7 @@ class TaskController extends ContentContainerController
                 'checklist-edit' => ['POST'],
                 'change-status' => ['POST'],
                 'kanban-status' => ['POST'],
+                'kanban-order' => ['POST'],
                 'quick-update' => ['POST'],
                 'dependency-add' => ['POST'],
                 'dependency-remove' => ['POST'],
@@ -189,6 +190,23 @@ public function actionIndex()
         ->offset($pagination->offset)
         ->limit($pagination->limit)
         ->all();
+
+    if ($viewMode === 'kanban' && !Yii::$app->user->isGuest && $tasks) {
+        $defaultPositions = array_flip(array_map(static fn($task) => (int) $task->id, $tasks));
+        $positionRows = (new \yii\db\Query())
+            ->select(['task_id', 'sort_order'])
+            ->from('todo_kanban_order')
+            ->where(['user_id' => Yii::$app->user->id, 'task_id' => array_map(static fn($task) => (int) $task->id, $tasks)])
+            ->all();
+        $positions = [];
+        foreach ($positionRows as $row) {
+            $positions[(int) $row['task_id']] = (int) $row['sort_order'];
+        }
+        usort($tasks, static function ($a, $b) use ($positions, $defaultPositions) {
+            $comparison = ($positions[$a->id] ?? PHP_INT_MAX) <=> ($positions[$b->id] ?? PHP_INT_MAX);
+            return $comparison !== 0 ? $comparison : $defaultPositions[$a->id] <=> $defaultPositions[$b->id];
+        });
+    }
 
     // 🔹 Gruppierung nach Benutzer
     $tasksByUser = [];
@@ -612,6 +630,52 @@ public function actionKanbanStatus($id)
         return ['success' => false, 'message' => implode(' ', $model->getFirstErrors()) ?: Yii::t('TodoModule.base', 'Der Status konnte nicht geändert werden.')];
     }
 
+    return ['success' => true];
+}
+
+public function actionKanbanOrder()
+{
+    Yii::$app->response->format = Response::FORMAT_JSON;
+
+    if (!$this->contentContainer || Yii::$app->user->isGuest) {
+        Yii::$app->response->statusCode = 403;
+        return ['success' => false];
+    }
+    if (!$this->contentContainer->permissionManager->can(new ViewTasks())) {
+        Yii::$app->response->statusCode = 403;
+        return ['success' => false];
+    }
+
+    $taskIds = json_decode((string) Yii::$app->request->post('task_ids', '[]'), true);
+    if (!is_array($taskIds) || count($taskIds) > 100) {
+        Yii::$app->response->statusCode = 400;
+        return ['success' => false];
+    }
+    $taskIds = array_values(array_unique(array_filter(array_map('intval', $taskIds), static fn($id) => $id > 0)));
+    if (!$taskIds) {
+        return ['success' => true];
+    }
+
+    $validIds = Task::find()
+        ->contentContainer($this->contentContainer)
+        ->select('todo_task.id')
+        ->andWhere(['todo_task.id' => $taskIds, 'todo_task.parent_task_id' => null])
+        ->column();
+    sort($validIds);
+    $submittedIds = $taskIds;
+    sort($submittedIds);
+    if ($validIds !== $submittedIds) {
+        Yii::$app->response->statusCode = 400;
+        return ['success' => false];
+    }
+
+    foreach ($taskIds as $index => $taskId) {
+        Yii::$app->db->createCommand()->upsert('todo_kanban_order', [
+            'task_id' => $taskId,
+            'user_id' => Yii::$app->user->id,
+            'sort_order' => ($index + 1) * 10,
+        ], ['sort_order' => ($index + 1) * 10])->execute();
+    }
     return ['success' => true];
 }
 

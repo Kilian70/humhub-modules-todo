@@ -127,7 +127,7 @@ $kanbanCard = function ($task) use ($contentContainer) {
              data-status-url="<?= Html::encode($statusUrl) ?>"
              role="link"
              tabindex="0"
-             draggable="<?= $canMove ? 'true' : 'false' ?>">
+             draggable="true">
         <a href="<?= Html::encode($taskViewUrl) ?>" class="todo-kanban-title"><?= Html::encode($task->title) ?></a>
         <div class="d-flex flex-wrap gap-1 mt-2">
             <span class="badge <?= $priorityClass ?>"><?= Html::encode(Yii::t('TodoModule.base', ucfirst($task->priority))) ?></span>
@@ -239,7 +239,7 @@ $kanbanCard = function ($task) use ($contentContainer) {
         <?php endif; ?>
 
         <?php if ($viewMode === 'kanban'): ?>
-            <div class="todo-kanban-board">
+            <div class="todo-kanban-board" data-order-url="<?= Html::encode($contentContainer->createUrl('/todo/task/kanban-order')) ?>">
                 <?php foreach (['offen' => Yii::t('TodoModule.base', 'Offen'), 'in_bearbeitung' => Yii::t('TodoModule.base', 'In Bearbeitung'), 'geschlossen' => Yii::t('TodoModule.base', 'Geschlossen')] as $status => $label): ?>
                     <?php $columnTasks = array_values(array_filter($tasks, static fn($task) => $task->status === $status)); ?>
                     <section class="todo-kanban-column" data-kanban-status="<?= $status ?>">
@@ -373,6 +373,7 @@ document.querySelectorAll('.todo-list-row[data-task-url]').forEach(function (row
     var csrfParam = document.querySelector('meta[name="csrf-param"]')?.content;
     var csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
     var draggedCard = null;
+    var sourceZone = null;
 
     function refreshColumns() {
         board.querySelectorAll('.todo-kanban-column').forEach(function (column) {
@@ -380,6 +381,23 @@ document.querySelectorAll('.todo-list-row[data-task-url]').forEach(function (row
             column.querySelector('[data-kanban-count]').textContent = count;
             column.querySelector('.todo-kanban-empty').classList.toggle('d-none', count > 0);
         });
+    }
+
+    async function saveOrder(zone) {
+        if (!zone) return;
+        var ids = Array.from(zone.querySelectorAll('.todo-kanban-card')).map(function (card) { return Number(card.dataset.taskId); });
+        var body = new FormData();
+        body.append('task_ids', JSON.stringify(ids));
+        if (csrfParam && csrfToken) body.append(csrfParam, csrfToken);
+        var response = await fetch(board.dataset.orderUrl, {method:'POST', body:body, headers:{'X-Requested-With':'XMLHttpRequest'}});
+        if (!response.ok) throw new Error('Die persönliche Reihenfolge konnte nicht gespeichert werden.');
+    }
+
+    function cardAfterPointer(zone, clientY) {
+        return Array.from(zone.querySelectorAll('.todo-kanban-card:not(.is-moving)')).find(function (card) {
+            var rect = card.getBoundingClientRect();
+            return clientY < rect.top + rect.height / 2;
+        }) || null;
     }
 
     async function changeStatus(card, newStatus, confirmed) {
@@ -414,8 +432,18 @@ document.querySelectorAll('.todo-list-row[data-task-url]').forEach(function (row
     }
 
     board.querySelectorAll('.todo-kanban-card[draggable="true"]').forEach(function (card) {
-        card.addEventListener('dragstart', function (event) { draggedCard = card; event.dataTransfer.effectAllowed = 'move'; });
-        card.addEventListener('dragend', function () { draggedCard = null; board.querySelectorAll('.is-drag-over').forEach(function (el) { el.classList.remove('is-drag-over'); }); });
+        card.addEventListener('dragstart', function (event) {
+            draggedCard = card;
+            sourceZone = card.closest('.todo-kanban-dropzone');
+            card.classList.add('is-moving');
+            event.dataTransfer.effectAllowed = 'move';
+        });
+        card.addEventListener('dragend', function () {
+            card.classList.remove('is-moving');
+            draggedCard = null;
+            sourceZone = null;
+            board.querySelectorAll('.is-drag-over').forEach(function (el) { el.classList.remove('is-drag-over'); });
+        });
     });
     board.querySelectorAll('.todo-kanban-card[data-task-url]').forEach(function (card) {
         card.addEventListener('click', function (event) {
@@ -433,7 +461,25 @@ document.querySelectorAll('.todo-list-row[data-task-url]').forEach(function (row
     board.querySelectorAll('.todo-kanban-column').forEach(function (column) {
         column.addEventListener('dragover', function (event) { if (draggedCard) { event.preventDefault(); column.classList.add('is-drag-over'); } });
         column.addEventListener('dragleave', function () { column.classList.remove('is-drag-over'); });
-        column.addEventListener('drop', function (event) { event.preventDefault(); column.classList.remove('is-drag-over'); if (draggedCard) changeStatus(draggedCard, column.dataset.kanbanStatus, false); });
+        column.addEventListener('drop', async function (event) {
+            event.preventDefault();
+            column.classList.remove('is-drag-over');
+            if (!draggedCard) return;
+            var card = draggedCard;
+            var oldZone = sourceZone;
+            var targetZone = column.querySelector('.todo-kanban-dropzone');
+            var beforeCard = cardAfterPointer(targetZone, event.clientY);
+            var changed = await changeStatus(card, column.dataset.kanbanStatus, false);
+            if (!changed) return;
+            if (beforeCard) targetZone.insertBefore(card, beforeCard); else targetZone.appendChild(card);
+            refreshColumns();
+            try {
+                await saveOrder(targetZone);
+                if (oldZone && oldZone !== targetZone) await saveOrder(oldZone);
+            } catch (error) {
+                window.alert(error.message);
+            }
+        });
     });
     board.querySelectorAll('[data-kanban-status-select]').forEach(function (select) {
         select.addEventListener('change', function () { changeStatus(select.closest('.todo-kanban-card'), select.value, false); });
