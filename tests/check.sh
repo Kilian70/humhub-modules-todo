@@ -10,6 +10,8 @@ find . -type f -name '*.php' -not -path './vendor/*' -print0 \
 
 composer validate --strict --no-check-publish
 
+php tests/authorization.php
+
 if grep -RInE "due_date = ['\"]{2}|->isModuleEnabled\(|MenuLink::isActiveState\(" --include='*.php' .; then
     echo "Obsolete HumHub API usage or invalid DATE comparison found" >&2
     exit 1
