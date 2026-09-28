@@ -118,8 +118,11 @@ $kanbanCard = function ($task) use ($contentContainer) {
     ?>
     <article class="todo-kanban-card"
              data-task-id="<?= (int) $task->id ?>"
+             data-task-url="<?= Html::encode($taskViewUrl) ?>"
              data-current-status="<?= Html::encode($task->status) ?>"
              data-status-url="<?= Html::encode($statusUrl) ?>"
+             role="link"
+             tabindex="0"
              draggable="<?= $canMove ? 'true' : 'false' ?>">
         <a href="<?= Html::encode($taskViewUrl) ?>" class="todo-kanban-title"><?= Html::encode($task->title) ?></a>
         <div class="d-flex flex-wrap gap-1 mt-2">
@@ -401,6 +404,19 @@ document.querySelectorAll('.todo-list-row[data-task-url]').forEach(function (row
     board.querySelectorAll('.todo-kanban-card[draggable="true"]').forEach(function (card) {
         card.addEventListener('dragstart', function (event) { draggedCard = card; event.dataTransfer.effectAllowed = 'move'; });
         card.addEventListener('dragend', function () { draggedCard = null; board.querySelectorAll('.is-drag-over').forEach(function (el) { el.classList.remove('is-drag-over'); }); });
+    });
+    board.querySelectorAll('.todo-kanban-card[data-task-url]').forEach(function (card) {
+        card.addEventListener('click', function (event) {
+            if (event.target.closest('a, button, input, select, textarea, label, form')) return;
+            window.location.href = card.dataset.taskUrl;
+        });
+        card.addEventListener('keydown', function (event) {
+            if ((event.key === 'Enter' || event.key === ' ') &&
+                !event.target.closest('a, button, input, select, textarea, label, form')) {
+                event.preventDefault();
+                window.location.href = card.dataset.taskUrl;
+            }
+        });
     });
     board.querySelectorAll('.todo-kanban-column').forEach(function (column) {
         column.addEventListener('dragover', function (event) { if (draggedCard) { event.preventDefault(); column.classList.add('is-drag-over'); } });
