@@ -236,6 +236,12 @@ $kanbanCard = function ($task) use ($contentContainer) {
                 'class' => 'btn btn-default btn-sm',
                 'title' => Yii::t('TodoModule.base', 'Aktuell gefilterte Aufgaben als CSV exportieren'),
             ]) ?>
+            <?= Html::a('<i class="fa fa-print"></i> ' . Yii::t('TodoModule.base', 'Drucken/PDF'), $contentContainer->createUrl('/todo/task/print', $exportParams), [
+                'class' => 'btn btn-default btn-sm',
+                'target' => '_blank',
+                'rel' => 'noopener',
+                'title' => Yii::t('TodoModule.base', 'Aktuell gefilterte Aufgaben drucken oder als PDF speichern'),
+            ]) ?>
             <?php if ($contentContainer->permissionManager->can(new \humhub\modules\todo\permissions\CreateTasks())): ?>
                 <?= Html::a(Yii::t('TodoModule.base', 'Neue Aufgabe'), $contentContainer->createUrl('/todo/task/create'), ['class' => 'btn btn-success btn-sm']) ?>
             <?php endif; ?>
