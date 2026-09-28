@@ -14,12 +14,12 @@ use humhub\modules\todo\models\TaskList;
     <div class="panel-heading d-flex justify-content-between align-items-center">
 
         <strong>
-            Aufgabe bearbeiten
+            <?= Yii::t('TodoModule.base', 'Aufgabe bearbeiten') ?>
         </strong>
 
         <div>
             <?= Html::a(
-                'Zurück',
+                Yii::t('TodoModule.base', 'Zurück'),
                 $contentContainer->createUrl('/todo/task/view', ['id' => $model->id]),
                 ['class' => 'btn btn-sm btn-light']
             ) ?>
@@ -42,7 +42,7 @@ use humhub\modules\todo\models\TaskList;
 
         <!-- Titel -->
         <?= $form->field($model, 'title')->textInput([
-            'placeholder' => 'Titel der Aufgabe'
+            'placeholder' => Yii::t('TodoModule.base', 'Titel der Aufgabe')
         ]) ?>
 
         <?php
@@ -52,13 +52,13 @@ use humhub\modules\todo\models\TaskList;
         ?>
 
         <div class="form-group">
-            <label class="control-label" for="<?= $taskListInputId ?>">Aufgabenliste</label>
+            <label class="control-label" for="<?= $taskListInputId ?>"><?= Yii::t('TodoModule.base', 'Aufgabenliste') ?></label>
 
             <div class="position-relative todo-task-list-picker" data-todo-task-list-picker>
                 <?= Html::activeTextInput($model, 'task_list_name', [
                     'id' => $taskListInputId,
                     'class' => 'form-control',
-                    'placeholder' => 'Liste auswählen oder neuen Namen eingeben',
+                    'placeholder' => Yii::t('TodoModule.base', 'Liste auswählen oder neuen Namen eingeben'),
                     'autocomplete' => 'off',
                     'data-role' => 'task-list-input',
                 ]) ?>
@@ -70,7 +70,7 @@ use humhub\modules\todo\models\TaskList;
 
                     <?php if (empty($taskLists)): ?>
                         <div class="list-group-item text-muted" data-role="empty-list-hint">
-                            Noch keine Aufgabenlisten vorhanden.
+                            <?= Yii::t('TodoModule.base', 'Noch keine Aufgabenlisten vorhanden.') ?>
                         </div>
                     <?php else: ?>
                         <?php foreach ($taskLists as $taskList): ?>
@@ -90,13 +90,13 @@ use humhub\modules\todo\models\TaskList;
                             data-role="task-list-create"
                             style="display:none;">
                         <i class="fa fa-plus"></i>
-                        <span data-role="task-list-create-label">Neue Aufgabenliste erstellen</span>
+                        <span data-role="task-list-create-label"><?= Yii::t('TodoModule.base', 'Neue Aufgabenliste erstellen') ?></span>
                     </button>
                 </div>
             </div>
 
             <div class="help-block">
-                Bestehende Liste auswählen oder einen neuen Namen eingeben. Neue Listen werden beim Speichern automatisch angelegt.
+                <?= Yii::t('TodoModule.base', 'Bestehende Liste auswählen oder einen neuen Namen eingeben. Neue Listen werden beim Speichern automatisch angelegt.') ?>
             </div>
         </div>
 
@@ -211,17 +211,17 @@ JS;
 
             <div class="col-md-4">
                 <?= $form->field($model, 'priority')->dropDownList([
-                    'niedrig' => 'Niedrig',
-                    'mittel' => 'Mittel',
-                    'hoch' => 'Hoch',
+                    'niedrig' => Yii::t('TodoModule.base', 'Niedrig'),
+                    'mittel' => Yii::t('TodoModule.base', 'Mittel'),
+                    'hoch' => Yii::t('TodoModule.base', 'Hoch'),
                 ]) ?>
             </div>
 
             <div class="col-md-4">
                 <?= $form->field($model, 'status')->dropDownList([
-                    'offen' => 'Offen',
-                    'in_bearbeitung' => 'In Bearbeitung',
-                    'geschlossen' => 'Geschlossen',
+                    'offen' => Yii::t('TodoModule.base', 'Offen'),
+                    'in_bearbeitung' => Yii::t('TodoModule.base', 'In Bearbeitung'),
+                    'geschlossen' => Yii::t('TodoModule.base', 'Geschlossen'),
                 ]) ?>
             </div>
 
@@ -234,11 +234,11 @@ JS;
         <div class="row mt-2">
             <div class="col-md-4">
                 <?= $form->field($model, 'recurrence_type')->dropDownList([
-                    '' => 'Keine Wiederholung',
-                    'daily' => 'Täglich',
-                    'weekly' => 'Wöchentlich',
-                    'monthly' => 'Monatlich',
-                    'yearly' => 'Jährlich',
+                    '' => Yii::t('TodoModule.base', 'Keine Wiederholung'),
+                    'daily' => Yii::t('TodoModule.base', 'Täglich'),
+                    'weekly' => Yii::t('TodoModule.base', 'Wöchentlich'),
+                    'monthly' => Yii::t('TodoModule.base', 'Monatlich'),
+                    'yearly' => Yii::t('TodoModule.base', 'Jährlich'),
                 ], ['id' => 'recurrence-type']) ?>
             </div>
             <div class="col-md-4 recurrence-options">
@@ -254,7 +254,7 @@ JS;
         <?php if (CalendarSyncService::isAvailable($contentContainer)): ?>
             <div class="mt-2">
                 <?= $form->field($model, 'sync_to_calendar')->checkbox([
-                    'label' => 'Fälligkeit als ganztägigen Termin im Kalender eintragen',
+                    'label' => Yii::t('TodoModule.base', 'Fälligkeit als ganztägigen Termin im Kalender eintragen'),
                     'disabled' => !$model->calendar_entry_id && !CalendarSyncService::canCreate($contentContainer),
                 ]) ?>
                 <?php if (!$model->calendar_entry_id && !CalendarSyncService::canCreate($contentContainer)): ?>
@@ -284,7 +284,7 @@ JS;
         <div class="mt-4 text-end">
 
             <?= Html::submitButton(
-                'Speichern',
+                Yii::t('TodoModule.base', 'Speichern'),
                 ['class' => 'btn btn-primary']
             ) ?>
 

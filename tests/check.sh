@@ -13,6 +13,7 @@ composer validate --strict --no-check-publish
 php tests/authorization.php
 php tests/reminder-policy.php
 php tests/recurrence-policy.php
+php tests/translation-coverage.php
 
 if grep -RInE "due_date = ['\"]{2}|->isModuleEnabled\(|MenuLink::isActiveState\(" --include='*.php' .; then
     echo "Obsolete HumHub API usage or invalid DATE comparison found" >&2
