@@ -1,6 +1,16 @@
 <?php
 
 return [
+    'Ansicht' => 'Ansicht',
+    'Aufgabe nicht gefunden.' => 'Aufgabe nicht gefunden.',
+    'Der Status konnte nicht geändert werden.' => 'Der Status konnte nicht geändert werden.',
+    'Du darfst den Status dieser Aufgabe nicht ändern.' => 'Du darfst den Status dieser Aufgabe nicht ändern.',
+    'Filter' => 'Filter',
+    'Kanban' => 'Kanban',
+    'Kein Space gefunden.' => 'Kein Space gefunden.',
+    'Liste' => 'Liste',
+    'Ungültiger Status.' => 'Ungültiger Status.',
+    'Diese Aufgabe enthält noch {count} offene Checklistenpunkte. Trotzdem schliessen?' => 'Diese Aufgabe enthält noch {count} offene Checklistenpunkte. Trotzdem schliessen?',
     'Alle' => 'Alle',
     'Alle sichtbar' => 'Alle sichtbar',
     'Alle sichtbaren' => 'Alle sichtbaren',

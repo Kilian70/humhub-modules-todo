@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.18.0 - 2026-09-28
+
+- optionale kompakte Kanban-Ansicht mit den Spalten Offen, In Bearbeitung und Geschlossen ergänzt
+- Statuswechsel per Drag-and-drop mit denselben Berechtigungen und Prüfungen wie in der Aufgabendetailansicht umgesetzt
+- Sicherheitsabfrage für offene Checklisten und Sperre für blockierte Aufgaben beibehalten
+- Filter nach Priorität, Aufgabenliste und zuständiger Person ergänzt und einklappbar gehalten
+- zuletzt gewählte Listen- oder Kanban-Ansicht wird pro Benutzer gespeichert
+- mobile Statusauswahl als zuverlässige Alternative zu Drag-and-drop ergänzt
+
 ## 1.17.0 - 2026-09-28
 
 - zentrale Aufgabenübersicht vollständig auf Deutsch und Englisch umgestellt
