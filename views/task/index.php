@@ -110,6 +110,7 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
             <?php if ($contentContainer->permissionManager->can(new \humhub\modules\todo\permissions\EditTasks())): ?>
                 <?= Html::a('Aufgabenlisten verwalten', $contentContainer->createUrl('/todo/task-list/index'), ['class' => 'btn btn-default btn-sm']) ?>
             <?php endif; ?>
+            <?= Html::a('Vorlagen', $contentContainer->createUrl('/todo/template/index'), ['class' => 'btn btn-default btn-sm']) ?>
             <?php if ($contentContainer->permissionManager->can(new \humhub\modules\todo\permissions\CreateTasks())): ?>
                 <?= Html::a('Neue Aufgabe', $contentContainer->createUrl('/todo/task/create'), ['class' => 'btn btn-success btn-sm']) ?>
             <?php endif; ?>

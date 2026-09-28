@@ -22,6 +22,7 @@ use humhub\modules\user\models\User;
 use humhub\modules\todo\services\CalendarSyncService;
 use humhub\modules\todo\services\TaskHistoryService;
 use humhub\modules\todo\services\TaskDependencyService;
+use humhub\modules\todo\services\TaskDuplicationService;
 
 class TaskController extends ContentContainerController
 {
@@ -44,6 +45,7 @@ class TaskController extends ContentContainerController
                 'quick-update' => ['POST'],
                 'dependency-add' => ['POST'],
                 'dependency-remove' => ['POST'],
+                'duplicate' => ['POST'],
             ],
         ];
 
@@ -531,6 +533,33 @@ public function actionDelete($id)
     Yii::$app->request->referrer
     ?: $this->contentContainer->createUrl('/todo/task/index')
 );
+}
+
+public function actionDuplicate($id)
+{
+    if (!$this->contentContainer) {
+        throw new HttpException(404, 'Kein Space gefunden.');
+    }
+    if (!$this->contentContainer->permissionManager->can(new CreateTasks())) {
+        throw new \yii\web\ForbiddenHttpException();
+    }
+
+    $source = Task::find()
+        ->contentContainer($this->contentContainer)
+        ->andWhere(['todo_task.id' => (int) $id])
+        ->one();
+    if (!$source || !$source->canView()) {
+        throw new NotFoundHttpException();
+    }
+
+    $copy = TaskDuplicationService::duplicate($source);
+    if (!$copy) {
+        Yii::$app->session->setFlash('error', 'Die Aufgabe konnte nicht dupliziert werden.');
+        return $this->redirect($this->contentContainer->createUrl('/todo/task/view', ['id' => $source->id]));
+    }
+
+    Yii::$app->session->setFlash('success', 'Aufgabe wurde als offene Kopie erstellt.');
+    return $this->redirect($this->contentContainer->createUrl('/todo/task/view', ['id' => $copy->id]));
 }
 
 public function actionView($id)
