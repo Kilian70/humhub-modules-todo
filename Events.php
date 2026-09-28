@@ -12,6 +12,7 @@ use humhub\modules\todo\notifications\TaskCommented;
 use humhub\modules\todo\services\ReminderService;
 use humhub\modules\todo\services\AutoArchiveService;
 use humhub\modules\todo\services\TrashService;
+use humhub\modules\todo\services\TaskNotificationPreferenceService;
 use humhub\helpers\ControllerHelper;
 use humhub\modules\ui\menu\MenuLink;
 use humhub\modules\todo\models\MenuSettingsForm;
@@ -121,6 +122,9 @@ class Events
 
         foreach ($task->users as $user) {
             if ((int) $user->id === (int) $originator->id) {
+                continue;
+            }
+            if (!TaskNotificationPreferenceService::allows($task, (int) $user->id, TaskNotificationPreferenceService::EVENT_COMMENT)) {
                 continue;
             }
 

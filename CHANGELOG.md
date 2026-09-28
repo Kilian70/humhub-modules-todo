@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.24.0 - 2026-09-28
+
+- persönliche Benachrichtigungseinstellung pro Aufgabe ergänzt
+- wählbar sind alle Meldungen, nur Kommentare und Zuweisungen, nur Erinnerungen oder stumm
+- die Auswahl ist einklappbar und gilt ausschließlich für den jeweiligen Benutzer und die jeweilige Aufgabe
+- bestehende Aufgaben behalten standardmäßig das bisherige Benachrichtigungsverhalten
+- Erwähnungen und HumHub-Follower bleiben von der Einstellung unberührt
+
 ## 1.23.0 - 2026-09-28
 
 - Papierkorb für gelöschte Aufgaben ergänzt

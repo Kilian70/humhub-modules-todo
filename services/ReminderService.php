@@ -68,6 +68,9 @@ class ReminderService
                     || !$container->getPermissionManager($user)->can(new ViewTasks())) {
                     continue;
                 }
+                if (!TaskNotificationPreferenceService::allows($task, (int) $user->id, TaskNotificationPreferenceService::EVENT_REMINDER)) {
+                    continue;
+                }
 
                 TaskReminder::instance()->from($systemUser)->about($task)->send($user);
                 $sent = true;

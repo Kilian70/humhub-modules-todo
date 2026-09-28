@@ -25,6 +25,7 @@ use humhub\modules\todo\services\CalendarSyncService;
 use humhub\modules\todo\services\TaskHistoryService;
 use humhub\modules\todo\services\TaskDependencyService;
 use humhub\modules\todo\services\TaskDuplicationService;
+use humhub\modules\todo\services\TaskNotificationPreferenceService;
 
 class TaskController extends ContentContainerController
 {
@@ -54,6 +55,7 @@ class TaskController extends ContentContainerController
                 'restore' => ['POST'],
                 'restore-trash' => ['POST'],
                 'permanent-delete' => ['POST'],
+                'notification-preference' => ['POST'],
             ],
         ];
 
@@ -865,6 +867,25 @@ public function actionView($id)
             ->limit(200)
             ->all(),
     ]);
+}
+
+public function actionNotificationPreference($id)
+{
+    $task = Task::find()
+        ->contentContainer($this->contentContainer)
+        ->andWhere(['todo_task.id' => (int) $id, 'todo_task.deleted_at' => null])
+        ->one();
+    if (!$task || !$task->canView() || Yii::$app->user->isGuest) {
+        throw new NotFoundHttpException();
+    }
+
+    $mode = (string) Yii::$app->request->post('mode');
+    if (!TaskNotificationPreferenceService::save($task, (int) Yii::$app->user->id, $mode)) {
+        Yii::$app->session->setFlash('error', Yii::t('TodoModule.base', 'Benachrichtigungseinstellung konnte nicht gespeichert werden.'));
+    } else {
+        Yii::$app->session->setFlash('success', Yii::t('TodoModule.base', 'Benachrichtigungseinstellung gespeichert.'));
+    }
+    return $this->redirect($this->contentContainer->createUrl('/todo/task/view', ['id' => $task->id, '#' => 'todo-notifications']));
 }
 
 public function actionDependencyAdd($id)

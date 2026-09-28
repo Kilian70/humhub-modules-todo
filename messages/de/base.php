@@ -1,6 +1,14 @@
 <?php
 
 return [
+    'Alle ToDo-Benachrichtigungen' => 'Alle ToDo-Benachrichtigungen',
+    'Benachrichtigungseinstellung konnte nicht gespeichert werden.' => 'Benachrichtigungseinstellung konnte nicht gespeichert werden.',
+    'Benachrichtigungseinstellung gespeichert.' => 'Benachrichtigungseinstellung gespeichert.',
+    'Diese Auswahl gilt nur für dich und nur für diese Aufgabe. Erwähnungen und HumHub-Follower bleiben unverändert.' => 'Diese Auswahl gilt nur für dich und nur für diese Aufgabe. Erwähnungen und HumHub-Follower bleiben unverändert.',
+    'Meine Benachrichtigungen' => 'Meine Benachrichtigungen',
+    'Nur Kommentare und Zuweisungen' => 'Nur Kommentare und Zuweisungen',
+    'Nur Erinnerungen' => 'Nur Erinnerungen',
+    'Stumm' => 'Stumm',
     'ARCHIVIERT' => 'ARCHIVIERT',
     'Archiv' => 'Archiv',
     'Archivieren' => 'Archivieren',
