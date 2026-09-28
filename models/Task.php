@@ -27,6 +27,8 @@ use yii\web\UploadedFile;
 
 class Task extends ContentActiveRecord implements ViewableInterface
 {
+    protected $moduleId = 'todo';
+
     public $createActivityOnInsert = false;
 
     /** @var string HumHub permission required to create this content type. */
@@ -755,6 +757,11 @@ public function getActivityTitle()
 public function getContentName(): string
 {
     return Yii::t('TodoModule.base', 'ToDo');
+}
+
+public function getIcon(): string
+{
+    return 'check-square-o';
 }
 
 public function getCreateActivityClass()

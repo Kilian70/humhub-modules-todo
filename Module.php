@@ -13,6 +13,7 @@ use humhub\helpers\ControllerHelper;
 use humhub\modules\todo\models\Task;
 use humhub\modules\todo\permissions\ViewTasks;
 use humhub\modules\todo\search\TaskSearchProvider;
+use humhub\modules\todo\permissions\CreateTasks;
 
 class Module extends ContentContainerModule
 {
@@ -104,6 +105,18 @@ public function init()
     public function getContentContainerTypes()
     {
         return [Space::class];
+    }
+
+    public function getContentClasses(?ContentContainerActiveRecord $contentContainer = null): array
+    {
+        if (
+            !$contentContainer instanceof Space
+            || !$contentContainer->permissionManager->can(new CreateTasks())
+        ) {
+            return [];
+        }
+
+        return [Task::class];
     }
 
 

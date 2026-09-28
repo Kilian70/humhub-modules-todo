@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.28.0 - 2026-09-28
+
+- „ToDo“ in das HumHub-Erstellen-Menü des Space-Streams integriert
+- der Eintrag öffnet das vollständige bestehende Aufgabenformular
+- Anzeige nur bei aktiviertem Modul und vorhandener Berechtigung „ToDo erstellen“
+- platzsparende Einsortierung hinter den vorrangigen Erstellaktionen
+- native HumHub-Integration ohne parallele Formularlogik
+
 ## 1.27.2 - 2026-09-28
 
 - Dateiaktionen strikt auf den aktuell geöffneten Space begrenzt

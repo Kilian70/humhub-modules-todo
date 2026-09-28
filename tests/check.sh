@@ -58,6 +58,16 @@ if (str_contains($overviewSources, "getOpenBlockingTasks()->exists()")) {
     fwrite(STDERR, "Overview contains a per-task blocker query\n");
     exit(1);
 }
+$moduleSource = file_get_contents("Module.php");
+$wallEntrySource = file_get_contents("widgets/WallEntry.php");
+if (!str_contains($moduleSource, "function getContentClasses") || !str_contains($moduleSource, "new CreateTasks()")) {
+    fwrite(STDERR, "Missing permission-aware stream creation menu integration\n");
+    exit(1);
+}
+if (!str_contains($wallEntrySource, "'/todo/task/create'") || !str_contains($wallEntrySource, "EDIT_MODE_NEW_WINDOW")) {
+    fwrite(STDERR, "Missing ToDo link in HumHub stream creation menu\n");
+    exit(1);
+}
 foreach (["README.md", "CHANGELOG.md", "LICENSE", "SECURITY.md", "CONTRIBUTING.md"] as $file) {
     if (!is_file($file) || filesize($file) === 0) {
         fwrite(STDERR, "Missing required repository file: {$file}\n");
