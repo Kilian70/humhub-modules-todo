@@ -48,6 +48,16 @@ if (($module["id"] ?? null) !== "todo") {
     fwrite(STDERR, "Unexpected module id\n");
     exit(1);
 }
+$taskController = file_get_contents("controllers/TaskController.php");
+if (preg_match("/->contentContainer\\([^)]*\\)\\s*->where\\(/", $taskController)) {
+    fwrite(STDERR, "A task query overwrites its content-container scope with where()\n");
+    exit(1);
+}
+$overviewSources = file_get_contents("services/OverviewTaskService.php") . file_get_contents("views/overview/index.php");
+if (str_contains($overviewSources, "getOpenBlockingTasks()->exists()")) {
+    fwrite(STDERR, "Overview contains a per-task blocker query\n");
+    exit(1);
+}
 foreach (["README.md", "CHANGELOG.md", "LICENSE", "SECURITY.md", "CONTRIBUTING.md"] as $file) {
     if (!is_file($file) || filesize($file) === 0) {
         fwrite(STDERR, "Missing required repository file: {$file}\n");

@@ -4,6 +4,7 @@ namespace humhub\modules\todo\services;
 
 use humhub\modules\space\models\Space;
 use humhub\modules\todo\models\Task;
+use humhub\modules\todo\models\TaskDependency;
 use Yii;
 use yii\db\Expression;
 
@@ -58,13 +59,18 @@ final class OverviewTaskService
                 $baseTasks[] = $task;
             }
         }
-        $tasks = array_values(array_filter($baseTasks, static fn(Task $task) => self::matchesFocus($task, $filters['focus'])));
+        $blockedTaskIds = self::getBlockedTaskIds($baseTasks);
+        $tasks = array_values(array_filter(
+            $baseTasks,
+            static fn(Task $task) => self::matchesFocus($task, $filters['focus'], $blockedTaskIds)
+        ));
 
         return [
             'tasks' => $tasks,
             'spaces' => self::getVisibleSpaces($userId),
             'filters' => $filters,
-            'stats' => self::getStats($baseTasks),
+            'stats' => self::getStats($baseTasks, $blockedTaskIds),
+            'blockedTaskIds' => $blockedTaskIds,
             'truncated' => count($baseTasks) >= self::MAX_RESULTS,
         ];
     }
@@ -86,7 +92,26 @@ final class OverviewTaskService
         return $spaces;
     }
 
-    private static function getStats(array $tasks): array
+    private static function getBlockedTaskIds(array $tasks): array
+    {
+        $taskIds = array_map(static fn(Task $task): int => (int) $task->id, $tasks);
+        if ($taskIds === []) {
+            return [];
+        }
+
+        $ids = TaskDependency::find()
+            ->alias('dependency')
+            ->select('dependency.task_id')
+            ->innerJoin('todo_task blocker', 'blocker.id = dependency.blocking_task_id')
+            ->where(['dependency.task_id' => $taskIds])
+            ->andWhere(['<>', 'blocker.status', 'geschlossen'])
+            ->distinct()
+            ->column();
+
+        return array_fill_keys(array_map('intval', $ids), true);
+    }
+
+    private static function getStats(array $tasks, array $blockedTaskIds): array
     {
         $today = date('Y-m-d');
         $soon = date('Y-m-d', strtotime('+7 days'));
@@ -94,12 +119,12 @@ final class OverviewTaskService
         foreach ($tasks as $task) {
             if ($task->status !== 'geschlossen' && $task->due_date && $task->due_date < $today) $stats['overdue']++;
             if ($task->status !== 'geschlossen' && $task->due_date && $task->due_date >= $today && $task->due_date <= $soon) $stats['soon']++;
-            if ($task->status !== 'geschlossen' && $task->getOpenBlockingTasks()->exists()) $stats['blocked']++;
+            if ($task->status !== 'geschlossen' && isset($blockedTaskIds[(int) $task->id])) $stats['blocked']++;
         }
         return $stats;
     }
 
-    private static function matchesFocus(Task $task, string $focus): bool
+    private static function matchesFocus(Task $task, string $focus, array $blockedTaskIds): bool
     {
         $today = date('Y-m-d');
         if ($focus === 'overdue') {
@@ -110,7 +135,7 @@ final class OverviewTaskService
                 && $task->due_date <= date('Y-m-d', strtotime('+7 days'));
         }
         if ($focus === 'blocked') {
-            return $task->status !== 'geschlossen' && $task->getOpenBlockingTasks()->exists();
+            return $task->status !== 'geschlossen' && isset($blockedTaskIds[(int) $task->id]);
         }
         if ($focus === 'subtasks') {
             return !empty($task->parent_task_id);

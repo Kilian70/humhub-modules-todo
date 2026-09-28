@@ -958,7 +958,7 @@ public function actionDeleteFile($id, $guid)
 
     $model = Task::find()
         ->contentContainer($this->contentContainer)
-        ->where(['todo_task.id' => $id])
+        ->andWhere(['todo_task.id' => (int) $id])
         ->one();
 
     if (!$model) {
@@ -999,7 +999,7 @@ public function actionUploadFile($id)
 
     $model = Task::find()
         ->contentContainer($this->contentContainer)
-        ->where(['todo_task.id' => $id])
+        ->andWhere(['todo_task.id' => (int) $id])
         ->one();
 
     if (!$model) {
@@ -1056,7 +1056,7 @@ public function actionUpdateFileTitle($id, $guid)
 
     $model = Task::find()
         ->contentContainer($this->contentContainer)
-        ->where(['todo_task.id' => $id])
+        ->andWhere(['todo_task.id' => (int) $id])
         ->one();
 
     if (!$model) {

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.27.2 - 2026-09-28
+
+- Dateiaktionen strikt auf den aktuell geöffneten Space begrenzt
+- Aufgabenübersicht für große Datenbestände deutlich beschleunigt
+- blockierte Aufgaben werden in einer Sammelabfrage statt einzeln geprüft
+- Qualitäts- und Sicherheitstests um Regressionstests für beide Korrekturen erweitert
+- Belastungstest mit 1.000 Aufgaben unter HumHub 1.19 erfolgreich durchgeführt
+
 ## 1.27.1 - 2026-09-28
 
 - unklare Aufgabenzähler wie „(1 | 2)“ aus dem Space-Menü entfernt

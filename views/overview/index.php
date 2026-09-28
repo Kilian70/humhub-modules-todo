@@ -91,7 +91,7 @@ $priorityLabels = ['niedrig' => Yii::t('TodoModule.base', 'Niedrig'), 'mittel' =
                 $space = $task->content ? $task->content->container : null;
                 if (!$space instanceof Space) continue;
                 $isOverdue = $task->status !== 'geschlossen' && $task->due_date && $task->due_date < date('Y-m-d');
-                $isBlocked = $task->status !== 'geschlossen' && $task->getOpenBlockingTasks()->exists();
+                $isBlocked = $task->status !== 'geschlossen' && isset($blockedTaskIds[(int) $task->id]);
                 ?>
                 <a class="list-group-item" href="<?= Html::encode($space->createUrl('/todo/task/view', ['id' => $task->id])) ?>">
                     <div class="d-flex flex-wrap align-items-center gap-1">
