@@ -5,6 +5,7 @@ use yii\widgets\ActiveForm;
 use humhub\modules\user\widgets\UserPickerField;
 use humhub\modules\todo\services\CalendarSyncService;
 use humhub\modules\todo\models\TaskList;
+use humhub\modules\todo\models\TaskLabel;
 
 ?>
 
@@ -230,6 +231,21 @@ JS;
             </div>
 
         </div>
+
+        <?php $availableLabels = TaskLabel::findForSpace((int) $contentContainer->id); ?>
+        <?php if ($availableLabels): ?>
+            <div class="form-group mt-2">
+                <label class="control-label"><?= Yii::t('TodoModule.base', 'Labels') ?></label>
+                <div class="d-flex flex-wrap gap-2">
+                    <?php foreach ($availableLabels as $label): ?>
+                        <label class="todo-label-choice">
+                            <?= Html::activeCheckbox($model, 'label_ids[]', ['value' => $label->id, 'label' => false, 'uncheck' => null, 'checked' => in_array((int) $label->id, array_map('intval', (array) $model->label_ids), true)]) ?>
+                            <span class="badge" style="background:<?= Html::encode($label->color) ?>;color:#fff;"><?= Html::encode($label->name) ?></span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endif; ?>
 
         <div class="row mt-2">
             <div class="col-md-4">

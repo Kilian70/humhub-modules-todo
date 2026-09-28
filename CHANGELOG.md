@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.19.0 - 2026-09-28
+
+- wiederverwendbare farbige Labels pro Space ergänzt
+- mehrere Labels können einer Aufgabe zugeordnet werden
+- Labels erscheinen kompakt in Listen-, Detail- und Kanban-Ansicht
+- einklappbaren Filter nach Labels ergänzt
+- zentrale Verwaltung für Namen und Farben ergänzt
+- Duplikate und wiederkehrende Folgeaufgaben übernehmen ihre Labels
+- Labeländerungen werden im Aktivitätsprotokoll festgehalten
+- vollständige Entfernung der Labeldaten bei der Moduldeinstallation ergänzt
+
 ## 1.18.1 - 2026-09-28
 
 - gesamte Kanban-Karte öffnet nun die zugehörige Aufgabe

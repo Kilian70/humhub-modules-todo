@@ -28,6 +28,8 @@ class uninstall extends Migration
         }
 
         $this->dropTableIfExists('todo_task_history');
+        $this->dropTableIfExists('todo_task_label_map');
+        $this->dropTableIfExists('todo_task_label');
         $this->dropTableIfExists('todo_task_template');
         $this->dropTableIfExists('todo_task_dependency');
         $this->dropTableIfExists('todo_checklist_item_user');
