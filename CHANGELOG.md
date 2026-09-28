@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.30.2 - 2026-09-28
+
+- offenen Status in der Aufgabenliste im dunklen Modus wieder lesbar gemacht
+- Kontrast der Zurücksetzen-Schaltflächen in Aufgabenliste und Übersicht korrigiert
+- aktive Standardfilter der globalen Aufgabenübersicht an den dunklen Modus angepasst
+
 ## 1.30.1 - 2026-09-28
 
 - Kontrast der inaktiven Ansichts-, Verwaltungs-, Export- und Filterschaltflächen im dunklen Modus korrigiert

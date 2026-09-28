@@ -32,7 +32,7 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
     $statusClass = match ($task->status) {
         'in_bearbeitung' => 'badge bg-info text-dark',
         'geschlossen' => 'badge bg-secondary',
-        default => 'badge bg-light text-dark border',
+        default => 'badge todo-status-open',
     };
     $statusLabel = match ($task->status) {
         'in_bearbeitung' => Yii::t('TodoModule.base', 'IN BEARBEITUNG'),
@@ -417,18 +417,23 @@ $this->registerCss(<<<CSS
 .todo-toolbar-dropdown .dropdown-menu { min-width:210px; }
 .todo-toolbar-dropdown .dropdown-item i { width:18px; text-align:center; margin-right:4px; }
 .todo-task-toolbar .btn-default,
-.todo-kanban-filters > summary.btn-default {
+.todo-kanban-filters .btn-default {
     background:var(--hh-background-color-secondary,#fff);
     color:var(--hh-text-color-main,#333);
     border-color:var(--hh-background3,#ccc);
 }
 .todo-task-toolbar .btn-default:hover,
 .todo-task-toolbar .btn-default:focus,
-.todo-kanban-filters > summary.btn-default:hover,
-.todo-kanban-filters > summary.btn-default:focus {
+.todo-kanban-filters .btn-default:hover,
+.todo-kanban-filters .btn-default:focus {
     background:var(--hh-background-color-highlight-soft,#f5f5f5);
     color:var(--hh-text-color-highlight,var(--hh-text-color-main,#333));
     border-color:var(--hh-text-color-highlight,#16788a);
+}
+.todo-status-open {
+    background:var(--hh-background-color-secondary,#f8f9fa);
+    color:var(--hh-text-color-main,#333);
+    border:1px solid var(--hh-background3,#dfe3e7);
 }
 .todo-kanban-board { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; align-items:start; }
 .todo-kanban-column { background:var(--hh-background-color-secondary,#f3f5f7); border:1px solid var(--hh-background3,#dfe3e7); border-radius:6px; min-width:0; color:var(--hh-text-color-main,#333); }

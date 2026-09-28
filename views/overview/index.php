@@ -61,7 +61,7 @@ $priorityLabels = ['niedrig' => Yii::t('TodoModule.base', 'Niedrig'), 'mittel' =
             <input type="hidden" name="focus" value="<?= Html::encode($filters['focus']) ?>">
             <div class="d-flex flex-wrap gap-1 mt-2">
                 <button class="btn btn-primary"><i class="fa fa-filter"></i> <?= Yii::t('TodoModule.base', 'Filtern') ?></button>
-                <?= Html::a(Yii::t('TodoModule.base', 'Zurücksetzen'), ['/todo/overview/index'], ['class' => 'btn btn-default']) ?>
+                <?= Html::a(Yii::t('TodoModule.base', 'Zurücksetzen'), ['/todo/overview/index'], ['class' => 'btn btn-default todo-dark-default']) ?>
             </div>
         </form>
     </div>
@@ -76,7 +76,7 @@ $priorityLabels = ['niedrig' => Yii::t('TodoModule.base', 'Niedrig'), 'mittel' =
         'subtasks' => [Yii::t('TodoModule.base', 'Unteraufgaben'), null, 'btn-default'],
     ] as $focus => [$label, $count, $buttonClass]): ?>
         <?= Html::a(Html::encode($label) . ($count === null ? '' : ' (' . (int) $count . ')'), $filterUrl(['focus' => $focus]), [
-            'class' => 'btn btn-sm ' . ($filters['focus'] === $focus ? $buttonClass : 'btn-outline-secondary'),
+            'class' => 'btn btn-sm ' . ($filters['focus'] === $focus ? $buttonClass . ($buttonClass === 'btn-default' ? ' todo-dark-default' : '') : 'btn-outline-secondary'),
         ]) ?>
     <?php endforeach; ?>
 </div>
@@ -123,3 +123,18 @@ $priorityLabels = ['niedrig' => Yii::t('TodoModule.base', 'Niedrig'), 'mittel' =
 <?php if ($truncated): ?>
     <div class="alert alert-info"><?= Yii::t('TodoModule.base', 'Es werden höchstens {count} Aufgaben angezeigt. Bitte Filter verwenden.', ['count' => \humhub\modules\todo\services\OverviewTaskService::MAX_RESULTS]) ?></div>
 <?php endif; ?>
+
+<?php $this->registerCss(<<<CSS
+.todo-dark-default {
+    background:var(--hh-background-color-secondary,#fff);
+    color:var(--hh-text-color-main,#333);
+    border-color:var(--hh-background3,#ccc);
+}
+.todo-dark-default:hover,
+.todo-dark-default:focus {
+    background:var(--hh-background-color-highlight-soft,#f5f5f5);
+    color:var(--hh-text-color-highlight,var(--hh-text-color-main,#333));
+    border-color:var(--hh-text-color-highlight,#16788a);
+}
+CSS
+); ?>
