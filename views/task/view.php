@@ -16,6 +16,7 @@ use yii\helpers\ArrayHelper;
 <?php
 $canEditTask = $task->canManage();
 $canWorkOnTask = $task->canWorkOn();
+$canCreateTask = $contentContainer->permissionManager->can(new \humhub\modules\todo\permissions\CreateTasks());
 ?>
 
 <div class="panel panel-default">
@@ -39,6 +40,30 @@ $canWorkOnTask = $task->canWorkOn();
                     $contentContainer->createUrl('/todo/task/update', ['id' => $task->id]),
                     ['class' => 'btn btn-sm btn-primary']
                 ) ?>
+            <?php endif; ?>
+
+            <?php if ($canCreateTask): ?>
+                <?= Html::beginForm(
+                    $contentContainer->createUrl('/todo/task/duplicate', ['id' => $task->id]),
+                    'post',
+                    ['class' => 'd-inline']
+                ) ?>
+                <?= Html::submitButton('<i class="fa fa-copy"></i> Duplizieren', [
+                    'class' => 'btn btn-sm btn-light',
+                    'data-confirm' => 'Diese Aufgabe als neue offene Aufgabe duplizieren?',
+                ]) ?>
+                <?= Html::endForm() ?>
+
+                <?= Html::beginForm(
+                    $contentContainer->createUrl('/todo/template/save-from-task', ['id' => $task->id]),
+                    'post',
+                    ['class' => 'd-inline']
+                ) ?>
+                <?= Html::submitButton('<i class="fa fa-bookmark"></i> Als Vorlage', [
+                    'class' => 'btn btn-sm btn-light',
+                    'data-confirm' => 'Diese Aufgabe als neue Vorlage speichern?',
+                ]) ?>
+                <?= Html::endForm() ?>
             <?php endif; ?>
 
         </div>
@@ -192,7 +217,7 @@ $canWorkOnTask = $task->canWorkOn();
         <?php
         $subtasks = $task->subtasks;
         $completedSubtasks = count(array_filter($subtasks, static fn($subtask) => $subtask->status === 'geschlossen'));
-        $canCreateSubtasks = $contentContainer->permissionManager->can(new \humhub\modules\todo\permissions\CreateTasks());
+        $canCreateSubtasks = $canCreateTask;
         ?>
         <details class="card mb-4" <?= empty($subtasks) ? '' : 'open' ?>>
             <summary class="card-header py-2" style="cursor:pointer;list-style:none;">
