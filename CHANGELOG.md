@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.27.0 - 2026-09-28
+
+- übersichtliche Druckansicht für Aufgaben ergänzt
+- die Druckansicht übernimmt wie der CSV-Export die aktuelle Ansicht und alle Filter
+- über den Browser kann die Liste gedruckt oder direkt als PDF gespeichert werden
+- platzsparendes Querformat mit wiederholter Tabellenüberschrift auf Folgeseiten
+- die Druckansicht enthält ausschließlich Aufgaben, die der Benutzer sehen darf
+
 ## 1.26.0 - 2026-09-28
 
 - CSV-Export für Aufgaben ergänzt

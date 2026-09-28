@@ -1,6 +1,14 @@
 <?php
 
 return [
+    'Aktuell gefilterte Aufgaben drucken oder als PDF speichern' => 'Aktuell gefilterte Aufgaben drucken oder als PDF speichern',
+    'Aufgaben' => 'Aufgaben',
+    'Drucken oder als PDF speichern' => 'Drucken oder als PDF speichern',
+    'Drucken/PDF' => 'Drucken/PDF',
+    'Erstellt am {date}' => 'Erstellt am {date}',
+    'Keine Aufgaben für diese Auswahl gefunden.' => 'Keine Aufgaben für diese Auswahl gefunden.',
+    'ToDo-Druckansicht' => 'ToDo-Druckansicht',
+    'ToDo-Liste: {space}' => 'ToDo-Liste: {space}',
     'Aktuell gefilterte Aufgaben als CSV exportieren' => 'Aktuell gefilterte Aufgaben als CSV exportieren',
     'CSV-Export' => 'CSV-Export',
     'Erstellt am' => 'Erstellt am',

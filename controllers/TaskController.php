@@ -305,6 +305,20 @@ public function actionExport()
     ]);
 }
 
+public function actionPrint()
+{
+    if (!$this->contentContainer
+        || !$this->contentContainer->permissionManager->can(new ViewTasks())) {
+        throw new \yii\web\ForbiddenHttpException();
+    }
+
+    return $this->renderPartial('print', [
+        'tasks' => TaskExportService::findTasks($this->contentContainer, Yii::$app->request->get()),
+        'contentContainer' => $this->contentContainer,
+        'generatedAt' => new \DateTimeImmutable(),
+    ]);
+}
+
 public function actionCreate()
 {
     if (!$this->contentContainer) {
