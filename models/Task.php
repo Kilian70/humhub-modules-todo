@@ -66,6 +66,7 @@ class Task extends ContentActiveRecord implements ViewableInterface
             [['due_date'], 'date', 'format' => 'php:Y-m-d'],
             [['priority'], 'in', 'range' => ['niedrig', 'mittel', 'hoch']],
             [['status'], 'in', 'range' => ['offen', 'in_bearbeitung', 'geschlossen']],
+            [['status'], 'validateBlockingTasks'],
             [['closed_by'], 'integer'],
             [['closed_at'], 'safe'],
             [['sync_to_calendar'], 'boolean'],
@@ -114,6 +115,16 @@ class Task extends ContentActiveRecord implements ViewableInterface
             }
             $seen[(int) $parent->id] = true;
             $parent = $parent->parentTask;
+        }
+    }
+
+    public function validateBlockingTasks(string $attribute): void
+    {
+        if ($this->$attribute !== 'geschlossen' || !$this->id) {
+            return;
+        }
+        if ($this->getBlockingTasks()->andWhere(['<>', 'todo_task.status', 'geschlossen'])->exists()) {
+            $this->addError($attribute, 'Die Aufgabe ist noch durch eine offene Voraussetzung blockiert.');
         }
     }
 
@@ -338,6 +349,23 @@ class Task extends ContentActiveRecord implements ViewableInterface
     {
         return $this->hasMany(self::class, ['parent_task_id' => 'id'])
             ->orderBy(['status' => SORT_ASC, 'due_date' => SORT_ASC, 'id' => SORT_ASC]);
+    }
+
+    public function getBlockingTasks()
+    {
+        return $this->hasMany(self::class, ['id' => 'blocking_task_id'])
+            ->viaTable('todo_task_dependency', ['task_id' => 'id']);
+    }
+
+    public function getBlockedTasks()
+    {
+        return $this->hasMany(self::class, ['id' => 'task_id'])
+            ->viaTable('todo_task_dependency', ['blocking_task_id' => 'id']);
+    }
+
+    public function getOpenBlockingTasks()
+    {
+        return $this->getBlockingTasks()->andWhere(['<>', 'todo_task.status', 'geschlossen']);
     }
 
     public function getHistoryEntries()

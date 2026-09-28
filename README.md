@@ -18,6 +18,7 @@ Aufgaben können Personen und Aufgabenlisten zugeordnet, kommentiert, terminiert
 - Prioritäten und Fälligkeitsdaten
 - wiederkehrende Aufgaben mit Intervall und optionalem Enddatum
 - vollständige Unteraufgaben mit eigenem Status, Termin und Zuständigen
+- Aufgabenabhängigkeiten mit sichtbarer Blockierung
 - mehrere zuständige Personen pro Aufgabe
 - Checklisten mit mehreren Zuständigen
 - frei verwaltbare und sortierbare Aufgabenlisten
@@ -66,7 +67,7 @@ php protected/yii cron/run
 
 ## Version
 
-Aktuelle Modulversion: **1.12.0**. Änderungen sind im [CHANGELOG.md](CHANGELOG.md)
+Aktuelle Modulversion: **1.13.0**. Änderungen sind im [CHANGELOG.md](CHANGELOG.md)
 dokumentiert.
 
 ## Mitwirken und Sicherheit

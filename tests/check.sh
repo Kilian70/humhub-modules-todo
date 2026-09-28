@@ -66,6 +66,9 @@ foreach ([
     "services/RecurringTaskService.php",
     "migrations/m260928_160000_recurring_tasks.php",
     "migrations/m260928_180000_task_hierarchy.php",
+    "models/TaskDependency.php",
+    "services/TaskDependencyService.php",
+    "migrations/m260928_200000_task_dependencies.php",
 ] as $file) {
     if (!is_file($file)) {
         fwrite(STDERR, "Missing task history component: {$file}\n");
