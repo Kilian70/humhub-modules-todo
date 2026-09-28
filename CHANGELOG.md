@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.19.1 - 2026-09-28
+
+- Namenskonflikt der Aufgabenlabel-Relation mit HumHubs eigener Content-Label-Methode behoben
+- Kompatibilität mit HumHub 1.18 und 1.19 wiederhergestellt
+
 ## 1.19.0 - 2026-09-28
 
 - wiederverwendbare farbige Labels pro Space ergänzt
