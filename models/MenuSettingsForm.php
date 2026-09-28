@@ -9,12 +9,14 @@ class MenuSettingsForm extends Model
 {
     public $menuVisible = true;
     public $menuPosition = 'front';
+    public $notificationDefault = 'all';
 
     public function rules(): array
     {
         return [
             [['menuVisible'], 'boolean'],
             [['menuPosition'], 'in', 'range' => ['front', 'middle', 'back']],
+            [['notificationDefault'], 'in', 'range' => ['all', 'important', 'reminders', 'muted']],
         ];
     }
 
@@ -23,6 +25,7 @@ class MenuSettingsForm extends Model
         return [
             'menuVisible' => Yii::t('TodoModule.base', '„Meine ToDos“ im Hauptmenü anzeigen'),
             'menuPosition' => Yii::t('TodoModule.base', 'Position im Hauptmenü'),
+            'notificationDefault' => Yii::t('TodoModule.base', 'Standard für neue und nicht individuell eingestellte Aufgaben'),
         ];
     }
 
@@ -32,6 +35,7 @@ class MenuSettingsForm extends Model
         return new self([
             'menuVisible' => (bool) $settings->get('menuVisible', true),
             'menuPosition' => (string) $settings->get('menuPosition', 'front'),
+            'notificationDefault' => (string) $settings->get('notificationDefault', 'all'),
         ]);
     }
 
@@ -43,6 +47,7 @@ class MenuSettingsForm extends Model
         $settings = self::settings();
         $settings->set('menuVisible', (bool) $this->menuVisible);
         $settings->set('menuPosition', (string) $this->menuPosition);
+        $settings->set('notificationDefault', (string) $this->notificationDefault);
         return true;
     }
 

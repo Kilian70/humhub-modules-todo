@@ -21,6 +21,15 @@ $this->title = Yii::t('TodoModule.base', 'ToDo-Menü');
             'middle' => Yii::t('TodoModule.base', 'Mitte – bevorzugt im mittleren Bereich'),
             'back' => Yii::t('TodoModule.base', 'Hinten – bevorzugt im hinteren Bereich'),
         ]) ?>
+        <hr>
+        <h4><?= Yii::t('TodoModule.base', 'Benachrichtigungen') ?></h4>
+        <p class="text-muted"><?= Yii::t('TodoModule.base', 'Diese Vorgabe gilt für alle Aufgaben, bei denen du keine eigene Auswahl getroffen hast.') ?></p>
+        <?= $form->field($model, 'notificationDefault')->dropDownList([
+            'all' => Yii::t('TodoModule.base', 'Alle ToDo-Benachrichtigungen'),
+            'important' => Yii::t('TodoModule.base', 'Nur Kommentare und Zuweisungen'),
+            'reminders' => Yii::t('TodoModule.base', 'Nur Erinnerungen'),
+            'muted' => Yii::t('TodoModule.base', 'Stumm'),
+        ]) ?>
         <button class="btn btn-primary" type="submit" data-ui-loader><?= Yii::t('TodoModule.base', 'Speichern') ?></button>
         <?php ActiveForm::end(); ?>
     </div>

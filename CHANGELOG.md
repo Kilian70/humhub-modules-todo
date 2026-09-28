@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.25.0 - 2026-09-28
+
+- persönliche Standardvorgabe für Aufgabenbenachrichtigungen ergänzt
+- die Vorgabe befindet sich unter Kontoeinstellungen → ToDo-Menü
+- Aufgaben ohne individuelle Auswahl übernehmen den persönlichen Standard automatisch
+- pro Aufgabe kann weiterhin eine abweichende Einstellung gewählt oder wieder auf den Standard zurückgestellt werden
+
 ## 1.24.0 - 2026-09-28
 
 - persönliche Benachrichtigungseinstellung pro Aufgabe ergänzt
