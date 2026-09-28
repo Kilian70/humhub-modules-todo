@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.22.1 - 2026-09-28
+
+- Aktionsleiste der Aufgabenübersicht für Smartphones neu angeordnet
+- Suche und Verwaltungsaktionen passen sich nun an die verfügbare Breite an
+- horizontales Überlaufen und abgeschnittene Kanban-Inhalte auf kleinen Bildschirmen behoben
+
 ## 1.22.0 - 2026-09-28
 
 - automatische Archivierung pro Space ergänzt

@@ -190,15 +190,15 @@ $kanbanCard = function ($task) use ($contentContainer) {
 ?>
 
 <div class="panel panel-default">
-    <div class="panel-heading d-flex flex-wrap justify-content-between align-items-center gap-2">
-        <div class="d-flex align-items-center gap-2 flex-wrap">
+    <div class="panel-heading d-flex flex-wrap justify-content-between align-items-center gap-2 todo-task-heading">
+        <div class="d-flex align-items-center gap-2 flex-wrap todo-task-heading-main">
             <strong style="white-space:nowrap;"><?= Yii::t('TodoModule.base', 'ToDo Liste') ?></strong>
-            <form method="get" action="<?= $contentContainer->createUrl('/todo/search/index') ?>" class="d-flex gap-1 align-items-center">
-                <input type="text" name="keyword" class="form-control form-control-sm" placeholder="<?= Yii::t('TodoModule.base', 'Suche...') ?>" style="width:160px">
+            <form method="get" action="<?= $contentContainer->createUrl('/todo/search/index') ?>" class="d-flex gap-1 align-items-center todo-task-search">
+                <input type="text" name="keyword" class="form-control form-control-sm" placeholder="<?= Yii::t('TodoModule.base', 'Suche...') ?>">
                 <button class="btn btn-sm btn-outline-primary"><i class="fa fa-search"></i></button>
             </form>
         </div>
-        <div class="d-flex gap-1">
+        <div class="d-flex gap-1 todo-task-toolbar">
             <div class="btn-group" role="group" aria-label="<?= Yii::t('TodoModule.base', 'Ansicht') ?>">
                 <?= Html::a('<i class="fa fa-list"></i> ' . Yii::t('TodoModule.base', 'Liste'), $contentContainer->createUrl('/todo/task/index', array_filter($filterParams + ['view' => 'list'])), ['class' => 'btn btn-sm ' . ($viewMode === 'list' ? 'btn-primary' : 'btn-default')]) ?>
                 <?= Html::a('<i class="fa fa-columns"></i> ' . Yii::t('TodoModule.base', 'Kanban'), $contentContainer->createUrl('/todo/task/index', array_filter($filterParams + ['view' => 'kanban'])), ['class' => 'btn btn-sm ' . ($viewMode === 'kanban' ? 'btn-primary' : 'btn-default')]) ?>
@@ -343,6 +343,11 @@ $this->registerCss(<<<CSS
 .todo-list-row:focus {
     box-shadow: inset 0 0 0 2px rgba(0, 123, 255, 0.18);
 }
+.todo-task-heading,
+.todo-task-heading-main,
+.todo-task-toolbar { min-width:0; }
+.todo-task-search { width:200px; max-width:100%; }
+.todo-task-search input { width:100%; min-width:0; }
 .todo-kanban-board { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; align-items:start; }
 .todo-kanban-column { background:#f3f5f7; border:1px solid #dfe3e7; border-radius:6px; min-width:0; }
 .todo-kanban-column > header { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; }
@@ -358,9 +363,28 @@ $this->registerCss(<<<CSS
 .todo-kanban-empty { color:#777; font-size:12px; text-align:center; padding:16px 6px; }
 .todo-kanban-mobile-status { display:none; margin-top:8px; }
 @media (max-width: 767px) {
+    .todo-task-heading { display:block !important; }
+    .todo-task-heading-main { width:100%; }
+    .todo-task-search { flex:1 1 180px; width:auto; }
+    .todo-task-toolbar {
+        display:grid !important;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        width:100%;
+        margin-top:10px;
+    }
+    .todo-task-toolbar > .btn,
+    .todo-task-toolbar > .btn-group { width:100%; min-width:0; }
+    .todo-task-toolbar > .btn {
+        white-space:normal;
+        overflow-wrap:anywhere;
+    }
+    .todo-task-toolbar > .btn-group { display:flex; }
+    .todo-task-toolbar > .btn-group > .btn { flex:1 1 50%; min-width:0; }
     .todo-kanban-board { grid-template-columns:1fr; }
     .todo-kanban-card[draggable="true"] { cursor:default; }
     .todo-kanban-mobile-status { display:block; }
+    .todo-list-row { align-items:flex-start !important; }
+    .todo-list-row [data-task-actions] { flex-wrap:wrap; justify-content:flex-end; }
 }
 CSS
 );
