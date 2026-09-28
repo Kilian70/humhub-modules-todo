@@ -50,6 +50,8 @@ class TaskController extends ContentContainerController
                 'dependency-add' => ['POST'],
                 'dependency-remove' => ['POST'],
                 'duplicate' => ['POST'],
+                'archive' => ['POST'],
+                'restore' => ['POST'],
             ],
         ];
 
@@ -82,10 +84,20 @@ public function actionIndex()
         ->contentContainer($this->contentContainer)
         ->andWhere(['todo_task.parent_task_id' => null]);
 
+    $showArchive = Yii::$app->request->get('archive') === '1';
+    if ($showArchive) {
+        $query->andWhere(['not', ['todo_task.archived_at' => null]]);
+        $viewMode = 'list';
+    } else {
+        $query->andWhere(['todo_task.archived_at' => null]);
+    }
+
     // Geschlossene Aufgaben werden separat angezeigt.
     $done = Yii::$app->request->get('done');
 
-    if ($viewMode === 'kanban') {
+    if ($showArchive) {
+        // The archive contains completed tasks regardless of the current work view.
+    } elseif ($viewMode === 'kanban') {
         // The board displays every workflow state side by side.
     } elseif ($done) {
         $query->andWhere(['todo_task.status' => 'geschlossen']);
@@ -260,6 +272,7 @@ public function actionIndex()
         'taskLists' => TaskList::findForSpace((int) $this->contentContainer->id),
         'spaceUsers' => Membership::getSpaceMembersQuery($this->contentContainer)->all(),
         'taskLabels' => TaskLabel::findForSpace((int) $this->contentContainer->id),
+        'showArchive' => $showArchive,
     ]);
 }
 
@@ -705,6 +718,54 @@ public function actionDelete($id)
     Yii::$app->request->referrer
     ?: $this->contentContainer->createUrl('/todo/task/index')
 );
+}
+
+public function actionArchive($id)
+{
+    $model = $this->findTaskForArchive((int) $id);
+    if (!$model->canManage()) {
+        throw new \yii\web\ForbiddenHttpException();
+    }
+    if ($model->status !== 'geschlossen') {
+        Yii::$app->session->setFlash('error', Yii::t('TodoModule.base', 'Nur geschlossene Aufgaben können archiviert werden.'));
+        return $this->redirect($this->contentContainer->createUrl('/todo/task/view', ['id' => $model->id]));
+    }
+    if ($model->archived_at === null) {
+        $model->updateAttributes([
+            'archived_at' => date('Y-m-d H:i:s'),
+            'archived_by' => Yii::$app->user->id,
+        ]);
+        TaskHistoryService::record($model, 'archived', 'Aufgabe archiviert');
+    }
+    return $this->redirect($this->contentContainer->createUrl('/todo/task/index'));
+}
+
+public function actionRestore($id)
+{
+    $model = $this->findTaskForArchive((int) $id);
+    if (!$model->canManage()) {
+        throw new \yii\web\ForbiddenHttpException();
+    }
+    if ($model->archived_at !== null) {
+        $model->updateAttributes(['archived_at' => null, 'archived_by' => null]);
+        TaskHistoryService::record($model, 'restored', 'Aufgabe aus dem Archiv wiederhergestellt');
+    }
+    return $this->redirect($this->contentContainer->createUrl('/todo/task/view', ['id' => $model->id]));
+}
+
+private function findTaskForArchive(int $id): Task
+{
+    if (!$this->contentContainer) {
+        throw new HttpException(404, Yii::t('TodoModule.base', 'Kein Space gefunden.'));
+    }
+    $model = Task::find()
+        ->contentContainer($this->contentContainer)
+        ->andWhere(['todo_task.id' => $id])
+        ->one();
+    if (!$model) {
+        throw new NotFoundHttpException();
+    }
+    return $model;
 }
 
 public function actionDuplicate($id)

@@ -9,6 +9,7 @@ $groupBy = $groupBy ?? Yii::$app->request->get('group', 'list');
 $isMy = Yii::$app->request->get('my');
 $currentDone = Yii::$app->request->get('done');
 $viewMode = $viewMode ?? 'list';
+$showArchive = $showArchive ?? false;
 $filterParams = [
     'my' => $isMy,
     'priority' => Yii::$app->request->get('priority'),
@@ -17,7 +18,7 @@ $filterParams = [
     'label_id' => Yii::$app->request->get('label_id'),
 ];
 
-$taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $currentDone, $isMy, $groupBy) {
+$taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $currentDone, $isMy, $groupBy, $showArchive) {
     $isOverdue = !empty($task->due_date) && $task->due_date < date('Y-m-d') && $task->status !== 'geschlossen';
     $priorityClass = match ($task->priority) {
         'hoch' => 'badge bg-danger',
@@ -81,6 +82,28 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
                     'onkeydown' => 'event.stopPropagation();',
                 ]
             ) ?>
+            <?php if ($showArchive): ?>
+                <?= Html::beginForm($contentContainer->createUrl('/todo/task/restore', ['id' => $task->id]), 'post', ['class' => 'd-inline']) ?>
+                <?= Html::submitButton('<i class="fa fa-undo"></i>', [
+                    'class' => 'btn btn-xs btn-outline-success',
+                    'title' => Yii::t('TodoModule.base', 'Wiederherstellen'),
+                    'aria-label' => Yii::t('TodoModule.base', 'Wiederherstellen'),
+                    'onclick' => 'event.stopPropagation();',
+                    'onkeydown' => 'event.stopPropagation();',
+                ]) ?>
+                <?= Html::endForm() ?>
+            <?php elseif ($task->status === 'geschlossen'): ?>
+                <?= Html::beginForm($contentContainer->createUrl('/todo/task/archive', ['id' => $task->id]), 'post', ['class' => 'd-inline']) ?>
+                <?= Html::submitButton('<i class="fa fa-archive"></i>', [
+                    'class' => 'btn btn-xs btn-outline-secondary',
+                    'title' => Yii::t('TodoModule.base', 'Archivieren'),
+                    'aria-label' => Yii::t('TodoModule.base', 'Archivieren'),
+                    'data-confirm' => Yii::t('TodoModule.base', 'Aufgabe archivieren?'),
+                    'onclick' => 'event.stopPropagation();',
+                    'onkeydown' => 'event.stopPropagation();',
+                ]) ?>
+                <?= Html::endForm() ?>
+            <?php endif; ?>
             <?php endif; ?>
             <?php if ($task->canDelete()): ?>
             <?= Html::a(
@@ -226,9 +249,10 @@ $kanbanCard = function ($task) use ($contentContainer) {
             </form>
         </details>
         <div class="mb-2 d-flex flex-wrap gap-1">
-            <?= Html::a(Yii::t('TodoModule.base', 'Alle Tasks'), $contentContainer->createUrl('/todo/task/index', ['group' => $groupBy, 'view' => $viewMode]), ['class' => 'btn btn-sm ' . (!$isMy && !$currentDone ? 'btn-primary' : 'btn-outline-secondary')]) ?>
+            <?= Html::a(Yii::t('TodoModule.base', 'Alle Tasks'), $contentContainer->createUrl('/todo/task/index', ['group' => $groupBy, 'view' => $viewMode]), ['class' => 'btn btn-sm ' . (!$isMy && !$currentDone && !$showArchive ? 'btn-primary' : 'btn-outline-secondary')]) ?>
             <?= Html::a(Yii::t('TodoModule.base', 'Meine Tasks'), $contentContainer->createUrl('/todo/task/index', ['my' => 1, 'done' => $currentDone, 'group' => $groupBy, 'view' => $viewMode]), ['class' => 'btn btn-sm ' . ($isMy ? 'btn-primary' : 'btn-outline-secondary')]) ?>
             <?php if ($viewMode === 'list'): ?><?= Html::a(Yii::t('TodoModule.base', 'Erledigt'), $contentContainer->createUrl('/todo/task/index', ['done' => 1, 'my' => $isMy, 'group' => $groupBy, 'view' => $viewMode]), ['class' => 'btn btn-sm ' . ($currentDone ? 'btn-primary' : 'btn-outline-secondary')]) ?><?php endif; ?>
+            <?= Html::a('<i class="fa fa-archive"></i> ' . Yii::t('TodoModule.base', 'Archiv'), $contentContainer->createUrl('/todo/task/index', ['archive' => 1, 'group' => 'date']), ['class' => 'btn btn-sm ' . ($showArchive ? 'btn-primary' : 'btn-outline-secondary')]) ?>
         </div>
         <?php if ($viewMode === 'list'): ?>
         <div class="mb-3 d-flex flex-wrap gap-1">

@@ -69,8 +69,8 @@ class Task extends ContentActiveRecord implements ViewableInterface
             [['priority'], 'in', 'range' => ['niedrig', 'mittel', 'hoch']],
             [['status'], 'in', 'range' => ['offen', 'in_bearbeitung', 'geschlossen']],
             [['status'], 'validateBlockingTasks'],
-            [['closed_by'], 'integer'],
-            [['closed_at'], 'safe'],
+            [['closed_by', 'archived_by'], 'integer'],
+            [['closed_at', 'archived_at'], 'safe'],
             [['sync_to_calendar'], 'boolean'],
             [['task_list_id', 'parent_task_id'], 'integer'],
             [['parent_task_id'], 'validateParentTask'],
@@ -156,6 +156,11 @@ class Task extends ContentActiveRecord implements ViewableInterface
     public function getClosedByUser()
     {
         return $this->hasOne(User::class, ['id' => 'closed_by']);
+    }
+
+    public function getArchivedByUser()
+    {
+        return $this->hasOne(User::class, ['id' => 'archived_by']);
     }
 
     /**

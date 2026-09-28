@@ -30,7 +30,7 @@ $canCreateTask = $contentContainer->permissionManager->can(new \humhub\modules\t
 
             <?= Html::a(
                 'Zurück',
-                $contentContainer->createUrl('/todo/task/index'),
+                $contentContainer->createUrl('/todo/task/index', $task->archived_at ? ['archive' => 1] : []),
                 ['class' => 'btn btn-sm btn-light']
             ) ?>
 
@@ -40,6 +40,19 @@ $canCreateTask = $contentContainer->permissionManager->can(new \humhub\modules\t
                     $contentContainer->createUrl('/todo/task/update', ['id' => $task->id]),
                     ['class' => 'btn btn-sm btn-primary']
                 ) ?>
+            <?php endif; ?>
+
+            <?php if ($canEditTask && $task->archived_at): ?>
+                <?= Html::beginForm($contentContainer->createUrl('/todo/task/restore', ['id' => $task->id]), 'post', ['class' => 'd-inline']) ?>
+                <?= Html::submitButton('<i class="fa fa-undo"></i> ' . Yii::t('TodoModule.base', 'Wiederherstellen'), ['class' => 'btn btn-sm btn-success']) ?>
+                <?= Html::endForm() ?>
+            <?php elseif ($canEditTask && $task->status === 'geschlossen'): ?>
+                <?= Html::beginForm($contentContainer->createUrl('/todo/task/archive', ['id' => $task->id]), 'post', ['class' => 'd-inline']) ?>
+                <?= Html::submitButton('<i class="fa fa-archive"></i> ' . Yii::t('TodoModule.base', 'Archivieren'), [
+                    'class' => 'btn btn-sm btn-default',
+                    'data-confirm' => Yii::t('TodoModule.base', 'Aufgabe archivieren?'),
+                ]) ?>
+                <?= Html::endForm() ?>
             <?php endif; ?>
 
             <?php if ($canCreateTask): ?>
@@ -104,6 +117,9 @@ $canCreateTask = $contentContainer->permissionManager->can(new \humhub\modules\t
         };
         ?>
         <div class="mb-3">
+            <?php if ($task->archived_at): ?>
+                <span class="badge bg-dark"><i class="fa fa-archive"></i> <?= Yii::t('TodoModule.base', 'ARCHIVIERT') ?></span>
+            <?php endif; ?>
             <span class="<?= $statusClass ?>"><?= $statusLabel ?></span>
             <?php if ($task->getOpenBlockingTasks()->exists()): ?>
                 <span class="badge bg-warning text-dark ms-1"><i class="fa fa-lock"></i> BLOCKIERT</span>
