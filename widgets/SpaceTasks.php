@@ -21,7 +21,8 @@ class SpaceTasks extends Widget
             return '';
         }
 
-        $limit = max(1, min(20, (int) $this->space->getSettings()->get('widgetLimit', 'todo', 5)));
+        $settings = Yii::$app->getModule('todo')->settings->contentContainer($this->space);
+        $limit = max(1, min(20, (int) $settings->get('widgetLimit', 5)));
         $tasks = WidgetTaskService::getSpaceTasks($this->space, $limit);
 
         if (empty($tasks)) {

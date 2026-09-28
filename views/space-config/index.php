@@ -32,6 +32,18 @@ $this->title = 'ToDo – Space-Einstellungen';
             </div>
         </div>
 
+        <hr>
+        <h4><?= Yii::t('TodoModule.base', 'Archiv') ?></h4>
+        <?= $form->field($model, 'autoArchiveDays')->dropDownList([
+            0 => Yii::t('TodoModule.base', 'Aus – nur manuell archivieren'),
+            30 => Yii::t('TodoModule.base', 'Nach 30 Tagen'),
+            60 => Yii::t('TodoModule.base', 'Nach 60 Tagen'),
+            90 => Yii::t('TodoModule.base', 'Nach 90 Tagen'),
+        ]) ?>
+        <div class="form-text text-muted">
+            <?= Yii::t('TodoModule.base', 'Es werden nur erledigte Aufgaben mit einem Abschlussdatum archiviert. Sie können im Archiv jederzeit wiederhergestellt werden.') ?>
+        </div>
+
         <div class="mt-3">
             <?= Html::submitButton('Speichern', ['class' => 'btn btn-primary']) ?>
         </div>

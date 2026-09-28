@@ -10,6 +10,7 @@ use humhub\modules\todo\widgets\SpaceTasks;
 use humhub\modules\todo\models\Task;
 use humhub\modules\todo\notifications\TaskCommented;
 use humhub\modules\todo\services\ReminderService;
+use humhub\modules\todo\services\AutoArchiveService;
 use humhub\helpers\ControllerHelper;
 use humhub\modules\ui\menu\MenuLink;
 use humhub\modules\todo\models\MenuSettingsForm;
@@ -76,21 +77,22 @@ class Events
             return;
         }
 
-        $settings = $space->getSettings();
-        if (!(bool) $settings->get('widgetEnabled', 'todo', true)) {
+        $settings = Yii::$app->getModule('todo')->settings->contentContainer($space);
+        if (!(bool) $settings->get('widgetEnabled', true)) {
             return;
         }
 
         $event->sender->addWidget(
             SpaceTasks::class,
             ['space' => $space],
-            ['sortOrder' => (int) $settings->get('widgetSortOrder', 'todo', 300)]
+            ['sortOrder' => (int) $settings->get('widgetSortOrder', 300)]
         );
     }
 
     public static function onCronRun(): void
     {
         ReminderService::run();
+        AutoArchiveService::run();
     }
 
     /**
