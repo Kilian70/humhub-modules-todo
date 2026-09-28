@@ -10,11 +10,50 @@ use humhub\modules\todo\widgets\SpaceTasks;
 use humhub\modules\todo\models\Task;
 use humhub\modules\todo\notifications\TaskCommented;
 use humhub\modules\todo\services\ReminderService;
+use humhub\helpers\ControllerHelper;
+use humhub\modules\ui\menu\MenuLink;
+use humhub\modules\todo\models\MenuSettingsForm;
 use Yii;
 use yii\base\Event;
 
 class Events
 {
+
+    public static function onTopMenuInit(Event $event): void
+    {
+        if (Yii::$app->user->isGuest) {
+            return;
+        }
+
+        $settings = MenuSettingsForm::settings();
+        if (!(bool) $settings->get('menuVisible', true)) {
+            return;
+        }
+        $positions = ['front' => 150, 'middle' => 350, 'back' => 900];
+        $position = (string) $settings->get('menuPosition', 'front');
+
+        $event->sender->addEntry(new MenuLink([
+            'id' => 'todo-overview',
+            'label' => 'Meine ToDos',
+            'url' => ['/todo/overview/index'],
+            'icon' => 'check-square-o',
+            'sortOrder' => $positions[$position] ?? $positions['front'],
+            'isActive' => ControllerHelper::isActivePath('todo', 'overview'),
+        ]));
+    }
+
+    public static function onAccountSettingsMenuInit(Event $event): void
+    {
+        if (Yii::$app->user->isGuest) {
+            return;
+        }
+        $event->sender->addEntry(new MenuLink([
+            'label' => 'ToDo-Menü',
+            'url' => ['/todo/menu-settings/index'],
+            'sortOrder' => 450,
+            'isActive' => ControllerHelper::isActivePath('todo', 'menu-settings'),
+        ]));
+    }
 
     public static function onDashboardSidebarInit(Event $event): void
     {
