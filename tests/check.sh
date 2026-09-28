@@ -75,6 +75,7 @@ foreach ([
     "services/TaskTemplateService.php",
     "controllers/TemplateController.php",
     "migrations/m260928_220000_task_templates.php",
+    "services/OverviewTaskService.php",
 ] as $file) {
     if (!is_file($file)) {
         fwrite(STDERR, "Missing task history component: {$file}\n");

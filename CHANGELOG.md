@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.16.0 - 2026-09-28
+
+- zentrale persönliche Aufgabenübersicht über alle sichtbaren Spaces ausgebaut
+- Filter nach Space, Zuständigkeit, Status und Priorität ergänzt
+- Suche in Titel und Beschreibung ergänzt
+- Schnellansichten für überfällige, bald fällige, blockierte Aufgaben und Unteraufgaben ergänzt
+- Space, Fälligkeit, Hauptaufgabe und Zuständige werden direkt in der Übersicht angezeigt
+- bestehender Link «Zeige alle» im Dashboard führt auf die neue Übersicht
+
 ## 1.15.0 - 2026-09-28
 
 - bestehende Aufgaben können als wiederverwendbare Space-Vorlagen gespeichert werden
