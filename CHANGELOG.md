@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.17.0 - 2026-09-28
+
+- zentrale Aufgabenübersicht vollständig auf Deutsch und Englisch umgestellt
+- Vorlagenverwaltung und persönliche Menüeinstellungen übersetzt
+- wichtigste Aufgabenlisten-, Erstellungs- und Bearbeitungsansichten internationalisiert
+- fehlende englische Texte für bald fällige Erinnerungen ergänzt
+- automatischen Test für fehlende deutsche oder englische Übersetzungsschlüssel ergänzt
+
 ## 1.16.2 - 2026-09-28
 
 - Bezeichnungen der persönlichen Menüpositionen präzisiert

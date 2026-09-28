@@ -6,16 +6,16 @@ use yii\widgets\ActiveForm;
 ?>
 <div class="panel panel-default">
     <div class="panel-heading d-flex justify-content-between align-items-center">
-        <strong>Vorlage bearbeiten</strong>
-        <?= Html::a('Zurück', $contentContainer->createUrl('/todo/template/index'), ['class' => 'btn btn-sm btn-light']) ?>
+        <strong><?= Yii::t('TodoModule.base', 'Vorlage bearbeiten') ?></strong>
+        <?= Html::a(Yii::t('TodoModule.base', 'Zurück'), $contentContainer->createUrl('/todo/template/index'), ['class' => 'btn btn-sm btn-light']) ?>
     </div>
     <div class="panel-body">
         <?php $form = ActiveForm::begin(); ?>
         <?= $form->field($model, 'title')->textInput(['maxlength' => 255]) ?>
         <?= $form->field($model, 'description')->textarea(['rows' => 5]) ?>
-        <?= $form->field($model, 'priority')->dropDownList(['niedrig' => 'Niedrig', 'mittel' => 'Mittel', 'hoch' => 'Hoch']) ?>
-        <?= $form->field($model, 'checklist_text')->textarea(['rows' => 8])->hint('Ein Checklistenpunkt pro Zeile.') ?>
-        <?= Html::submitButton('Speichern', ['class' => 'btn btn-primary']) ?>
+        <?= $form->field($model, 'priority')->dropDownList(['niedrig' => Yii::t('TodoModule.base', 'Niedrig'), 'mittel' => Yii::t('TodoModule.base', 'Mittel'), 'hoch' => Yii::t('TodoModule.base', 'Hoch')]) ?>
+        <?= $form->field($model, 'checklist_text')->textarea(['rows' => 8])->hint(Yii::t('TodoModule.base', 'Ein Checklistenpunkt pro Zeile.')) ?>
+        <?= Html::submitButton(Yii::t('TodoModule.base', 'Speichern'), ['class' => 'btn btn-primary']) ?>
         <?php ActiveForm::end(); ?>
     </div>
 </div>

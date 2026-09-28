@@ -21,8 +21,8 @@ class MenuSettingsForm extends Model
     public function attributeLabels(): array
     {
         return [
-            'menuVisible' => '„Meine ToDos“ im Hauptmenü anzeigen',
-            'menuPosition' => 'Position im Hauptmenü',
+            'menuVisible' => Yii::t('TodoModule.base', '„Meine ToDos“ im Hauptmenü anzeigen'),
+            'menuPosition' => Yii::t('TodoModule.base', 'Position im Hauptmenü'),
         ];
     }
 

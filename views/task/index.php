@@ -22,9 +22,9 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
         default => 'badge bg-light text-dark border',
     };
     $statusLabel = match ($task->status) {
-        'in_bearbeitung' => 'IN BEARBEITUNG',
-        'geschlossen' => 'GESCHLOSSEN',
-        default => 'OFFEN',
+        'in_bearbeitung' => Yii::t('TodoModule.base', 'IN BEARBEITUNG'),
+        'geschlossen' => Yii::t('TodoModule.base', 'GESCHLOSSEN'),
+        default => Yii::t('TodoModule.base', 'OFFEN'),
     };
     ?>
     <?php $taskViewUrl = $contentContainer->createUrl('/todo/task/view', ['id' => $task->id]); ?>
@@ -38,7 +38,7 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
                 <span class="fw-semibold text-break"><?= Html::encode($task->title) ?></span>
                 <span class="<?= $priorityClass ?>"><?= ucfirst(Html::encode($task->priority)) ?></span>
                 <span class="<?= $statusClass ?>"><?= $statusLabel ?></span>
-                <?php if ($isOverdue): ?><span class="badge bg-danger">ÜBERFÄLLIG</span><?php endif; ?>
+                <?php if ($isOverdue): ?><span class="badge bg-danger"><?= Yii::t('TodoModule.base', 'ÜBERFÄLLIG') ?></span><?php endif; ?>
             </div>
             <div class="small text-muted d-flex flex-wrap align-items-center gap-2 mt-1">
                 <?php if ($task->due_date): ?>
@@ -63,8 +63,8 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
                 $contentContainer->createUrl('/todo/task/update', ['id' => $task->id]),
                 [
                     'class' => 'btn btn-xs btn-outline-primary',
-                    'title' => 'Bearbeiten',
-                    'aria-label' => 'Bearbeiten',
+                    'title' => Yii::t('TodoModule.base', 'Bearbeiten'),
+                    'aria-label' => Yii::t('TodoModule.base', 'Bearbeiten'),
                     'onclick' => 'event.stopPropagation();',
                     'onkeydown' => 'event.stopPropagation();',
                 ]
@@ -81,9 +81,9 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
                 ]),
                 [
                     'class' => 'btn btn-xs btn-outline-danger',
-                    'title' => 'Löschen',
-                    'aria-label' => 'Löschen',
-                    'data-confirm' => 'Wirklich löschen?',
+                    'title' => Yii::t('TodoModule.base', 'Löschen'),
+                    'aria-label' => Yii::t('TodoModule.base', 'Löschen'),
+                    'data-confirm' => Yii::t('TodoModule.base', 'Wirklich löschen?'),
                     'data-method' => 'post',
                     'onclick' => 'event.stopPropagation();',
                     'onkeydown' => 'event.stopPropagation();',
@@ -100,19 +100,19 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
 <div class="panel panel-default">
     <div class="panel-heading d-flex flex-wrap justify-content-between align-items-center gap-2">
         <div class="d-flex align-items-center gap-2 flex-wrap">
-            <strong style="white-space:nowrap;">ToDo Liste</strong>
+            <strong style="white-space:nowrap;"><?= Yii::t('TodoModule.base', 'ToDo Liste') ?></strong>
             <form method="get" action="<?= $contentContainer->createUrl('/todo/search/index') ?>" class="d-flex gap-1 align-items-center">
-                <input type="text" name="keyword" class="form-control form-control-sm" placeholder="Suche..." style="width:160px">
+                <input type="text" name="keyword" class="form-control form-control-sm" placeholder="<?= Yii::t('TodoModule.base', 'Suche...') ?>" style="width:160px">
                 <button class="btn btn-sm btn-outline-primary"><i class="fa fa-search"></i></button>
             </form>
         </div>
         <div class="d-flex gap-1">
             <?php if ($contentContainer->permissionManager->can(new \humhub\modules\todo\permissions\EditTasks())): ?>
-                <?= Html::a('Aufgabenlisten verwalten', $contentContainer->createUrl('/todo/task-list/index'), ['class' => 'btn btn-default btn-sm']) ?>
+                <?= Html::a(Yii::t('TodoModule.base', 'Aufgabenlisten verwalten'), $contentContainer->createUrl('/todo/task-list/index'), ['class' => 'btn btn-default btn-sm']) ?>
             <?php endif; ?>
-            <?= Html::a('Vorlagen', $contentContainer->createUrl('/todo/template/index'), ['class' => 'btn btn-default btn-sm']) ?>
+            <?= Html::a(Yii::t('TodoModule.base', 'Vorlagen'), $contentContainer->createUrl('/todo/template/index'), ['class' => 'btn btn-default btn-sm']) ?>
             <?php if ($contentContainer->permissionManager->can(new \humhub\modules\todo\permissions\CreateTasks())): ?>
-                <?= Html::a('Neue Aufgabe', $contentContainer->createUrl('/todo/task/create'), ['class' => 'btn btn-success btn-sm']) ?>
+                <?= Html::a(Yii::t('TodoModule.base', 'Neue Aufgabe'), $contentContainer->createUrl('/todo/task/create'), ['class' => 'btn btn-success btn-sm']) ?>
             <?php endif; ?>
         </div>
     </div>
@@ -121,14 +121,14 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="mb-2 d-flex flex-wrap gap-1">
-            <?= Html::a('Alle Tasks', $contentContainer->createUrl('/todo/task/index', ['group' => $groupBy]), ['class' => 'btn btn-sm ' . (!$isMy && !$currentDone ? 'btn-primary' : 'btn-outline-secondary')]) ?>
-            <?= Html::a('Meine Tasks', $contentContainer->createUrl('/todo/task/index', ['my' => 1, 'done' => $currentDone, 'group' => $groupBy]), ['class' => 'btn btn-sm ' . ($isMy ? 'btn-primary' : 'btn-outline-secondary')]) ?>
-            <?= Html::a('Erledigt', $contentContainer->createUrl('/todo/task/index', ['done' => 1, 'my' => $isMy, 'group' => $groupBy]), ['class' => 'btn btn-sm ' . ($currentDone ? 'btn-primary' : 'btn-outline-secondary')]) ?>
+            <?= Html::a(Yii::t('TodoModule.base', 'Alle Tasks'), $contentContainer->createUrl('/todo/task/index', ['group' => $groupBy]), ['class' => 'btn btn-sm ' . (!$isMy && !$currentDone ? 'btn-primary' : 'btn-outline-secondary')]) ?>
+            <?= Html::a(Yii::t('TodoModule.base', 'Meine Tasks'), $contentContainer->createUrl('/todo/task/index', ['my' => 1, 'done' => $currentDone, 'group' => $groupBy]), ['class' => 'btn btn-sm ' . ($isMy ? 'btn-primary' : 'btn-outline-secondary')]) ?>
+            <?= Html::a(Yii::t('TodoModule.base', 'Erledigt'), $contentContainer->createUrl('/todo/task/index', ['done' => 1, 'my' => $isMy, 'group' => $groupBy]), ['class' => 'btn btn-sm ' . ($currentDone ? 'btn-primary' : 'btn-outline-secondary')]) ?>
         </div>
         <div class="mb-3 d-flex flex-wrap gap-1">
-            <?= Html::a('Nach Aufgabenliste', $contentContainer->createUrl('/todo/task/index', ['group' => 'list', 'my' => $isMy, 'done' => $currentDone]), ['class' => 'btn btn-sm ' . ($groupBy === 'list' ? 'btn-primary' : 'btn-outline-secondary')]) ?>
-            <?= Html::a('Nach Datum', $contentContainer->createUrl('/todo/task/index', ['group' => 'date', 'my' => $isMy, 'done' => $currentDone]), ['class' => 'btn btn-sm ' . ($groupBy === 'date' ? 'btn-primary' : 'btn-outline-secondary')]) ?>
-            <?= Html::a('Nach Zuständig', $contentContainer->createUrl('/todo/task/index', ['group' => 'user', 'my' => $isMy, 'done' => $currentDone]), ['class' => 'btn btn-sm ' . ($groupBy === 'user' ? 'btn-primary' : 'btn-outline-secondary')]) ?>
+            <?= Html::a(Yii::t('TodoModule.base', 'Nach Aufgabenliste'), $contentContainer->createUrl('/todo/task/index', ['group' => 'list', 'my' => $isMy, 'done' => $currentDone]), ['class' => 'btn btn-sm ' . ($groupBy === 'list' ? 'btn-primary' : 'btn-outline-secondary')]) ?>
+            <?= Html::a(Yii::t('TodoModule.base', 'Nach Datum'), $contentContainer->createUrl('/todo/task/index', ['group' => 'date', 'my' => $isMy, 'done' => $currentDone]), ['class' => 'btn btn-sm ' . ($groupBy === 'date' ? 'btn-primary' : 'btn-outline-secondary')]) ?>
+            <?= Html::a(Yii::t('TodoModule.base', 'Nach Zuständig'), $contentContainer->createUrl('/todo/task/index', ['group' => 'user', 'my' => $isMy, 'done' => $currentDone]), ['class' => 'btn btn-sm ' . ($groupBy === 'user' ? 'btn-primary' : 'btn-outline-secondary')]) ?>
         </div>
 
         <?php if ($groupBy === 'list'): ?>
@@ -137,7 +137,7 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
                 $list = $group['list'];
                 $groupTasks = $group['tasks'];
                 if (empty($groupTasks) && !$list) continue;
-                $name = $list ? $list->name : 'Unsortiert';
+                $name = $list ? $list->name : Yii::t('TodoModule.base', 'Unsortiert');
                 $color = $list ? $list->color : '#6c757d';
                 ?>
                 <details class="panel panel-default mb-2" open>
@@ -162,7 +162,7 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
                     </summary>
                     <div class="panel-body p-0">
                         <?php if (empty($groupTasks)): ?>
-                            <div class="text-muted small p-2">Noch keine <?= $currentDone ? 'erledigten ' : '' ?>Aufgaben in dieser Liste.</div>
+                            <div class="text-muted small p-2"><?= $currentDone ? Yii::t('TodoModule.base', 'Noch keine erledigten Aufgaben in dieser Liste.') : Yii::t('TodoModule.base', 'Noch keine Aufgaben in dieser Liste.') ?></div>
                         <?php else: ?>
                             <?php foreach ($groupTasks as $task) $taskRow($task, true); ?>
                         <?php endif; ?>
@@ -180,7 +180,7 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
 
         <?php else: ?>
             <div class="border rounded">
-                <?php if (empty($tasks)): ?><div class="text-muted p-3">Keine Aufgaben vorhanden.</div><?php endif; ?>
+                <?php if (empty($tasks)): ?><div class="text-muted p-3"><?= Yii::t('TodoModule.base', 'Keine Aufgaben vorhanden.') ?></div><?php endif; ?>
                 <?php foreach ($tasks as $task) $taskRow($task, true); ?>
             </div>
         <?php endif; ?>

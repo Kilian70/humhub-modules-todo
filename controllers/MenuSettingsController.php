@@ -17,7 +17,7 @@ class MenuSettingsController extends Controller
     {
         $model = MenuSettingsForm::loadCurrent();
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            Yii::$app->session->setFlash('success', 'ToDo-Menüeinstellungen gespeichert.');
+            Yii::$app->session->setFlash('success', Yii::t('TodoModule.base', 'ToDo-Menüeinstellungen gespeichert.'));
             return $this->refresh();
         }
 

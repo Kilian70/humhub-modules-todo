@@ -37,10 +37,10 @@ class TaskTemplate extends ActiveRecord
     public function attributeLabels(): array
     {
         return [
-            'title' => 'Vorlagenname / Aufgabentitel',
-            'description' => 'Beschreibung',
-            'priority' => 'Priorität',
-            'checklist_text' => 'Checkliste',
+            'title' => Yii::t('TodoModule.base', 'Vorlagenname / Aufgabentitel'),
+            'description' => Yii::t('TodoModule.base', 'Beschreibung'),
+            'priority' => Yii::t('TodoModule.base', 'Priorität'),
+            'checklist_text' => Yii::t('TodoModule.base', 'Checkliste'),
         ];
     }
 
