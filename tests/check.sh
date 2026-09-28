@@ -14,6 +14,7 @@ php tests/authorization.php
 php tests/reminder-policy.php
 php tests/recurrence-policy.php
 php tests/translation-coverage.php
+php tests/export-policy.php
 
 if grep -RInE "due_date = ['\"]{2}|->isModuleEnabled\(|MenuLink::isActiveState\(" --include='*.php' .; then
     echo "Obsolete HumHub API usage or invalid DATE comparison found" >&2
@@ -83,6 +84,7 @@ foreach ([
     "models/TaskNotificationPreference.php",
     "services/TaskNotificationPreferenceService.php",
     "migrations/m260929_030000_task_notification_preferences.php",
+    "services/TaskExportService.php",
 ] as $file) {
     if (!is_file($file)) {
         fwrite(STDERR, "Missing task history component: {$file}\n");
