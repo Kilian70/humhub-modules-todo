@@ -17,6 +17,7 @@ use humhub\modules\todo\permissions\ViewTasks;
 use humhub\modules\todo\services\CalendarSyncService;
 use humhub\modules\todo\services\TaskAuthorizationService;
 use humhub\modules\todo\services\TaskHistoryService;
+use humhub\modules\todo\services\RecurringTaskService;
 use humhub\modules\todo\models\TaskList;
 use humhub\modules\user\helpers\UserHelper;
 use yii\helpers\FileHelper;
@@ -69,6 +70,11 @@ class Task extends ContentActiveRecord implements ViewableInterface
             [['closed_at'], 'safe'],
             [['sync_to_calendar'], 'boolean'],
             [['task_list_id'], 'integer'],
+            [['recurrence_interval'], 'default', 'value' => 1],
+            [['recurrence_interval'], 'integer', 'min' => 1, 'max' => 365],
+            [['recurrence_type'], 'in', 'range' => array_merge([null, ''], \humhub\modules\todo\services\RecurrencePolicy::TYPES)],
+            [['recurrence_end_date'], 'date', 'format' => 'php:Y-m-d'],
+            [['recurrence_generated_at'], 'safe'],
             [['task_list_name'], 'string', 'max' => 100],
 
             [['user_ids'], 'each', 'rule' => ['string', 'max' => 36]],
@@ -94,6 +100,9 @@ class Task extends ContentActiveRecord implements ViewableInterface
             'user_ids' => Yii::t('TodoModule.base', 'Zuständig'),
             'status' => Yii::t('TodoModule.base', 'Status'),
             'uploadFiles' => Yii::t('TodoModule.base', 'Dateien'),
+            'recurrence_type' => Yii::t('TodoModule.base', 'Wiederholung'),
+            'recurrence_interval' => Yii::t('TodoModule.base', 'Intervall'),
+            'recurrence_end_date' => Yii::t('TodoModule.base', 'Enddatum'),
         ];
     }
 
@@ -499,6 +508,15 @@ public function afterSave($insert, $changedAttributes)
             'warning',
             Yii::t('TodoModule.base', 'Die Aufgabe wurde gespeichert, der Kalendereintrag konnte aber nicht synchronisiert werden.')
         );
+    }
+
+    if (
+        !$insert
+        && isset($changedAttributes['status'])
+        && $changedAttributes['status'] !== 'geschlossen'
+        && $this->status === 'geschlossen'
+    ) {
+        RecurringTaskService::createNext($this);
     }
 }
 
