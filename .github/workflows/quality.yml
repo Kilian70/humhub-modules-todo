@@ -3,16 +3,23 @@ name: Quality
 on:
   push:
   pull_request:
+  schedule:
+    - cron: '11 4 * * 2'
+  workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   checks:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-version: ['8.2', '8.3']
+        php-version: ${{ fromJSON((github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && '["8.2", "8.3"]' || '["8.2"]') }}
 
     steps:
       - name: Check out repository
