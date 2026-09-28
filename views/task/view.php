@@ -88,6 +88,23 @@ $canWorkOnTask = $task->canWorkOn();
             <?php endif; ?>
         </div>
 
+        <?php if (in_array($task->recurrence_type, ['daily', 'weekly', 'monthly', 'yearly'], true)): ?>
+            <?php
+            $singleNames = ['daily' => 'Jeden Tag', 'weekly' => 'Jede Woche', 'monthly' => 'Jeden Monat', 'yearly' => 'Jedes Jahr'];
+            $pluralNames = ['daily' => 'Tage', 'weekly' => 'Wochen', 'monthly' => 'Monate', 'yearly' => 'Jahre'];
+            $recurrenceText = (int) $task->recurrence_interval === 1
+                ? $singleNames[$task->recurrence_type]
+                : 'Alle ' . (int) $task->recurrence_interval . ' ' . $pluralNames[$task->recurrence_type];
+            ?>
+            <div class="mb-3 small text-muted">
+                <i class="fa fa-repeat"></i>
+                <?= Html::encode($recurrenceText) ?>
+                <?php if ($task->recurrence_end_date): ?>
+                    · bis <?= Yii::$app->formatter->asDate($task->recurrence_end_date) ?>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+
         <?php if ($task->taskList): ?>
             <div class="mb-3 small">
                 <span class="badge" style="background-color: <?= Html::encode($task->taskList->color) ?>; color:#fff;">
