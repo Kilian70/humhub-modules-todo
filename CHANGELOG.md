@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.18.1 - 2026-09-28
+
+- gesamte Kanban-Karte öffnet nun die zugehörige Aufgabe
+- Tastaturbedienung der Kanban-Karten mit Enter und Leertaste ergänzt
+- Drag-and-drop bleibt unverändert nutzbar
+
 ## 1.18.0 - 2026-09-28
 
 - optionale kompakte Kanban-Ansicht mit den Spalten Offen, In Bearbeitung und Geschlossen ergänzt
