@@ -191,4 +191,10 @@ return [
     'Nach 90 Tagen' => 'After 90 days',
     'Es werden nur erledigte Aufgaben mit einem Abschlussdatum archiviert. Sie können im Archiv jederzeit wiederhergestellt werden.' => 'Only completed tasks with a completion date are archived. They can be restored from the archive at any time.',
     'Aufgabe nach {days} Tagen automatisch archiviert' => 'Task automatically archived after {days} days',
+    'Papierkorb' => 'Trash',
+    'Endgültig löschen' => 'Delete permanently',
+    'Aufgabe endgültig löschen? Dies kann nicht rückgängig gemacht werden.' => 'Permanently delete this task? This cannot be undone.',
+    'Aufgabe in den Papierkorb verschoben' => 'Task moved to trash',
+    'Aufgabe aus dem Papierkorb wiederhergestellt' => 'Task restored from trash',
+    'Aufgaben im Papierkorb werden nach 30 Tagen automatisch endgültig gelöscht.' => 'Tasks in the trash are permanently deleted automatically after 30 days.',
 ];

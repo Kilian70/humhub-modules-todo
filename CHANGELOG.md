@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.23.0 - 2026-09-28
+
+- Papierkorb für gelöschte Aufgaben ergänzt
+- Aufgaben können innerhalb von 30 Tagen vollständig wiederhergestellt werden
+- nur Space-Administratoren dürfen Aufgaben sofort endgültig löschen
+- Papierkorbeinträge werden nach 30 Tagen automatisch endgültig entfernt
+- Papierkorbaufgaben werden aus Suche, Übersichten, Widgets, Erinnerungen und Kanban ausgeblendet
+- Verschieben und Wiederherstellen werden im Aktivitätsprotokoll dokumentiert
+
 ## 1.22.1 - 2026-09-28
 
 - Aktionsleiste der Aufgabenübersicht für Smartphones neu angeordnet

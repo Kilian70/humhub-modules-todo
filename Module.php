@@ -57,6 +57,7 @@ public function init()
 				->joinWith('taskUsers')
 				->andWhere(['todo_task_user.user_id' => Yii::$app->user->id])
 				->andWhere(['!=', 'todo_task.status', 'geschlossen'])
+				->andWhere(['todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
 				->count();
 			
 			
@@ -64,6 +65,7 @@ public function init()
 			$allCount = Task::find()
 				->contentContainer($space)
 				->andWhere(['!=', 'todo_task.status', 'geschlossen'])
+				->andWhere(['todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
 				->count();
 			
 			
@@ -73,6 +75,7 @@ public function init()
 				->joinWith('taskUsers')
 				->andWhere(['todo_task_user.user_id' => Yii::$app->user->id])
 				->andWhere(['!=', 'todo_task.status', 'geschlossen'])
+				->andWhere(['todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
 				->andWhere(['<', 'todo_task.due_date', date('Y-m-d')])
 				->count();
 			

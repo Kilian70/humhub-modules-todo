@@ -11,6 +11,7 @@ use humhub\modules\todo\models\Task;
 use humhub\modules\todo\notifications\TaskCommented;
 use humhub\modules\todo\services\ReminderService;
 use humhub\modules\todo\services\AutoArchiveService;
+use humhub\modules\todo\services\TrashService;
 use humhub\helpers\ControllerHelper;
 use humhub\modules\ui\menu\MenuLink;
 use humhub\modules\todo\models\MenuSettingsForm;
@@ -93,6 +94,7 @@ class Events
     {
         ReminderService::run();
         AutoArchiveService::run();
+        TrashService::purgeExpired();
     }
 
     /**
