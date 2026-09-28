@@ -85,6 +85,7 @@ foreach ([
     "services/TaskNotificationPreferenceService.php",
     "migrations/m260929_030000_task_notification_preferences.php",
     "services/TaskExportService.php",
+    "views/task/print.php",
 ] as $file) {
     if (!is_file($file)) {
         fwrite(STDERR, "Missing task history component: {$file}\n");

@@ -1,6 +1,14 @@
 <?php
 
 return [
+    'Aktuell gefilterte Aufgaben drucken oder als PDF speichern' => 'Print currently filtered tasks or save them as PDF',
+    'Aufgaben' => 'Tasks',
+    'Drucken oder als PDF speichern' => 'Print or save as PDF',
+    'Drucken/PDF' => 'Print/PDF',
+    'Erstellt am {date}' => 'Created on {date}',
+    'Keine Aufgaben für diese Auswahl gefunden.' => 'No tasks found for this selection.',
+    'ToDo-Druckansicht' => 'ToDo print view',
+    'ToDo-Liste: {space}' => 'ToDo list: {space}',
     'Aktuell gefilterte Aufgaben als CSV exportieren' => 'Export currently filtered tasks as CSV',
     'CSV-Export' => 'CSV export',
     'Erstellt am' => 'Created at',
