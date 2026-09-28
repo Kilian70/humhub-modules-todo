@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'ARCHIVIERT' => 'ARCHIVIERT',
+    'Archiv' => 'Archiv',
+    'Archivieren' => 'Archivieren',
+    'Aufgabe archivieren?' => 'Aufgabe archivieren?',
+    'Nur geschlossene Aufgaben können archiviert werden.' => 'Nur geschlossene Aufgaben können archiviert werden.',
+    'Wiederherstellen' => 'Wiederherstellen',
     'Hinzufügen' => 'Hinzufügen',
     'Label' => 'Label',
     'Labels' => 'Labels',
