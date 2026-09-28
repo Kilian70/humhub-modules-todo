@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.26.0 - 2026-09-28
+
+- CSV-Export für Aufgaben ergänzt
+- der Export übernimmt die aktuelle Ansicht und alle gesetzten Filter
+- enthalten sind Titel, Aufgabenliste, Status, Priorität, Fälligkeit, Zuständige, Labels und Erstellungsangaben
+- UTF-8 und Semikolon-Trennung sorgen für eine zuverlässige Darstellung in Excel
+- Tabellenformeln aus Aufgabentexten werden beim Export aus Sicherheitsgründen neutralisiert
+
 ## 1.25.0 - 2026-09-28
 
 - persönliche Standardvorgabe für Aufgabenbenachrichtigungen ergänzt
