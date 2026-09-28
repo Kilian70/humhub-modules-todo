@@ -62,7 +62,7 @@ class TaskReminder extends BaseNotification
             return 'today';
         }
 
-        return 'tomorrow';
+        return 'upcoming';
     }
 
 
@@ -77,7 +77,7 @@ class TaskReminder extends BaseNotification
                 return Yii::t('TodoModule.base', 'Aufgabe heute fällig');
 
             default:
-                return Yii::t('TodoModule.base', 'Aufgabe morgen fällig');
+                return Yii::t('TodoModule.base', 'Aufgabe bald fällig');
         }
     }
 
@@ -107,7 +107,7 @@ class TaskReminder extends BaseNotification
             default:
                 return Yii::t(
                     'TodoModule.base',
-                    'Die Aufgabe "{title}" ist morgen fällig',
+                    'Die Aufgabe "{title}" ist bald fällig',
                     ['{title}' => Html::encode($this->source->title)]
                 );
         }
@@ -138,7 +138,7 @@ class TaskReminder extends BaseNotification
                 return Yii::t('TodoModule.base', 'Erinnerung: Aufgabe heute fällig');
 
             default:
-                return Yii::t('TodoModule.base', 'Erinnerung: Aufgabe morgen fällig');
+                return Yii::t('TodoModule.base', 'Erinnerung: Aufgabe bald fällig');
         }
     }
 
@@ -168,7 +168,7 @@ class TaskReminder extends BaseNotification
             default:
                 return Yii::t(
                     'TodoModule.base',
-                    'Die Aufgabe "{title}" ist morgen fällig.',
+                    'Die Aufgabe "{title}" ist bald fällig.',
                     ['{title}' => $this->source->title]
                 );
         }

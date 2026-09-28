@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.10.0 - 2026-09-28
+
+- konfigurierbare Vorwarnung bis zu 30 Tage vor Fälligkeit ergänzt
+- getrennte einmalige Erinnerungen vor Fälligkeit, am Fälligkeitstag und bei Überfälligkeit
+- wiederholte tägliche Überfälligkeitsmeldungen verhindert
+- Änderung des Fälligkeitsdatums setzt die Erinnerungsstufen der Aufgabe zurück
+- globale ToDo-Konfiguration um Schalter und Vorwarnzeit erweitert
+- automatische Tests für die Erinnerungsstufen ergänzt
+
 ## 1.9.0 - 2026-09-28
 
 - einklappbares Aktivitätsprotokoll in der Aufgabendetailansicht ergänzt
