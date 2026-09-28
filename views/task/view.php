@@ -736,6 +736,45 @@ JS
             ?>
         <?php endif; ?>
 
+        <!-- AKTIVITÄTSPROTOKOLL (standardmässig eingeklappt) -->
+        <?php $historyEntries = $task->getHistoryEntries()->limit(100)->all(); ?>
+        <details class="panel panel-default mt-4" id="todo-history">
+            <summary class="panel-heading d-flex align-items-center justify-content-between"
+                     style="cursor:pointer;list-style:none;">
+                <span><i class="fa fa-history"></i> <strong>Verlauf</strong></span>
+                <span class="badge bg-secondary"><?= count($historyEntries) ?></span>
+            </summary>
+            <div class="panel-body p-0">
+                <?php if ($historyEntries === []): ?>
+                    <div class="text-muted small p-3">Noch keine Aktivitäten protokolliert.</div>
+                <?php else: ?>
+                    <div class="list-group list-group-flush">
+                        <?php foreach ($historyEntries as $history): ?>
+                            <div class="list-group-item d-flex gap-2 align-items-start">
+                                <div class="flex-shrink-0">
+                                    <?php if ($history->user): ?>
+                                        <?= UserImage::widget(['user' => $history->user, 'width' => 28]) ?>
+                                    <?php else: ?>
+                                        <span class="fa-stack" style="font-size:14px;">
+                                            <i class="fa fa-circle fa-stack-2x text-muted"></i>
+                                            <i class="fa fa-cog fa-stack-1x fa-inverse"></i>
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="flex-grow-1 min-width-0">
+                                    <div class="text-break"><?= Html::encode($history->message) ?></div>
+                                    <div class="small text-muted">
+                                        <?= Html::encode($history->user ? $history->user->displayName : 'System') ?>
+                                        · <?= Yii::$app->formatter->asDatetime($history->created_at) ?>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </details>
+
         <!-- KOMMUNIKATION -->
         <div class="mt-4" id="todo-communication">
             <strong>Kommunikation</strong>

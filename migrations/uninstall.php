@@ -2,6 +2,7 @@
 
 use humhub\components\Migration;
 use humhub\modules\content\models\Content;
+use humhub\modules\todo\models\Task;
 
 /** Completely removes all database structures and content owned by ToDo. */
 class uninstall extends Migration
@@ -26,11 +27,23 @@ class uninstall extends Migration
             }
         }
 
+        $this->dropTableIfExists('todo_task_history');
         $this->dropTableIfExists('todo_checklist_item_user');
         $this->dropTableIfExists('todo_checklist_item');
         $this->dropTableIfExists('todo_task_user');
         $this->dropTableIfExists('todo_task');
         $this->dropTableIfExists('todo_task_list');
+
+        // A disabled module can make the polymorphic Task record unavailable
+        // before Content::hardDelete() finishes. Remove any resulting orphan
+        // through HumHub's version-specific hard-delete implementation.
+        foreach (Content::find()->where(['object_model' => Task::class])->each() as $content) {
+            if (method_exists($content, 'hardDeleteInternal')) {
+                $content->hardDeleteInternal();
+            } else {
+                $content->hardDelete();
+            }
+        }
     }
 
     private function dropTableIfExists(string $table): void
