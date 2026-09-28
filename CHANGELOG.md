@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.20.0 - 2026-09-28
+
+- Kanban-Karten lassen sich innerhalb einer Spalte per Drag-and-drop sortieren
+- persönliche Kartenreihenfolge wird pro Benutzer dauerhaft gespeichert
+- beim Verschieben zwischen Spalten werden Status und Reihenfolge gemeinsam aktualisiert
+- persönliche Reihenfolge verändert die Ansicht anderer Mitglieder nicht
+- Reihenfolgedaten werden bei gelöschten Aufgaben und bei der Moduldeinstallation entfernt
+
 ## 1.19.1 - 2026-09-28
 
 - Namenskonflikt der Aufgabenlabel-Relation mit HumHubs eigener Content-Label-Methode behoben
