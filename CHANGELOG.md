@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.15.0 - 2026-09-28
+
+- bestehende Aufgaben können als wiederverwendbare Space-Vorlagen gespeichert werden
+- eigene Vorlagenverwaltung mit Bearbeiten, Verwenden und Löschen ergänzt
+- Vorlagen übernehmen Titel, Beschreibung, Priorität, Zuständige und Checklistenpunkte
+- beim Verwenden öffnet sich die neue Aufgabe zur Ergänzung von Termin und weiteren Details
+- Vorlagen enthalten bewusst keinen Status, Termin, Verlauf, Dateien oder Abhängigkeiten
+- Aufgaben lassen sich direkt aus der Detailansicht duplizieren
+- Kopien übernehmen Beschreibung, Liste, Priorität, Fälligkeit, Zuständige und Wiederholung
+- Checklisten und deren Zuständige werden als offene Punkte übernommen
+- eine Kopie startet immer mit dem Status «Offen» und erhält einen eindeutigen Titelzusatz
+- Kommentare, Dateien, Verlauf, Abhängigkeiten und Unteraufgaben werden bewusst nicht kopiert
+- Quelle und Kopie erhalten nachvollziehbare Einträge im Aktivitätsprotokoll
+
 ## 1.14.0 - 2026-09-28
 
 - Zuständige werden benachrichtigt, sobald die letzte offene Voraussetzung erledigt ist
