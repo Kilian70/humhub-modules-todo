@@ -43,4 +43,25 @@ class TaskLabel extends ActiveRecord
     {
         return static::find()->where(['space_id' => $spaceId])->orderBy(['sort_order' => SORT_ASC, 'name' => SORT_ASC])->all();
     }
+
+    /** Returns the better contrasting text color for the configured label color. */
+    public function getTextColor(): string
+    {
+        $hex = ltrim((string) $this->color, '#');
+        if (!preg_match('/^[0-9a-fA-F]{6}$/', $hex)) {
+            return '#ffffff';
+        }
+
+        $channels = array_map(static function (string $value): float {
+            $channel = hexdec($value) / 255;
+            return $channel <= 0.04045
+                ? $channel / 12.92
+                : (($channel + 0.055) / 1.055) ** 2.4;
+        }, str_split($hex, 2));
+        $luminance = 0.2126 * $channels[0] + 0.7152 * $channels[1] + 0.0722 * $channels[2];
+        $whiteContrast = 1.05 / ($luminance + 0.05);
+        $darkContrast = ($luminance + 0.05) / 0.066;
+
+        return $whiteContrast >= $darkContrast ? '#ffffff' : '#212529';
+    }
 }

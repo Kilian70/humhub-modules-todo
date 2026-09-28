@@ -115,7 +115,7 @@ class Events
             return;
         }
 
-        $originator = $comment->user;
+        $originator = $comment->createdBy;
         if (!$originator) {
             return;
         }

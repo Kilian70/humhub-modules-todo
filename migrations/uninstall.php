@@ -9,6 +9,14 @@ class uninstall extends Migration
 {
     public function safeUp()
     {
+        // ToDo notifications use the task as their source, not the HumHub
+        // Content record. Remove them explicitly before the task table goes away.
+        if ($this->db->schema->getTableSchema('notification', true) !== null) {
+            $this->db->createCommand()
+                ->delete('notification', ['module' => 'todo'])
+                ->execute();
+        }
+
         $taskTable = $this->db->schema->getTableSchema('todo_task', true);
         if ($taskTable !== null && isset($taskTable->columns['content_id'])) {
             $contentIds = (new \yii\db\Query())

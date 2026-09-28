@@ -71,12 +71,17 @@ use humhub\modules\todo\models\TaskLabel;
                     'placeholder' => Yii::t('TodoModule.base', 'Liste auswählen oder neuen Namen eingeben'),
                     'autocomplete' => 'off',
                     'data-role' => 'task-list-input',
+                    'role' => 'combobox',
+                    'aria-autocomplete' => 'list',
+                    'aria-expanded' => 'false',
+                    'aria-controls' => $taskListMenuId,
                 ]) ?>
 
                 <div id="<?= $taskListMenuId ?>"
-                     class="list-group position-absolute w-100 shadow-sm bg-white"
+                     class="list-group position-absolute w-100 shadow-sm"
                      data-role="task-list-menu"
-                     style="display:none;z-index:1050;max-height:280px;overflow-y:auto;left:0;right:0;">
+                     role="listbox"
+                     style="display:none;z-index:1050;max-height:280px;overflow-y:auto;left:0;right:0;background:var(--hh-background-color-main,#fff);color:var(--hh-text-color-main,#333);">
 
                     <?php if (empty($taskLists)): ?>
                         <div class="list-group-item text-muted" data-role="empty-list-hint">
@@ -87,6 +92,8 @@ use humhub\modules\todo\models\TaskLabel;
                             <button type="button"
                                     class="list-group-item list-group-item-action d-flex align-items-center gap-2"
                                     data-role="task-list-option"
+                                    role="option"
+                                    aria-selected="false"
                                     data-name="<?= Html::encode($taskList->name) ?>">
                                 <span aria-hidden="true"
                                       style="display:inline-block;width:14px;height:14px;border-radius:4px;flex:0 0 14px;background:<?= Html::encode($taskList->color ?: '#6c757d') ?>;"></span>
@@ -98,6 +105,8 @@ use humhub\modules\todo\models\TaskLabel;
                     <button type="button"
                             class="list-group-item list-group-item-action text-primary"
                             data-role="task-list-create"
+                            role="option"
+                            aria-selected="false"
                             style="display:none;">
                         <i class="fa fa-plus"></i>
                         <span data-role="task-list-create-label"><?= Yii::t('TodoModule.base', 'Neue Aufgabenliste erstellen') ?></span>
@@ -129,6 +138,17 @@ use humhub\modules\todo\models\TaskLabel;
             return (value || '').trim().toLocaleLowerCase();
         }
 
+        function closeMenu() {
+            menu.style.display = 'none';
+            input.setAttribute('aria-expanded', 'false');
+        }
+
+        function visibleChoices() {
+            return [...options, createButton].filter(function (option) {
+                return option.style.display !== 'none';
+            });
+        }
+
         function updateMenu() {
             const query = normalize(input.value);
             let exactMatch = false;
@@ -139,6 +159,7 @@ use humhub\modules\todo\models\TaskLabel;
                 const normalizedName = normalize(name);
                 const visible = query === '' || normalizedName.includes(query);
                 option.style.display = visible ? '' : 'none';
+                option.setAttribute('aria-selected', normalizedName === query && query !== '' ? 'true' : 'false');
 
                 if (visible) {
                     visibleCount++;
@@ -156,6 +177,7 @@ use humhub\modules\todo\models\TaskLabel;
             }
 
             menu.style.display = '';
+            input.setAttribute('aria-expanded', 'true');
         }
 
         input.addEventListener('focus', updateMenu);
@@ -165,26 +187,46 @@ use humhub\modules\todo\models\TaskLabel;
         options.forEach(function (option) {
             option.addEventListener('click', function () {
                 input.value = option.dataset.name || '';
-                menu.style.display = 'none';
+                closeMenu();
                 input.dispatchEvent(new Event('change', {bubbles: true}));
             });
         });
 
         createButton.addEventListener('click', function () {
-            menu.style.display = 'none';
+            closeMenu();
             input.focus();
         });
 
         document.addEventListener('click', function (event) {
             if (!picker.contains(event.target)) {
-                menu.style.display = 'none';
+                closeMenu();
             }
         });
 
         input.addEventListener('keydown', function (event) {
             if (event.key === 'Escape') {
-                menu.style.display = 'none';
+                closeMenu();
+            } else if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                updateMenu();
+                visibleChoices()[0]?.focus();
             }
+        });
+
+        [...options, createButton].forEach(function (option) {
+            option.addEventListener('keydown', function (event) {
+                const choices = visibleChoices();
+                const current = choices.indexOf(option);
+                if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    const direction = event.key === 'ArrowDown' ? 1 : -1;
+                    choices[(current + direction + choices.length) % choices.length]?.focus();
+                } else if (event.key === 'Escape') {
+                    event.preventDefault();
+                    closeMenu();
+                    input.focus();
+                }
+            });
         });
     });
 })();
@@ -200,7 +242,7 @@ JS;
 
         <!-- Upload -->
         <div class="mb-4">
-            <strong>Dateien hinzufügen</strong>
+            <label class="control-label" for="<?= Html::getInputId($model, 'uploadFiles') ?>"><?= Yii::t('TodoModule.base', 'Dateien hinzufügen') ?></label>
             <div class="mt-2">
                 <?= $form->field($model, 'uploadFiles[]')
                     ->fileInput(['multiple' => true])
@@ -236,17 +278,17 @@ JS;
 
         <?php $availableLabels = TaskLabel::findForSpace((int) $contentContainer->id); ?>
         <?php if ($availableLabels): ?>
-            <div class="form-group mt-2">
-                <label class="control-label"><?= Yii::t('TodoModule.base', 'Labels') ?></label>
+            <fieldset class="form-group mt-2">
+                <legend class="control-label" style="font-size:inherit;border:0;margin-bottom:5px;padding:0;"><?= Yii::t('TodoModule.base', 'Labels') ?></legend>
                 <div class="d-flex flex-wrap gap-2">
                     <?php foreach ($availableLabels as $label): ?>
                         <label class="todo-label-choice">
                             <?= Html::activeCheckbox($model, 'label_ids[]', ['value' => $label->id, 'label' => false, 'uncheck' => null, 'checked' => in_array((int) $label->id, array_map('intval', (array) $model->label_ids), true)]) ?>
-                            <span class="badge" style="background:<?= Html::encode($label->color) ?>;color:#fff;"><?= Html::encode($label->name) ?></span>
+                            <span class="badge" style="background:<?= Html::encode($label->color) ?>;color:<?= Html::encode($label->textColor) ?>;"><?= Html::encode($label->name) ?></span>
                         </label>
                     <?php endforeach; ?>
                 </div>
-            </div>
+            </fieldset>
         <?php endif; ?>
 
         <div class="row mt-2">

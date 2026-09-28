@@ -11,6 +11,9 @@ class TaskReminder extends BaseNotification
 {
     public $moduleId = 'todo';
 
+    /** Reminders must also reach the creator when the system user is the originator. */
+    public $suppressSendToOriginator = false;
+
     public function category()
     {
         return new ToDoNotificationCategory();
@@ -26,11 +29,6 @@ class TaskReminder extends BaseNotification
 
         return $this->source->content->canView($user)
             && $container->getPermissionManager($user)->can(new ViewTasks());
-    }
-
-    public function allowSelfNotification()
-    {
-        return true;
     }
 
     public function getPriority()

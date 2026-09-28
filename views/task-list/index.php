@@ -25,21 +25,21 @@ $this->title = 'Aufgabenlisten verwalten';
                 <span style="width:8px;align-self:stretch;border-radius:3px;background:<?= Html::encode($list->color) ?>;"></span>
 
                 <?= Html::beginForm($contentContainer->createUrl('/todo/task-list/update', ['id' => $list->id]), 'post', ['class' => 'd-flex align-items-center gap-2 flex-grow-1']) ?>
-                    <?= Html::textInput('name', $list->name, ['class' => 'form-control', 'maxlength' => 100, 'required' => true]) ?>
-                    <?= Html::input('color', 'color', $list->color, ['class' => 'form-control', 'style' => 'width:60px;padding:3px;', 'title' => 'Farbe']) ?>
+                    <?= Html::textInput('name', $list->name, ['class' => 'form-control', 'maxlength' => 100, 'required' => true, 'aria-label' => 'Name der Aufgabenliste']) ?>
+                    <?= Html::input('color', 'color', $list->color, ['class' => 'form-control', 'style' => 'width:60px;padding:3px;', 'title' => 'Farbe', 'aria-label' => 'Farbe der Aufgabenliste']) ?>
                     <?= Html::submitButton('Speichern', ['class' => 'btn btn-sm btn-primary']) ?>
                 <?= Html::endForm() ?>
 
                 <div class="d-flex gap-1">
                     <?php if ($index > 0): ?>
                         <?= Html::beginForm($contentContainer->createUrl('/todo/task-list/move', ['id' => $list->id, 'direction' => 'up']), 'post', ['class' => 'd-inline']) ?>
-                        <?= Html::submitButton('<i class="fa fa-arrow-up"></i>', ['class' => 'btn btn-sm btn-default', 'title' => 'Nach oben']) ?>
+                        <?= Html::submitButton('<i class="fa fa-arrow-up" aria-hidden="true"></i>', ['class' => 'btn btn-sm btn-default', 'title' => 'Nach oben', 'aria-label' => 'Aufgabenliste nach oben verschieben']) ?>
                         <?= Html::endForm() ?>
                     <?php endif; ?>
 
                     <?php if ($index < count($lists) - 1): ?>
                         <?= Html::beginForm($contentContainer->createUrl('/todo/task-list/move', ['id' => $list->id, 'direction' => 'down']), 'post', ['class' => 'd-inline']) ?>
-                        <?= Html::submitButton('<i class="fa fa-arrow-down"></i>', ['class' => 'btn btn-sm btn-default', 'title' => 'Nach unten']) ?>
+                        <?= Html::submitButton('<i class="fa fa-arrow-down" aria-hidden="true"></i>', ['class' => 'btn btn-sm btn-default', 'title' => 'Nach unten', 'aria-label' => 'Aufgabenliste nach unten verschieben']) ?>
                         <?= Html::endForm() ?>
                     <?php endif; ?>
 
@@ -47,6 +47,7 @@ $this->title = 'Aufgabenlisten verwalten';
                     <?= Html::submitButton('<i class="fa fa-trash"></i>', [
                         'class' => 'btn btn-sm btn-danger',
                         'title' => 'Löschen',
+                        'aria-label' => 'Aufgabenliste löschen',
                         'data-confirm' => 'Aufgabenliste wirklich löschen? Die Aufgaben bleiben erhalten und werden Unsortiert.',
                     ]) ?>
                     <?= Html::endForm() ?>
@@ -58,7 +59,7 @@ $this->title = 'Aufgabenlisten verwalten';
 
         <h5>Neue Aufgabenliste</h5>
         <?= Html::beginForm($contentContainer->createUrl('/todo/task-list/create'), 'post', ['class' => 'd-flex gap-2']) ?>
-            <?= Html::textInput('name', '', ['class' => 'form-control', 'placeholder' => 'Name der neuen Aufgabenliste', 'maxlength' => 100, 'required' => true]) ?>
+            <?= Html::textInput('name', '', ['class' => 'form-control', 'placeholder' => 'Name der neuen Aufgabenliste', 'maxlength' => 100, 'required' => true, 'aria-label' => 'Name der neuen Aufgabenliste']) ?>
             <?= Html::submitButton('<i class="fa fa-plus"></i> Hinzufügen', ['class' => 'btn btn-success']) ?>
         <?= Html::endForm() ?>
     </div>

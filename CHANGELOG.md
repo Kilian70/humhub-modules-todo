@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.30.0 - 2026-09-28
+
+- Kanban-Aufgaben vollständig per Tastatur öffnungs- und verschiebbar gemacht
+- dauerhaft erreichbare Statusauswahl als Alternative zu Drag-and-drop ergänzt
+- Screenreader-Beschriftungen, Statusmeldungen und sichtbare Fokusmarkierungen verbessert
+- Suchfeld, Filter, Symbolschaltflächen und Aufgabenlisten-Auswahl korrekt beschriftet
+- Aufgabenlisten-Auswahl mit Pfeiltasten- und Escape-Steuerung ergänzt
+- Kontraste benutzerdefinierter Labels automatisch an deren Hintergrundfarbe angepasst
+- Kanban-Karten und Auswahllisten an HumHubs hellen und dunklen Modus angepasst
+- Kommentarbenachrichtigungen mit der HumHub-1.19-Eigenschaft für den Ersteller korrigiert
+- Erinnerungen erreichen nun auch den Aufgabenersteller zuverlässig
+- Deinstallation entfernt auch sämtliche ToDo-Benachrichtigungen aus HumHubs zentraler Tabelle
+
 ## 1.29.0 - 2026-09-28
 
 - Werkzeugleiste der Aufgabenansicht übersichtlicher gegliedert

@@ -42,7 +42,7 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
     ?>
     <?php $taskViewUrl = $showTrash ? null : $contentContainer->createUrl('/todo/task/view', ['id' => $task->id]); ?>
     <div class="d-flex align-items-center gap-2 px-2 py-2 border-top todo-list-row"
-         <?= $taskViewUrl ? 'role="link" tabindex="0" data-task-url="' . Html::encode($taskViewUrl) . '" style="cursor:pointer;"' : '' ?>>
+         <?= $taskViewUrl ? 'role="link" aria-label="' . Html::encode(Yii::t('TodoModule.base', 'Aufgabe öffnen: {title}', ['title' => $task->title])) . '" tabindex="0" data-task-url="' . Html::encode($taskViewUrl) . '" style="cursor:pointer;"' : '' ?>>
         <div class="flex-grow-1 min-width-0">
             <div class="d-flex flex-wrap align-items-center gap-1">
                 <span class="fw-semibold text-break"><?= Html::encode($task->title) ?></span>
@@ -50,12 +50,12 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
                 <span class="<?= $statusClass ?>"><?= $statusLabel ?></span>
                 <?php if ($isOverdue): ?><span class="badge bg-danger"><?= Yii::t('TodoModule.base', 'ÜBERFÄLLIG') ?></span><?php endif; ?>
                 <?php foreach ($task->taskLabels as $label): ?>
-                    <span class="badge" style="background:<?= Html::encode($label->color) ?>;color:#fff;"><?= Html::encode($label->name) ?></span>
+                    <span class="badge" style="background:<?= Html::encode($label->color) ?>;color:<?= Html::encode($label->textColor) ?>;"><?= Html::encode($label->name) ?></span>
                 <?php endforeach; ?>
             </div>
             <div class="small text-muted d-flex flex-wrap align-items-center gap-2 mt-1">
                 <?php if ($task->due_date): ?>
-                    <span class="<?= $isOverdue ? 'text-danger fw-bold' : '' ?>"><i class="fa fa-calendar"></i> <?= Yii::$app->formatter->asDate($task->due_date) ?></span>
+                    <span class="<?= $isOverdue ? 'text-danger fw-bold' : '' ?>"><i class="fa fa-calendar" aria-hidden="true"></i> <?= Yii::$app->formatter->asDate($task->due_date) ?></span>
                 <?php endif; ?>
                 <?php if ($showUsers && !empty($task->users)): ?>
                     <span>
@@ -172,41 +172,41 @@ $kanbanCard = function ($task) use ($contentContainer) {
              data-task-url="<?= Html::encode($taskViewUrl) ?>"
              data-current-status="<?= Html::encode($task->status) ?>"
              data-status-url="<?= Html::encode($statusUrl) ?>"
-             role="link"
-             tabindex="0"
-             draggable="true">
+             role="group"
+             aria-label="<?= Html::encode(Yii::t('TodoModule.base', 'Aufgabe: {title}', ['title' => $task->title])) ?>"
+             draggable="<?= $canMove ? 'true' : 'false' ?>">
         <a href="<?= Html::encode($taskViewUrl) ?>" class="todo-kanban-title"><?= Html::encode($task->title) ?></a>
         <div class="d-flex flex-wrap gap-1 mt-2">
             <span class="badge <?= $priorityClass ?>"><?= Html::encode(Yii::t('TodoModule.base', ucfirst($task->priority))) ?></span>
             <?php if ($isOverdue): ?><span class="badge bg-danger"><?= Yii::t('TodoModule.base', 'ÜBERFÄLLIG') ?></span><?php endif; ?>
             <?php if ($task->getOpenBlockingTasks()->exists()): ?><span class="badge bg-warning text-dark"><?= Yii::t('TodoModule.base', 'BLOCKIERT') ?></span><?php endif; ?>
             <?php foreach ($task->taskLabels as $label): ?>
-                <span class="badge" style="background:<?= Html::encode($label->color) ?>;color:#fff;"><?= Html::encode($label->name) ?></span>
+                <span class="badge" style="background:<?= Html::encode($label->color) ?>;color:<?= Html::encode($label->textColor) ?>;"><?= Html::encode($label->name) ?></span>
             <?php endforeach; ?>
         </div>
         <?php if ($task->taskList || $task->due_date || !empty($task->users)): ?>
         <div class="todo-kanban-meta">
             <span class="d-flex flex-wrap gap-2">
                 <?php if ($task->taskList): ?>
-                    <span><i class="fa fa-list"></i> <?= Html::encode($task->taskList->name) ?></span>
+                    <span><i class="fa fa-list" aria-hidden="true"></i> <?= Html::encode($task->taskList->name) ?></span>
                 <?php endif; ?>
                 <?php if ($task->due_date): ?>
-                    <span class="<?= $isOverdue ? 'text-danger fw-bold' : '' ?>"><i class="fa fa-calendar"></i> <?= Yii::$app->formatter->asDate($task->due_date) ?></span>
+                    <span class="<?= $isOverdue ? 'text-danger fw-bold' : '' ?>"><i class="fa fa-calendar" aria-hidden="true"></i> <?= Yii::$app->formatter->asDate($task->due_date) ?></span>
                 <?php endif; ?>
             </span>
             <?php if (!empty($task->users)): ?>
                 <span class="todo-kanban-users">
                     <?php foreach ($task->users as $user): ?>
-                        <span title="<?= Html::encode($user->displayName) ?>"><?= UserImage::widget(['user' => $user, 'width' => 22]) ?></span>
+                        <span title="<?= Html::encode($user->displayName) ?>" aria-label="<?= Html::encode($user->displayName) ?>"><?= UserImage::widget(['user' => $user, 'width' => 22]) ?></span>
                     <?php endforeach; ?>
                 </span>
             <?php endif; ?>
         </div>
         <?php endif; ?>
         <?php if ($canMove): ?>
-            <label class="todo-kanban-mobile-status">
-                <span class="sr-only"><?= Yii::t('TodoModule.base', 'Status') ?></span>
-                <select class="form-control form-control-sm" data-kanban-status-select>
+            <label class="todo-kanban-status">
+                <span class="sr-only"><?= Html::encode(Yii::t('TodoModule.base', 'Status von {title}', ['title' => $task->title])) ?></span>
+                <select class="form-control form-control-sm" data-kanban-status-select aria-label="<?= Html::encode(Yii::t('TodoModule.base', 'Status von {title}', ['title' => $task->title])) ?>">
                     <option value="offen" <?= $task->status === 'offen' ? 'selected' : '' ?>><?= Yii::t('TodoModule.base', 'Offen') ?></option>
                     <option value="in_bearbeitung" <?= $task->status === 'in_bearbeitung' ? 'selected' : '' ?>><?= Yii::t('TodoModule.base', 'In Bearbeitung') ?></option>
                     <option value="geschlossen" <?= $task->status === 'geschlossen' ? 'selected' : '' ?>><?= Yii::t('TodoModule.base', 'Geschlossen') ?></option>
@@ -222,15 +222,16 @@ $kanbanCard = function ($task) use ($contentContainer) {
     <div class="panel-heading d-flex flex-wrap justify-content-between align-items-center gap-2 todo-task-heading">
         <div class="d-flex align-items-center gap-2 flex-wrap todo-task-heading-main">
             <strong style="white-space:nowrap;"><?= Yii::t('TodoModule.base', 'ToDo Liste') ?></strong>
-            <form method="get" action="<?= $contentContainer->createUrl('/todo/search/index') ?>" class="d-flex gap-1 align-items-center todo-task-search">
-                <input type="text" name="keyword" class="form-control form-control-sm" placeholder="<?= Yii::t('TodoModule.base', 'Suche...') ?>">
-                <button class="btn btn-sm btn-outline-primary"><i class="fa fa-search"></i></button>
+            <form method="get" action="<?= $contentContainer->createUrl('/todo/search/index') ?>" class="d-flex gap-1 align-items-center todo-task-search" role="search">
+                <label class="sr-only" for="todo-task-search-input"><?= Yii::t('TodoModule.base', 'Aufgaben durchsuchen') ?></label>
+                <input id="todo-task-search-input" type="search" name="keyword" class="form-control form-control-sm" placeholder="<?= Yii::t('TodoModule.base', 'Suche...') ?>">
+                <button class="btn btn-sm btn-outline-primary" aria-label="<?= Yii::t('TodoModule.base', 'Suchen') ?>" title="<?= Yii::t('TodoModule.base', 'Suchen') ?>"><i class="fa fa-search" aria-hidden="true"></i></button>
             </form>
         </div>
         <div class="d-flex gap-1 todo-task-toolbar">
             <div class="btn-group" role="group" aria-label="<?= Yii::t('TodoModule.base', 'Ansicht') ?>">
-                <?= Html::a('<i class="fa fa-list"></i> ' . Yii::t('TodoModule.base', 'Liste'), $contentContainer->createUrl('/todo/task/index', array_filter($filterParams + ['view' => 'list'])), ['class' => 'btn btn-sm ' . ($viewMode === 'list' ? 'btn-primary' : 'btn-default')]) ?>
-                <?= Html::a('<i class="fa fa-columns"></i> ' . Yii::t('TodoModule.base', 'Kanban'), $contentContainer->createUrl('/todo/task/index', array_filter($filterParams + ['view' => 'kanban'])), ['class' => 'btn btn-sm ' . ($viewMode === 'kanban' ? 'btn-primary' : 'btn-default')]) ?>
+                <?= Html::a('<i class="fa fa-list" aria-hidden="true"></i> ' . Yii::t('TodoModule.base', 'Liste'), $contentContainer->createUrl('/todo/task/index', array_filter($filterParams + ['view' => 'list'])), ['class' => 'btn btn-sm ' . ($viewMode === 'list' ? 'btn-primary' : 'btn-default'), 'aria-current' => $viewMode === 'list' ? 'page' : null]) ?>
+                <?= Html::a('<i class="fa fa-columns" aria-hidden="true"></i> ' . Yii::t('TodoModule.base', 'Kanban'), $contentContainer->createUrl('/todo/task/index', array_filter($filterParams + ['view' => 'kanban'])), ['class' => 'btn btn-sm ' . ($viewMode === 'kanban' ? 'btn-primary' : 'btn-default'), 'aria-current' => $viewMode === 'kanban' ? 'page' : null]) ?>
             </div>
             <?php if ($contentContainer->permissionManager->can(new \humhub\modules\todo\permissions\EditTasks())): ?>
                 <div class="btn-group dropdown todo-toolbar-dropdown">
@@ -279,23 +280,23 @@ $kanbanCard = function ($task) use ($contentContainer) {
                 <?php if ($viewMode === 'list'): ?><input type="hidden" name="group" value="<?= Html::encode($groupBy) ?>"><?php endif; ?>
                 <?php if ($isMy): ?><input type="hidden" name="my" value="1"><?php endif; ?>
                 <div class="col-sm-3">
-                    <label class="control-label"><?= Yii::t('TodoModule.base', 'Priorität') ?></label>
-                    <?= Html::dropDownList('priority', Yii::$app->request->get('priority'), ['' => Yii::t('TodoModule.base', 'Alle'), 'hoch' => Yii::t('TodoModule.base', 'Hoch'), 'mittel' => Yii::t('TodoModule.base', 'Mittel'), 'niedrig' => Yii::t('TodoModule.base', 'Niedrig')], ['class' => 'form-control']) ?>
+                    <label class="control-label" for="todo-filter-priority"><?= Yii::t('TodoModule.base', 'Priorität') ?></label>
+                    <?= Html::dropDownList('priority', Yii::$app->request->get('priority'), ['' => Yii::t('TodoModule.base', 'Alle'), 'hoch' => Yii::t('TodoModule.base', 'Hoch'), 'mittel' => Yii::t('TodoModule.base', 'Mittel'), 'niedrig' => Yii::t('TodoModule.base', 'Niedrig')], ['class' => 'form-control', 'id' => 'todo-filter-priority']) ?>
                 </div>
                 <div class="col-sm-3">
-                    <label class="control-label"><?= Yii::t('TodoModule.base', 'Aufgabenliste') ?></label>
+                    <label class="control-label" for="todo-filter-list"><?= Yii::t('TodoModule.base', 'Aufgabenliste') ?></label>
                     <?php $listOptions = []; foreach ($taskLists as $list) $listOptions[$list->id] = $list->name; ?>
-                    <?= Html::dropDownList('list_id', Yii::$app->request->get('list_id'), ['' => Yii::t('TodoModule.base', 'Alle')] + $listOptions, ['class' => 'form-control']) ?>
+                    <?= Html::dropDownList('list_id', Yii::$app->request->get('list_id'), ['' => Yii::t('TodoModule.base', 'Alle')] + $listOptions, ['class' => 'form-control', 'id' => 'todo-filter-list']) ?>
                 </div>
                 <div class="col-sm-3">
-                    <label class="control-label"><?= Yii::t('TodoModule.base', 'Zuständig') ?></label>
+                    <label class="control-label" for="todo-filter-assignee"><?= Yii::t('TodoModule.base', 'Zuständig') ?></label>
                     <?php $userOptions = []; foreach ($spaceUsers as $user) $userOptions[$user->id] = $user->displayName; ?>
-                    <?= Html::dropDownList('assignee_id', Yii::$app->request->get('assignee_id'), ['' => Yii::t('TodoModule.base', 'Alle')] + $userOptions, ['class' => 'form-control']) ?>
+                    <?= Html::dropDownList('assignee_id', Yii::$app->request->get('assignee_id'), ['' => Yii::t('TodoModule.base', 'Alle')] + $userOptions, ['class' => 'form-control', 'id' => 'todo-filter-assignee']) ?>
                 </div>
                 <div class="col-sm-3">
-                    <label class="control-label"><?= Yii::t('TodoModule.base', 'Label') ?></label>
+                    <label class="control-label" for="todo-filter-label"><?= Yii::t('TodoModule.base', 'Label') ?></label>
                     <?php $labelOptions = []; foreach ($taskLabels as $label) $labelOptions[$label->id] = $label->name; ?>
-                    <?= Html::dropDownList('label_id', Yii::$app->request->get('label_id'), ['' => Yii::t('TodoModule.base', 'Alle')] + $labelOptions, ['class' => 'form-control']) ?>
+                    <?= Html::dropDownList('label_id', Yii::$app->request->get('label_id'), ['' => Yii::t('TodoModule.base', 'Alle')] + $labelOptions, ['class' => 'form-control', 'id' => 'todo-filter-label']) ?>
                 </div>
                 <div class="col-12 d-flex gap-1">
                     <button class="btn btn-primary btn-sm"><?= Yii::t('TodoModule.base', 'Filtern') ?></button>
@@ -324,11 +325,13 @@ $kanbanCard = function ($task) use ($contentContainer) {
         <?php endif; ?>
 
         <?php if ($viewMode === 'kanban'): ?>
-            <div class="todo-kanban-board" data-order-url="<?= Html::encode($contentContainer->createUrl('/todo/task/kanban-order')) ?>">
+            <p id="todo-kanban-help" class="sr-only"><?= Yii::t('TodoModule.base', 'Öffne eine Aufgabe mit der Eingabetaste. Ändere ihren Status über das Auswahlfeld. Mit der Maus können bearbeitbare Aufgaben zusätzlich verschoben werden.') ?></p>
+            <div class="todo-kanban-board" role="region" aria-label="<?= Yii::t('TodoModule.base', 'Kanban-Aufgaben') ?>" aria-describedby="todo-kanban-help" data-count-template="<?= Html::encode(Yii::t('TodoModule.base', '{count} Aufgaben', ['count' => '__COUNT__'])) ?>" data-order-url="<?= Html::encode($contentContainer->createUrl('/todo/task/kanban-order')) ?>">
+                <div class="sr-only" aria-live="polite" aria-atomic="true" data-kanban-live></div>
                 <?php foreach (['offen' => Yii::t('TodoModule.base', 'Offen'), 'in_bearbeitung' => Yii::t('TodoModule.base', 'In Bearbeitung'), 'geschlossen' => Yii::t('TodoModule.base', 'Geschlossen')] as $status => $label): ?>
                     <?php $columnTasks = array_values(array_filter($tasks, static fn($task) => $task->status === $status)); ?>
-                    <section class="todo-kanban-column" data-kanban-status="<?= $status ?>">
-                        <header><strong><?= $label ?></strong><span class="badge bg-secondary" data-kanban-count><?= count($columnTasks) ?></span></header>
+                    <section class="todo-kanban-column" data-kanban-status="<?= $status ?>" aria-labelledby="todo-kanban-column-<?= $status ?>">
+                        <header><strong id="todo-kanban-column-<?= $status ?>"><?= $label ?></strong><span class="badge bg-secondary" data-kanban-count aria-label="<?= Yii::t('TodoModule.base', '{count} Aufgaben', ['count' => count($columnTasks)]) ?>"><?= count($columnTasks) ?></span></header>
                         <div class="todo-kanban-dropzone">
                             <?php foreach ($columnTasks as $task) $kanbanCard($task); ?>
                             <div class="todo-kanban-empty<?= $columnTasks ? ' d-none' : '' ?>"><?= Yii::t('TodoModule.base', 'Keine Aufgaben vorhanden.') ?></div>
@@ -358,6 +361,7 @@ $kanbanCard = function ($task) use ($contentContainer) {
                                 [
                                     'class' => 'btn btn-xs btn-success',
                                     'title' => $list ? 'Aufgabe in dieser Liste erstellen' : 'Unsortierte Aufgabe erstellen',
+                                    'aria-label' => $list ? 'Aufgabe in dieser Liste erstellen' : 'Unsortierte Aufgabe erstellen',
                                     'onclick' => 'event.stopPropagation();',
                                 ]
                             ) ?>
@@ -396,13 +400,14 @@ $kanbanCard = function ($task) use ($contentContainer) {
 
 <?php
 $this->registerCss(<<<CSS
-.todo-list-row:hover,
-.todo-list-row:focus {
-    background: rgba(0, 0, 0, 0.035);
-    outline: none;
+.todo-list-row:hover {
+    background:var(--hh-background-color-highlight-soft,rgba(0,0,0,.035));
 }
-.todo-list-row:focus {
-    box-shadow: inset 0 0 0 2px rgba(0, 123, 255, 0.18);
+.todo-list-row:focus-visible,
+.todo-kanban-card:focus-visible,
+.todo-kanban-card:focus-within {
+    outline:3px solid var(--hh-text-color-highlight,#16788a);
+    outline-offset:2px;
 }
 .todo-task-heading,
 .todo-task-heading-main,
@@ -412,19 +417,20 @@ $this->registerCss(<<<CSS
 .todo-toolbar-dropdown .dropdown-menu { min-width:210px; }
 .todo-toolbar-dropdown .dropdown-item i { width:18px; text-align:center; margin-right:4px; }
 .todo-kanban-board { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; align-items:start; }
-.todo-kanban-column { background:#f3f5f7; border:1px solid #dfe3e7; border-radius:6px; min-width:0; }
+.todo-kanban-column { background:var(--hh-background-color-secondary,#f3f5f7); border:1px solid var(--hh-background3,#dfe3e7); border-radius:6px; min-width:0; color:var(--hh-text-color-main,#333); }
 .todo-kanban-column > header { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; }
 .todo-kanban-dropzone { min-height:90px; padding:0 8px 8px; }
-.todo-kanban-column.is-drag-over { box-shadow:inset 0 0 0 2px #21a1b3; }
-.todo-kanban-card { background:#fff; border:1px solid #dfe3e7; border-radius:5px; padding:10px; margin-bottom:8px; box-shadow:0 1px 2px rgba(0,0,0,.05); }
+.todo-kanban-column.is-drag-over { box-shadow:inset 0 0 0 2px var(--hh-text-color-highlight,#21a1b3); }
+.todo-kanban-card { background:var(--hh-background-color-main,#fff); color:var(--hh-text-color-main,#333); border:1px solid var(--hh-background3,#dfe3e7); border-radius:5px; padding:10px; margin-bottom:8px; box-shadow:0 1px 2px rgba(0,0,0,.16); }
 .todo-kanban-card[draggable="true"] { cursor:grab; }
 .todo-kanban-card.is-moving { opacity:.55; }
-.todo-kanban-title { color:inherit; font-weight:600; overflow-wrap:anywhere; }
-.todo-kanban-meta { display:flex; justify-content:space-between; gap:8px; align-items:center; color:#6c757d; font-size:12px; margin-top:8px; }
+.todo-kanban-title { color:var(--hh-text-color-main,inherit); font-weight:600; overflow-wrap:anywhere; }
+.todo-kanban-meta { display:flex; justify-content:space-between; gap:8px; align-items:center; color:var(--hh-text-color-secondary,#6c757d); font-size:12px; margin-top:8px; }
 .todo-kanban-users { display:flex; }
 .todo-kanban-users > span + span { margin-left:-5px; }
-.todo-kanban-empty { color:#777; font-size:12px; text-align:center; padding:16px 6px; }
-.todo-kanban-mobile-status { display:none; margin-top:8px; }
+.todo-kanban-empty { color:var(--hh-text-color-secondary,#777); font-size:12px; text-align:center; padding:16px 6px; }
+.todo-kanban-status { display:block; margin-top:8px; }
+.todo-kanban-status select { min-height:34px; }
 @media (max-width: 767px) {
     .todo-task-heading { display:block !important; }
     .todo-task-heading-main { width:100%; }
@@ -447,7 +453,6 @@ $this->registerCss(<<<CSS
     .todo-task-toolbar > .todo-toolbar-dropdown > .btn { width:100%; }
     .todo-kanban-board { grid-template-columns:1fr; }
     .todo-kanban-card[draggable="true"] { cursor:default; }
-    .todo-kanban-mobile-status { display:block; }
     .todo-list-row { align-items:flex-start !important; }
     .todo-list-row [data-task-actions] { flex-wrap:wrap; justify-content:flex-end; }
 }
@@ -487,11 +492,20 @@ document.querySelectorAll('.todo-list-row[data-task-url]').forEach(function (row
     var csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
     var draggedCard = null;
     var sourceZone = null;
+    var liveRegion = board.querySelector('[data-kanban-live]');
+
+    function announce(message) {
+        if (!liveRegion) return;
+        liveRegion.textContent = '';
+        window.setTimeout(function () { liveRegion.textContent = message; }, 20);
+    }
 
     function refreshColumns() {
         board.querySelectorAll('.todo-kanban-column').forEach(function (column) {
             var count = column.querySelectorAll('.todo-kanban-card').length;
-            column.querySelector('[data-kanban-count]').textContent = count;
+            var countBadge = column.querySelector('[data-kanban-count]');
+            countBadge.textContent = count;
+            countBadge.setAttribute('aria-label', (board.dataset.countTemplate || '__COUNT__').replace('__COUNT__', count));
             column.querySelector('.todo-kanban-empty').classList.toggle('d-none', count > 0);
         });
     }
@@ -533,6 +547,9 @@ document.querySelectorAll('.todo-list-row[data-task-url]').forEach(function (row
             var select = card.querySelector('[data-kanban-status-select]');
             if (select) select.value = newStatus;
             refreshColumns();
+            var statusName = board.querySelector('[data-kanban-status="' + newStatus + '"] strong')?.textContent || newStatus;
+            var taskName = card.querySelector('.todo-kanban-title')?.textContent || '';
+            announce(taskName + ': ' + statusName);
             return true;
         } catch (error) {
             window.alert(error.message);
@@ -562,13 +579,6 @@ document.querySelectorAll('.todo-list-row[data-task-url]').forEach(function (row
         card.addEventListener('click', function (event) {
             if (event.target.closest('a, button, input, select, textarea, label, form')) return;
             window.location.href = card.dataset.taskUrl;
-        });
-        card.addEventListener('keydown', function (event) {
-            if ((event.key === 'Enter' || event.key === ' ') &&
-                !event.target.closest('a, button, input, select, textarea, label, form')) {
-                event.preventDefault();
-                window.location.href = card.dataset.taskUrl;
-            }
         });
     });
     board.querySelectorAll('.todo-kanban-column').forEach(function (column) {

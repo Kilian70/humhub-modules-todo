@@ -128,7 +128,7 @@ $notificationDefault = TaskNotificationPreferenceService::getDefaultMode((int) Y
                 <span class="badge bg-warning text-dark ms-1"><i class="fa fa-lock"></i> BLOCKIERT</span>
             <?php endif; ?>
             <?php foreach ($task->taskLabels as $label): ?>
-                <span class="badge ms-1" style="background:<?= Html::encode($label->color) ?>;color:#fff;"><?= Html::encode($label->name) ?></span>
+                <span class="badge ms-1" style="background:<?= Html::encode($label->color) ?>;color:<?= Html::encode($label->textColor) ?>;"><?= Html::encode($label->name) ?></span>
             <?php endforeach; ?>
             <?php if ($task->status === 'geschlossen' && $task->closed_at): ?>
                 <span class="small text-muted ms-2">
@@ -208,6 +208,7 @@ $notificationDefault = TaskNotificationPreferenceService::getDefaultMode((int) Y
                                         <?= Html::submitButton('<i class="fa fa-times"></i>', [
                                             'class' => 'btn btn-sm btn-danger',
                                             'title' => 'Voraussetzung entfernen',
+                                            'aria-label' => 'Voraussetzung entfernen',
                                         ]) ?>
                                         <?= Html::endForm() ?>
                                     <?php endif; ?>

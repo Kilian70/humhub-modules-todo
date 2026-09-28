@@ -63,6 +63,16 @@ if (!str_contains($reminderSource, "Atomically claim this reminder stage") || !s
     fwrite(STDERR, "Missing concurrent reminder claim protection\n");
     exit(1);
 }
+$reminderNotificationSource = file_get_contents("notifications/TaskReminder.php");
+if (!str_contains($reminderNotificationSource, "public \$suppressSendToOriginator = false;")) {
+    fwrite(STDERR, "Task reminders would be suppressed for a creator represented by the system originator\n");
+    exit(1);
+}
+$eventSource = file_get_contents("Events.php");
+if (!str_contains($eventSource, "\$comment->createdBy") || str_contains($eventSource, "\$comment->user")) {
+    fwrite(STDERR, "Comment notifications use an invalid HumHub comment-originator property\n");
+    exit(1);
+}
 $moduleSource = file_get_contents("Module.php");
 $wallEntrySource = file_get_contents("widgets/WallEntry.php");
 if (!str_contains($moduleSource, "function getContentClasses") || !str_contains($moduleSource, "new CreateTasks()")) {
@@ -71,6 +81,19 @@ if (!str_contains($moduleSource, "function getContentClasses") || !str_contains(
 }
 if (!str_contains($wallEntrySource, "'/todo/task/create'") || !str_contains($wallEntrySource, "EDIT_MODE_NEW_WINDOW")) {
     fwrite(STDERR, "Missing ToDo link in HumHub stream creation menu\n");
+    exit(1);
+}
+$taskIndexSource = file_get_contents("views/task/index.php");
+if (!str_contains($taskIndexSource, "todo-kanban-status")
+    || !str_contains($taskIndexSource, "aria-live=\"polite\"")
+    || !str_contains($taskIndexSource, "draggable=\"<?= \$canMove ?")) {
+    fwrite(STDERR, "Missing accessible keyboard alternative or status feedback in Kanban\n");
+    exit(1);
+}
+$taskFormSources = file_get_contents("views/task/create.php") . file_get_contents("views/task/update.php");
+if (substr_count($taskFormSources, "combobox") < 2
+    || substr_count($taskFormSources, "ArrowDown") < 2) {
+    fwrite(STDERR, "Task-list picker is missing accessible combobox keyboard handling\n");
     exit(1);
 }
 foreach (["README.md", "CHANGELOG.md", "LICENSE", "SECURITY.md", "CONTRIBUTING.md"] as $file) {
@@ -85,6 +108,11 @@ if (!is_file("resources/module_image.png") || filesize("resources/module_image.p
 }
 if (!is_file("migrations/uninstall.php")) {
     fwrite(STDERR, "Missing uninstall migration\n");
+    exit(1);
+}
+$uninstallSource = file_get_contents("migrations/uninstall.php");
+if (!str_contains($uninstallSource, "->delete") || !str_contains($uninstallSource, "notification") || !str_contains($uninstallSource, "module")) {
+    fwrite(STDERR, "Uninstall does not remove ToDo notifications\n");
     exit(1);
 }
 foreach ([
