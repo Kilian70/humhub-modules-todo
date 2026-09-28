@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.30.1 - 2026-09-28
+
+- Kontrast der inaktiven Ansichts-, Verwaltungs-, Export- und Filterschaltflächen im dunklen Modus korrigiert
+- Hover- und Tastaturfokuszustände an HumHubs Farbschema angepasst
+
 ## 1.30.0 - 2026-09-28
 
 - Kanban-Aufgaben vollständig per Tastatur öffnungs- und verschiebbar gemacht
