@@ -15,6 +15,13 @@ if grep -RInE "due_date = ['\"]{2}|->isModuleEnabled\(|MenuLink::isActiveState\(
     exit 1
 fi
 
+for method in canManage canWorkOn canDelete; do
+    if ! grep -q "function ${method}" models/Task.php; then
+        echo "Missing task authorization method: ${method}" >&2
+        exit 1
+    fi
+done
+
 php -r '
 $module = json_decode(file_get_contents("module.json"), true, 512, JSON_THROW_ON_ERROR);
 $composer = json_decode(file_get_contents("composer.json"), true, 512, JSON_THROW_ON_ERROR);

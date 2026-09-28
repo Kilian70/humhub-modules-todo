@@ -3,6 +3,7 @@
 namespace humhub\modules\todo\permissions;
 
 use humhub\libs\BasePermission;
+use humhub\modules\space\models\Space;
 
 class ViewTasks extends BasePermission
 {
@@ -14,5 +15,10 @@ class ViewTasks extends BasePermission
 
     protected $description = 'Erlaubt das Anzeigen der ToDo-Liste';
 
-    protected $defaultState = self::STATE_ALLOW;
+    protected $defaultAllowedGroups = [
+        Space::USERGROUP_OWNER,
+        Space::USERGROUP_ADMIN,
+        Space::USERGROUP_MODERATOR,
+        Space::USERGROUP_MEMBER,
+    ];
 }

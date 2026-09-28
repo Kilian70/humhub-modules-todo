@@ -36,7 +36,14 @@ if ($humhubVersion === '' || version_compare($humhubVersion, $manifest['humhub']
     exit(1);
 }
 
-foreach ([humhub\modules\todo\Module::class, humhub\modules\todo\Events::class] as $class) {
+foreach ([
+    humhub\modules\todo\Module::class,
+    humhub\modules\todo\Events::class,
+    humhub\modules\todo\permissions\ViewTasks::class,
+    humhub\modules\todo\permissions\CreateTasks::class,
+    humhub\modules\todo\permissions\EditTasks::class,
+    humhub\modules\todo\permissions\DeleteTasks::class,
+] as $class) {
     if (!class_exists($class)) {
         fwrite(STDERR, "Cannot load {$class} against HumHub {$humhubVersion}.\n");
         exit(1);

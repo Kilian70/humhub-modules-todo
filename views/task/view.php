@@ -3,7 +3,6 @@
 use yii\helpers\Html;
 use humhub\modules\user\widgets\Image as UserImage;
 use humhub\modules\user\models\User;
-use humhub\modules\todo\permissions\EditTasks;
 use humhub\modules\todo\services\CalendarSyncService;
 use humhub\modules\comment\widgets\Comments;
 
@@ -13,7 +12,10 @@ use yii\helpers\Url;
 
 ?>
 
-<?php $canEditTask = $contentContainer->permissionManager->can(new EditTasks()); ?>
+<?php
+$canEditTask = $task->canManage();
+$canWorkOnTask = $task->canWorkOn();
+?>
 
 <div class="panel panel-default">
 
@@ -96,7 +98,7 @@ use yii\helpers\Url;
 
         <!-- CHECKLISTE -->
         <?php
-        $canEditChecklist = $canEditTask;
+        $canEditChecklist = $canWorkOnTask;
         $checklistItems = $task->checklistItems;
         $doneCount = count(array_filter($checklistItems, static fn($item) => (bool) $item->is_done));
         $spaceMembers = User::find()
@@ -280,9 +282,9 @@ use yii\helpers\Url;
         <div class="row g-3">
 
             <div class="col-md-4">
-                <strong>Status</strong><?php if ($canEditTask): ?> <span class="text-muted small"><i class="fa fa-pencil"></i></span><?php endif; ?><br>
+                <strong>Status</strong><?php if ($canWorkOnTask): ?> <span class="text-muted small"><i class="fa fa-pencil"></i></span><?php endif; ?><br>
 
-                <?php if ($canEditTask): ?>
+                <?php if ($canWorkOnTask): ?>
                     <?= Html::beginForm(
                         $contentContainer->createUrl('/todo/task/quick-update', ['id' => $task->id]),
                         'post',
