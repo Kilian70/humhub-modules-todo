@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.39.2 - 2026-09-29
+
+- Benachrichtigungseinstellung „Stumm“ verständlicher in „Nur Kommunikation“ umbenannt
+- erklärt, dass Aufgabenmeldungen unterdrückt werden, Kommentare, Antworten und Erwähnungen aber sichtbar bleiben
+- deutsche und englische Übersetzungen angepasst
+
 ## 1.39.1 - 2026-09-29
 
 - Kommentarbereich übersichtlicher gestaltet

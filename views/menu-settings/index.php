@@ -28,8 +28,9 @@ $this->title = Yii::t('TodoModule.base', 'ToDo-Menü');
             'all' => Yii::t('TodoModule.base', 'Alle ToDo-Benachrichtigungen'),
             'important' => Yii::t('TodoModule.base', 'Nur Kommentare und Zuweisungen'),
             'reminders' => Yii::t('TodoModule.base', 'Nur Erinnerungen'),
-            'muted' => Yii::t('TodoModule.base', 'Stumm'),
+            'muted' => Yii::t('TodoModule.base', 'Nur Kommunikation'),
         ]) ?>
+        <p class="help-block"><?= Yii::t('TodoModule.base', 'Bei „Nur Kommunikation“ werden Aufgabenmeldungen unterdrückt; Kommentare, Antworten und Erwähnungen bleiben sichtbar.') ?></p>
         <button class="btn btn-primary" type="submit" data-ui-loader><?= Yii::t('TodoModule.base', 'Speichern') ?></button>
         <?php ActiveForm::end(); ?>
     </div>

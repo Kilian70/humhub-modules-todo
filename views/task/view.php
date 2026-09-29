@@ -628,16 +628,16 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                             TaskNotificationPreferenceService::ALL => 'Alle ToDo-Benachrichtigungen',
                             TaskNotificationPreferenceService::IMPORTANT => 'Nur Kommentare und Zuweisungen',
                             TaskNotificationPreferenceService::REMINDERS => 'Nur Erinnerungen',
-                            TaskNotificationPreferenceService::MUTED => 'Stumm',
+                            TaskNotificationPreferenceService::MUTED => 'Nur Kommunikation',
                         ][$notificationDefault]),
                     ]),
                     TaskNotificationPreferenceService::ALL => Yii::t('TodoModule.base', 'Alle ToDo-Benachrichtigungen'),
                     TaskNotificationPreferenceService::IMPORTANT => Yii::t('TodoModule.base', 'Nur Kommentare und Zuweisungen'),
                     TaskNotificationPreferenceService::REMINDERS => Yii::t('TodoModule.base', 'Nur Erinnerungen'),
-                    TaskNotificationPreferenceService::MUTED => Yii::t('TodoModule.base', 'Stumm'),
+                    TaskNotificationPreferenceService::MUTED => Yii::t('TodoModule.base', 'Nur Kommunikation'),
                 ], ['class' => 'form-control']) ?>
                 <p class="help-block mb-2">
-                    <?= Yii::t('TodoModule.base', 'Diese Auswahl gilt nur für dich und nur für diese Aufgabe. Erwähnungen und HumHub-Follower bleiben unverändert.') ?>
+                    <?= Yii::t('TodoModule.base', 'Diese Auswahl gilt nur für dich und nur für diese Aufgabe. Bei „Nur Kommunikation“ bleiben Kommentare, Antworten, Erwähnungen und HumHub-Follower unverändert.') ?>
                 </p>
                 <?= Html::submitButton(Yii::t('TodoModule.base', 'Speichern'), ['class' => 'btn btn-sm btn-primary']) ?>
                 <?= Html::endForm() ?>
