@@ -9,7 +9,7 @@ use yii\widgets\LinkPager;
 
 <div class="panel-heading d-flex justify-content-between align-items-center">
 
-<strong>Suche</strong>
+<strong><?= Yii::t('TodoModule.base', 'Suche') ?></strong>
 
 <form method="get">
 
@@ -35,7 +35,7 @@ Suchen
 
 <?php if (empty($tasks)): ?>
 
-<p>Keine Treffer gefunden.</p>
+<p><?= Yii::t('TodoModule.base', 'Keine Treffer gefunden.') ?></p>
 
 <?php else: ?>
 
@@ -45,8 +45,8 @@ Suchen
 
 <tr>
 <th>ToDo</th>
-<th>Priorität</th>
-<th>Fällig</th>
+<th><?= Yii::t('TodoModule.base', 'Priorität') ?></th>
+<th><?= Yii::t('TodoModule.base', 'Fällig') ?></th>
 </tr>
 
 </thead>

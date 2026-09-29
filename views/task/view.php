@@ -36,14 +36,14 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
         <div>
 
             <?= Html::a(
-                'Zurück',
+                Yii::t('TodoModule.base', 'Zurück'),
                 $contentContainer->createUrl('/todo/task/index', $task->archived_at ? ['archive' => 1] : []),
                 ['class' => 'btn btn-sm btn-light']
             ) ?>
 
             <?php if ($canEditTask): ?>
                 <?= Html::a(
-                    'Bearbeiten',
+                    Yii::t('TodoModule.base', 'Bearbeiten'),
                     $contentContainer->createUrl('/todo/task/update', ['id' => $task->id]),
                     ['class' => 'btn btn-sm btn-primary']
                 ) ?>
@@ -70,7 +70,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                 ) ?>
                 <?= Html::submitButton('<i class="fa fa-copy"></i> Duplizieren', [
                     'class' => 'btn btn-sm btn-light',
-                    'data-confirm' => 'Diese Aufgabe als neue offene Aufgabe duplizieren?',
+                    'data-confirm' => Yii::t('TodoModule.base', 'Diese Aufgabe als neue offene Aufgabe duplizieren?'),
                 ]) ?>
                 <?= Html::endForm() ?>
 
@@ -81,7 +81,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                 ) ?>
                 <?= Html::submitButton('<i class="fa fa-bookmark"></i> Als Vorlage', [
                     'class' => 'btn btn-sm btn-light',
-                    'data-confirm' => 'Diese Aufgabe als neue Vorlage speichern?',
+                    'data-confirm' => Yii::t('TodoModule.base', 'Diese Aufgabe als neue Vorlage speichern?'),
                 ]) ?>
                 <?= Html::endForm() ?>
             <?php endif; ?>
@@ -100,7 +100,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
 
             <div class="mb-4">
 
-                <strong>Beschreibung</strong>
+                <strong><?= Yii::t('TodoModule.base', 'Beschreibung') ?></strong>
 
                 <div class="mt-1">
                     <?= nl2br(Html::encode($task->description)) ?>
@@ -129,7 +129,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
             <?php endif; ?>
             <span class="<?= $statusClass ?>"><?= $statusLabel ?></span>
             <?php if ($task->getOpenBlockingTasks()->exists()): ?>
-                <span class="badge bg-warning text-dark ms-1"><i class="fa fa-lock"></i> BLOCKIERT</span>
+                <span class="badge bg-warning text-dark ms-1"><i class="fa fa-lock"></i> <?= Yii::t('TodoModule.base', 'BLOCKIERT') ?></span>
             <?php endif; ?>
             <?php foreach ($task->taskLabels as $label): ?>
                 <span class="badge ms-1" style="background:<?= Html::encode($label->color) ?>;color:<?= Html::encode($label->textColor) ?>;"><?= Html::encode($label->name) ?></span>
@@ -183,14 +183,14 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
         <?php if (!empty($blockingTasks) || $canEditTask): ?>
             <details class="card mb-4" <?= !empty($blockingTasks) ? 'open' : '' ?>>
                 <summary class="card-header py-2" style="cursor:pointer;list-style:none;">
-                    <strong><i class="fa fa-link"></i> Voraussetzungen</strong>
+                    <strong><i class="fa fa-link"></i> <?= Yii::t('TodoModule.base', 'Voraussetzungen') ?></strong>
                     <?php if ($task->getOpenBlockingTasks()->exists()): ?>
                         <span class="badge bg-warning text-dark ms-1">blockiert</span>
                     <?php endif; ?>
                 </summary>
                 <div class="card-body p-2">
                     <?php if (empty($blockingTasks)): ?>
-                        <p class="text-muted mb-2">Keine Voraussetzungen festgelegt.</p>
+                        <p class="text-muted mb-2"><?= Yii::t('TodoModule.base', 'Keine Voraussetzungen festgelegt.') ?></p>
                     <?php else: ?>
                         <div class="list-group mb-2">
                             <?php foreach ($blockingTasks as $blockingTask): ?>
@@ -211,8 +211,8 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                                         ]), 'post', ['class' => 'd-inline']) ?>
                                         <?= Html::submitButton('<i class="fa fa-times"></i>', [
                                             'class' => 'btn btn-sm btn-danger',
-                                            'title' => 'Voraussetzung entfernen',
-                                            'aria-label' => 'Voraussetzung entfernen',
+                                            'title' => Yii::t('TodoModule.base', 'Voraussetzung entfernen'),
+                                            'aria-label' => Yii::t('TodoModule.base', 'Voraussetzung entfernen'),
                                         ]) ?>
                                         <?= Html::endForm() ?>
                                     <?php endif; ?>
@@ -226,7 +226,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                             'class' => 'd-flex gap-2 align-items-end',
                         ]) ?>
                         <div class="flex-grow-1">
-                            <label class="control-label" for="todo-blocking-task">Aufgabe auswählen</label>
+                            <label class="control-label" for="todo-blocking-task"><?= Yii::t('TodoModule.base', 'Aufgabe auswählen') ?></label>
                             <?= Html::dropDownList(
                                 'blocking_task_id',
                                 null,
@@ -249,13 +249,13 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
         <details class="card mb-4" <?= empty($subtasks) ? '' : 'open' ?>>
             <summary class="card-header py-2" style="cursor:pointer;list-style:none;">
                 <span class="d-flex justify-content-between align-items-center">
-                    <strong><i class="fa fa-sitemap"></i> Unteraufgaben</strong>
+                    <strong><i class="fa fa-sitemap"></i> <?= Yii::t('TodoModule.base', 'Unteraufgaben') ?></strong>
                     <span class="badge bg-secondary"><?= $completedSubtasks ?> / <?= count($subtasks) ?></span>
                 </span>
             </summary>
             <div class="card-body p-2">
                 <?php if (empty($subtasks)): ?>
-                    <p class="text-muted mb-2">Noch keine Unteraufgaben vorhanden.</p>
+                    <p class="text-muted mb-2"><?= Yii::t('TodoModule.base', 'Noch keine Unteraufgaben vorhanden.') ?></p>
                 <?php else: ?>
                     <div class="list-group mb-2">
                         <?php foreach ($subtasks as $subtask): ?>
@@ -307,14 +307,14 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
 
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center py-2">
-                <strong>Checkliste</strong>
+                <strong><?= Yii::t('TodoModule.base', 'Checkliste') ?></strong>
                 <?php if (!empty($checklistItems)): ?>
                     <span class="badge bg-secondary"><?= $doneCount ?> / <?= count($checklistItems) ?></span>
                 <?php endif; ?>
             </div>
             <div class="card-body p-2">
                 <?php if (empty($checklistItems)): ?>
-                    <p class="text-muted mb-2">Noch keine Checklistenpunkte vorhanden.</p>
+                    <p class="text-muted mb-2"><?= Yii::t('TodoModule.base', 'Noch keine Checklistenpunkte vorhanden.') ?></p>
                 <?php else: ?>
                     <div class="mb-2">
                         <?php foreach ($checklistItems as $index => $item): ?>
@@ -324,8 +324,8 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                                         <?= Html::beginForm($contentContainer->createUrl('/todo/task/checklist-toggle', ['id' => $task->id, 'itemId' => $item->id]), 'post', ['class' => 'm-0']) ?>
                                         <?= Html::submitButton($item->is_done ? '<i class="fa fa-check-square"></i>' : '<i class="fa fa-square-o"></i>', [
                                             'class' => 'btn btn-sm ' . ($item->is_done ? 'btn-success' : 'btn-outline-secondary'),
-                                            'title' => $item->is_done ? 'Wieder öffnen' : 'Abhaken',
-                                            'aria-label' => $item->is_done ? 'Wieder öffnen' : 'Abhaken',
+                                            'title' => $item->is_done ? Yii::t('TodoModule.base', 'Wieder öffnen') : Yii::t('TodoModule.base', 'Abhaken'),
+                                            'aria-label' => $item->is_done ? Yii::t('TodoModule.base', 'Wieder öffnen') : Yii::t('TodoModule.base', 'Abhaken'),
                                         ]) ?>
                                         <?= Html::endForm() ?>
                                     <?php else: ?>
@@ -355,26 +355,26 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
 
                                         <?php if ($canEditChecklist): ?>
                                             <details class="mt-1">
-                                                <summary class="small text-muted" style="cursor:pointer">Bearbeiten</summary>
+                                                <summary class="small text-muted" style="cursor:pointer"><?= Yii::t('TodoModule.base', 'Bearbeiten') ?></summary>
                                                 <?= Html::beginForm($contentContainer->createUrl('/todo/task/checklist-edit', ['id' => $task->id, 'itemId' => $item->id]), 'post', ['class' => 'row g-2 mt-1 align-items-end']) ?>
                                                 <div class="col-md-4">
-                                                    <label class="form-label small mb-1">Checklistenpunkt</label>
+                                                    <label class="form-label small mb-1"><?= Yii::t('TodoModule.base', 'Checklistenpunkt') ?></label>
                                                     <?= Html::textInput('title', $item->title, ['class' => 'form-control form-control-sm', 'maxlength' => 255, 'required' => true]) ?>
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <label class="form-label small mb-1">Zuständig</label>
+                                                    <label class="form-label small mb-1"><?= Yii::t('TodoModule.base', 'Zuständig') ?></label>
                                                     <?= UserPickerField::widget([
                                                         'name' => 'assigned_user_guids',
                                                         'selection' => $item->assignedUsers,
                                                         'defaultResults' => $spaceMembers,
                                                         'url' => $spaceUserSearchUrl,
-                                                        'placeholder' => 'Benutzer auswählen',
-                                                        'placeholderMore' => 'Benutzer hinzufügen',
+                                                        'placeholder' => Yii::t('TodoModule.base', 'Benutzer auswählen'),
+                                                        'placeholderMore' => Yii::t('TodoModule.base', 'Benutzer hinzufügen'),
                                                         'minInput' => 1,
                                                     ]) ?>
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <label class="form-label small mb-1">Termin</label>
+                                                    <label class="form-label small mb-1"><?= Yii::t('TodoModule.base', 'Termin') ?></label>
                                                     <?= Html::input('date', 'due_date', $item->due_date, ['class' => 'form-control form-control-sm']) ?>
                                                     <?php if ($calendarAvailable): ?>
                                                         <div class="form-check mt-1">
@@ -384,7 +384,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                                                                 'id' => 'calendar-item-' . $item->id,
                                                                 'disabled' => !$item->calendar_entry_id && !$calendarCanCreate,
                                                             ]) ?>
-                                                            <label class="form-check-label small" for="calendar-item-<?= $item->id ?>">Kalender</label>
+                                                            <label class="form-check-label small" for="calendar-item-<?= $item->id ?>"><?= Yii::t('TodoModule.base', 'Kalender') ?></label>
                                                         </div>
                                                     <?php endif; ?>
                                                 </div>
@@ -400,16 +400,16 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                                         <div class="d-flex gap-1 flex-shrink-0">
                                             <?php if ($index > 0): ?>
                                                 <?= Html::beginForm($contentContainer->createUrl('/todo/task/checklist-move', ['id' => $task->id, 'itemId' => $item->id, 'direction' => 'up']), 'post', ['class' => 'm-0']) ?>
-                                                <?= Html::submitButton('<i class="fa fa-arrow-up"></i>', ['class' => 'btn btn-sm btn-outline-secondary', 'title' => 'Nach oben', 'aria-label' => 'Nach oben']) ?>
+                                                <?= Html::submitButton('<i class="fa fa-arrow-up"></i>', ['class' => 'btn btn-sm btn-outline-secondary', 'title' => Yii::t('TodoModule.base', 'Nach oben'), 'aria-label' => Yii::t('TodoModule.base', 'Nach oben')]) ?>
                                                 <?= Html::endForm() ?>
                                             <?php endif; ?>
                                             <?php if ($index < count($checklistItems) - 1): ?>
                                                 <?= Html::beginForm($contentContainer->createUrl('/todo/task/checklist-move', ['id' => $task->id, 'itemId' => $item->id, 'direction' => 'down']), 'post', ['class' => 'm-0']) ?>
-                                                <?= Html::submitButton('<i class="fa fa-arrow-down"></i>', ['class' => 'btn btn-sm btn-outline-secondary', 'title' => 'Nach unten', 'aria-label' => 'Nach unten']) ?>
+                                                <?= Html::submitButton('<i class="fa fa-arrow-down"></i>', ['class' => 'btn btn-sm btn-outline-secondary', 'title' => Yii::t('TodoModule.base', 'Nach unten'), 'aria-label' => Yii::t('TodoModule.base', 'Nach unten')]) ?>
                                                 <?= Html::endForm() ?>
                                             <?php endif; ?>
                                             <?= Html::beginForm($contentContainer->createUrl('/todo/task/checklist-delete', ['id' => $task->id, 'itemId' => $item->id]), 'post', ['class' => 'm-0']) ?>
-                                            <?= Html::submitButton('<i class="fa fa-trash"></i>', ['class' => 'btn btn-sm btn-outline-danger', 'title' => 'Löschen', 'aria-label' => 'Löschen', 'data-confirm' => 'Checklistenpunkt wirklich löschen?']) ?>
+                                            <?= Html::submitButton('<i class="fa fa-trash"></i>', ['class' => 'btn btn-sm btn-outline-danger', 'title' => Yii::t('TodoModule.base', 'Löschen'), 'aria-label' => Yii::t('TodoModule.base', 'Löschen'), 'data-confirm' => Yii::t('TodoModule.base', 'Checklistenpunkt wirklich löschen?')]) ?>
                                             <?= Html::endForm() ?>
                                         </div>
                                     <?php endif; ?>
@@ -422,23 +422,23 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                 <?php if ($canEditChecklist): ?>
                     <?= Html::beginForm($contentContainer->createUrl('/todo/task/checklist-add', ['id' => $task->id]), 'post', ['class' => 'row g-2 align-items-end']) ?>
                     <div class="col-md-4">
-                        <label class="form-label small mb-1">Checklistenpunkt</label>
-                        <?= Html::textInput('title', '', ['class' => 'form-control', 'placeholder' => 'Neuer Checklistenpunkt …', 'maxlength' => 255, 'required' => true]) ?>
+                        <label class="form-label small mb-1"><?= Yii::t('TodoModule.base', 'Checklistenpunkt') ?></label>
+                        <?= Html::textInput('title', '', ['class' => 'form-control', 'placeholder' => Yii::t('TodoModule.base', 'Neuer Checklistenpunkt …'), 'maxlength' => 255, 'required' => true]) ?>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label small mb-1">Zuständig</label>
+                        <label class="form-label small mb-1"><?= Yii::t('TodoModule.base', 'Zuständig') ?></label>
                         <?= UserPickerField::widget([
                             'name' => 'assigned_user_guids',
                             'selection' => [],
                             'defaultResults' => $spaceMembers,
                             'url' => $spaceUserSearchUrl,
-                            'placeholder' => 'Benutzer auswählen',
-                            'placeholderMore' => 'Benutzer hinzufügen',
+                            'placeholder' => Yii::t('TodoModule.base', 'Benutzer auswählen'),
+                            'placeholderMore' => Yii::t('TodoModule.base', 'Benutzer hinzufügen'),
                             'minInput' => 1,
                         ]) ?>
                     </div>
                     <div class="col-md-2">
-                        <label class="form-label small mb-1">Termin</label>
+                        <label class="form-label small mb-1"><?= Yii::t('TodoModule.base', 'Termin') ?></label>
                         <?= Html::input('date', 'due_date', '', ['class' => 'form-control']) ?>
                         <?php if ($calendarAvailable): ?>
                             <div class="form-check mt-1">
@@ -448,7 +448,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                                     'id' => 'calendar-item-new',
                                     'disabled' => !$calendarCanCreate,
                                 ]) ?>
-                                <label class="form-check-label small" for="calendar-item-new">Kalender</label>
+                                <label class="form-check-label small" for="calendar-item-new"><?= Yii::t('TodoModule.base', 'Kalender') ?></label>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -473,7 +473,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
         <div class="row g-3">
 
             <div class="col-md-4">
-                <strong>Status</strong><?php if ($canWorkOnTask): ?> <span class="text-muted small"><i class="fa fa-pencil"></i></span><?php endif; ?><br>
+                <strong><?= Yii::t('TodoModule.base', 'Status') ?></strong><?php if ($canWorkOnTask): ?> <span class="text-muted small"><i class="fa fa-pencil"></i></span><?php endif; ?><br>
 
                 <?php if ($canWorkOnTask): ?>
                     <?= Html::beginForm(
@@ -495,7 +495,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                             'class' => 'form-control input-sm',
                             'style' => 'max-width:190px;height:34px;cursor:pointer;',
                             'onchange' => 'return todoConfirmClose(this, ' . (int) $openChecklistCount . ');',
-                            'aria-label' => 'Status ändern',
+                            'aria-label' => Yii::t('TodoModule.base', 'Status ändern'),
                             'data-current-status' => $task->status,
                         ]
                     ) ?>
@@ -513,7 +513,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
             </div>
 
             <div class="col-md-4">
-                <strong>Priorität</strong><?php if ($canEditTask): ?> <span class="text-muted small"><i class="fa fa-pencil"></i></span><?php endif; ?><br>
+                <strong><?= Yii::t('TodoModule.base', 'Priorität') ?></strong><?php if ($canEditTask): ?> <span class="text-muted small"><i class="fa fa-pencil"></i></span><?php endif; ?><br>
 
                 <?php if ($canEditTask): ?>
                     <?= Html::beginForm(
@@ -534,7 +534,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                             'class' => 'form-control input-sm',
                             'style' => 'max-width:190px;height:34px;cursor:pointer;',
                             'onchange' => 'this.form.submit();',
-                            'aria-label' => 'Priorität ändern',
+                            'aria-label' => Yii::t('TodoModule.base', 'Priorität ändern'),
                         ]
                     ) ?>
                     <?= Html::endForm() ?>
@@ -544,7 +544,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
             </div>
 
             <div class="col-md-4">
-                <strong>Fällig</strong><?php if ($canEditTask): ?> <span class="text-muted small"><i class="fa fa-pencil"></i></span><?php endif; ?><br>
+                <strong><?= Yii::t('TodoModule.base', 'Fällig') ?></strong><?php if ($canEditTask): ?> <span class="text-muted small"><i class="fa fa-pencil"></i></span><?php endif; ?><br>
 
                 <?php if ($canEditTask): ?>
                     <?= Html::beginForm(
@@ -562,7 +562,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                                 'class' => 'form-control input-sm',
                                 'style' => 'max-width:190px;height:34px;',
                                 'onchange' => 'this.form.submit();',
-                                'aria-label' => 'Fälligkeitsdatum ändern',
+                                'aria-label' => Yii::t('TodoModule.base', 'Fälligkeitsdatum ändern'),
                             ]
                         ) ?>
                         <?php if ($task->sync_to_calendar): ?>
@@ -587,7 +587,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
 
             <div class="mt-4">
 
-                <strong>Zuständig</strong>
+                <strong><?= Yii::t('TodoModule.base', 'Zuständig') ?></strong>
 
                 <div class="mt-2">
 
@@ -653,7 +653,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
 
                 <div class="mt-4">
 
-                    <strong>Erstellt</strong>
+                    <strong><?= Yii::t('TodoModule.base', 'Erstellt') ?></strong>
 
                     <div class="mt-1 d-flex align-items-center">
 
@@ -704,7 +704,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
         <?php if (!empty($files)): ?>
 
             <div class="mt-4">
-                <strong>Dateien & Fotos</strong>
+                <strong><?= Yii::t('TodoModule.base', 'Dateien & Fotos') ?></strong>
 
                 <div class="mt-2 d-flex flex-column gap-2">
                     <?php foreach ($files as $file): ?>
@@ -732,7 +732,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                                         'target' => '_blank',
                                         'rel' => 'noopener',
                                         'class' => 'flex-shrink-0',
-                                        'title' => 'Foto öffnen',
+                                        'title' => Yii::t('TodoModule.base', 'Foto öffnen'),
                                     ]
                                 ) ?>
                             <?php else: ?>
@@ -763,15 +763,15 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                                     <?= Html::textInput('title', $displayTitle, [
                                         'class' => 'form-control form-control-sm',
                                         'maxlength' => 255,
-                                        'placeholder' => 'Titel / kurze Beschreibung',
-                                        'aria-label' => 'Titel oder Beschreibung der Datei',
+                                        'placeholder' => Yii::t('TodoModule.base', 'Titel / kurze Beschreibung'),
+                                        'aria-label' => Yii::t('TodoModule.base', 'Titel oder Beschreibung der Datei'),
                                     ]) ?>
                                     <?= Html::submitButton(
                                         '<i class="fa fa-save"></i>',
                                         [
                                             'class' => 'btn btn-sm btn-outline-secondary',
-                                            'title' => 'Titel speichern',
-                                            'aria-label' => 'Titel speichern',
+                                            'title' => Yii::t('TodoModule.base', 'Titel speichern'),
+                                            'aria-label' => Yii::t('TodoModule.base', 'Titel speichern'),
                                         ]
                                     ) ?>
                                     <?= Html::endForm() ?>
@@ -797,7 +797,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                                             ]),
                                             [
                                                 'class' => 'btn btn-sm btn-outline-danger',
-                                                'data-confirm' => 'Datei wirklich löschen?',
+                                                'data-confirm' => Yii::t('TodoModule.base', 'Datei wirklich löschen?'),
                                                 'data-method' => 'post',
                                             ]
                                         ) ?>
@@ -828,12 +828,12 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
             <div id="todo-file-upload-backdrop" class="todo-file-upload-backdrop" hidden>
                 <div class="todo-file-upload-dialog" role="dialog" aria-modal="true" aria-labelledby="todo-file-upload-title">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <strong id="todo-file-upload-title">Datei hinzufügen</strong>
+                        <strong id="todo-file-upload-title"><?= Yii::t('TodoModule.base', 'Datei hinzufügen') ?></strong>
                         <?= Html::button('&times;', [
                             'class' => 'btn btn-sm btn-light',
                             'type' => 'button',
                             'id' => 'todo-file-upload-close',
-                            'aria-label' => 'Dialog schliessen',
+                            'aria-label' => Yii::t('TodoModule.base', 'Dialog schliessen'),
                         ]) ?>
                     </div>
 
@@ -871,7 +871,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                             'maxlength' => 255,
                             'placeholder' => 'z.B. Bühne vor dem Aufbau',
                         ]) ?>
-                        <div class="small text-muted mt-1">Ohne Titel wird automatisch der Dateiname verwendet.</div>
+                        <div class="small text-muted mt-1"><?= Yii::t('TodoModule.base', 'Ohne Titel wird automatisch der Dateiname verwendet.') ?></div>
                     </div>
 
                     <div class="d-flex justify-content-end gap-2">
@@ -981,12 +981,12 @@ JS
         <details class="panel panel-default mt-4" id="todo-history">
             <summary class="panel-heading d-flex align-items-center justify-content-between"
                      style="cursor:pointer;list-style:none;">
-                <span><i class="fa fa-history"></i> <strong>Verlauf</strong></span>
+                <span><i class="fa fa-history"></i> <strong><?= Yii::t('TodoModule.base', 'Verlauf') ?></strong></span>
                 <span class="badge bg-secondary"><?= count($historyEntries) ?></span>
             </summary>
             <div class="panel-body p-0">
                 <?php if ($historyEntries === []): ?>
-                    <div class="text-muted small p-3">Noch keine Aktivitäten protokolliert.</div>
+                    <div class="text-muted small p-3"><?= Yii::t('TodoModule.base', 'Noch keine Aktivitäten protokolliert.') ?></div>
                 <?php else: ?>
                     <div class="list-group list-group-flush">
                         <?php foreach ($historyEntries as $history): ?>
@@ -1017,7 +1017,7 @@ JS
 
         <!-- KOMMUNIKATION -->
         <div class="mt-4" id="todo-communication">
-            <strong>Kommunikation</strong>
+            <strong><?= Yii::t('TodoModule.base', 'Kommunikation') ?></strong>
             <div class="small text-muted mt-1">
                 Nachrichten, Rückfragen und Absprachen zu dieser Aufgabe.
             </div>

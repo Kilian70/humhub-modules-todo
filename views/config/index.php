@@ -9,7 +9,7 @@ $this->title = 'ToDo – Einstellungen';
 ?>
 
 <div class="panel panel-default">
-    <div class="panel-heading"><strong>ToDo</strong> – Dashboard</div>
+    <div class="panel-heading"><strong>ToDo</strong> – <?= Yii::t('TodoModule.base', 'Dashboard') ?></div>
     <div class="panel-body">
         <p class="text-muted">
             Hier wird nur das persönliche Dashboard-Widget konfiguriert.
@@ -22,7 +22,7 @@ $this->title = 'ToDo – Einstellungen';
         <div class="row">
             <div class="col-md-6">
                 <?= $form->field($model, 'dashboardWidgetSortOrder')->input('number', ['min' => 0, 'max' => 10000]) ?>
-                <div class="form-text text-muted">Kleinere Zahl = weiter oben, grössere Zahl = weiter unten.</div>
+                <div class="form-text text-muted"><?= Yii::t('TodoModule.base', 'Kleinere Zahl = weiter oben, grössere Zahl = weiter unten.') ?></div>
             </div>
             <div class="col-md-6">
                 <?= $form->field($model, 'dashboardWidgetLimit')->input('number', ['min' => 1, 'max' => 20]) ?>
@@ -30,7 +30,7 @@ $this->title = 'ToDo – Einstellungen';
         </div>
 
         <hr>
-        <h4>Erinnerungen</h4>
+        <h4><?= Yii::t('TodoModule.base', 'Erinnerungen') ?></h4>
         <p class="text-muted">
             Jede Erinnerungsstufe wird pro Aufgabe nur einmal versendet. Wird das Fälligkeitsdatum geändert,
             werden die Stufen für diese Aufgabe zurückgesetzt.

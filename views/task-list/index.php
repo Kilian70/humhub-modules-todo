@@ -10,8 +10,8 @@ $this->title = 'Aufgabenlisten verwalten';
 
 <div class="panel panel-default">
     <div class="panel-heading d-flex justify-content-between align-items-center">
-        <strong>Aufgabenlisten verwalten</strong>
-        <?= Html::a('Zurück', $contentContainer->createUrl('/todo/task/index', ['group' => 'list']), ['class' => 'btn btn-sm btn-default']) ?>
+        <strong><?= Yii::t('TodoModule.base', 'Aufgabenlisten verwalten') ?></strong>
+        <?= Html::a(Yii::t('TodoModule.base', 'Zurück'), $contentContainer->createUrl('/todo/task/index', ['group' => 'list']), ['class' => 'btn btn-sm btn-default']) ?>
     </div>
 
     <div class="panel-body">
@@ -25,30 +25,30 @@ $this->title = 'Aufgabenlisten verwalten';
                 <span style="width:8px;align-self:stretch;border-radius:3px;background:<?= Html::encode($list->color) ?>;"></span>
 
                 <?= Html::beginForm($contentContainer->createUrl('/todo/task-list/update', ['id' => $list->id]), 'post', ['class' => 'd-flex align-items-center gap-2 flex-grow-1']) ?>
-                    <?= Html::textInput('name', $list->name, ['class' => 'form-control', 'maxlength' => 100, 'required' => true, 'aria-label' => 'Name der Aufgabenliste']) ?>
-                    <?= Html::input('color', 'color', $list->color, ['class' => 'form-control', 'style' => 'width:60px;padding:3px;', 'title' => 'Farbe', 'aria-label' => 'Farbe der Aufgabenliste']) ?>
+                    <?= Html::textInput('name', $list->name, ['class' => 'form-control', 'maxlength' => 100, 'required' => true, 'aria-label' => Yii::t('TodoModule.base', 'Name der Aufgabenliste')]) ?>
+                    <?= Html::input('color', 'color', $list->color, ['class' => 'form-control', 'style' => 'width:60px;padding:3px;', 'title' => Yii::t('TodoModule.base', 'Farbe'), 'aria-label' => Yii::t('TodoModule.base', 'Farbe der Aufgabenliste')]) ?>
                     <?= Html::submitButton('Speichern', ['class' => 'btn btn-sm btn-primary']) ?>
                 <?= Html::endForm() ?>
 
                 <div class="d-flex gap-1">
                     <?php if ($index > 0): ?>
                         <?= Html::beginForm($contentContainer->createUrl('/todo/task-list/move', ['id' => $list->id, 'direction' => 'up']), 'post', ['class' => 'd-inline']) ?>
-                        <?= Html::submitButton('<i class="fa fa-arrow-up" aria-hidden="true"></i>', ['class' => 'btn btn-sm btn-default', 'title' => 'Nach oben', 'aria-label' => 'Aufgabenliste nach oben verschieben']) ?>
+                        <?= Html::submitButton('<i class="fa fa-arrow-up" aria-hidden="true"></i>', ['class' => 'btn btn-sm btn-default', 'title' => Yii::t('TodoModule.base', 'Nach oben'), 'aria-label' => Yii::t('TodoModule.base', 'Aufgabenliste nach oben verschieben')]) ?>
                         <?= Html::endForm() ?>
                     <?php endif; ?>
 
                     <?php if ($index < count($lists) - 1): ?>
                         <?= Html::beginForm($contentContainer->createUrl('/todo/task-list/move', ['id' => $list->id, 'direction' => 'down']), 'post', ['class' => 'd-inline']) ?>
-                        <?= Html::submitButton('<i class="fa fa-arrow-down" aria-hidden="true"></i>', ['class' => 'btn btn-sm btn-default', 'title' => 'Nach unten', 'aria-label' => 'Aufgabenliste nach unten verschieben']) ?>
+                        <?= Html::submitButton('<i class="fa fa-arrow-down" aria-hidden="true"></i>', ['class' => 'btn btn-sm btn-default', 'title' => Yii::t('TodoModule.base', 'Nach unten'), 'aria-label' => Yii::t('TodoModule.base', 'Aufgabenliste nach unten verschieben')]) ?>
                         <?= Html::endForm() ?>
                     <?php endif; ?>
 
                     <?= Html::beginForm($contentContainer->createUrl('/todo/task-list/delete', ['id' => $list->id]), 'post', ['class' => 'd-inline']) ?>
                     <?= Html::submitButton('<i class="fa fa-trash"></i>', [
                         'class' => 'btn btn-sm btn-danger',
-                        'title' => 'Löschen',
-                        'aria-label' => 'Aufgabenliste löschen',
-                        'data-confirm' => 'Aufgabenliste wirklich löschen? Die Aufgaben bleiben erhalten und werden Unsortiert.',
+                        'title' => Yii::t('TodoModule.base', 'Löschen'),
+                        'aria-label' => Yii::t('TodoModule.base', 'Aufgabenliste löschen'),
+                        'data-confirm' => Yii::t('TodoModule.base', 'Aufgabenliste wirklich löschen? Die Aufgaben bleiben erhalten und werden Unsortiert.'),
                     ]) ?>
                     <?= Html::endForm() ?>
                 </div>
@@ -57,9 +57,9 @@ $this->title = 'Aufgabenlisten verwalten';
 
         <hr>
 
-        <h5>Neue Aufgabenliste</h5>
+        <h5><?= Yii::t('TodoModule.base', 'Neue Aufgabenliste') ?></h5>
         <?= Html::beginForm($contentContainer->createUrl('/todo/task-list/create'), 'post', ['class' => 'd-flex gap-2']) ?>
-            <?= Html::textInput('name', '', ['class' => 'form-control', 'placeholder' => 'Name der neuen Aufgabenliste', 'maxlength' => 100, 'required' => true, 'aria-label' => 'Name der neuen Aufgabenliste']) ?>
+            <?= Html::textInput('name', '', ['class' => 'form-control', 'placeholder' => Yii::t('TodoModule.base', 'Name der neuen Aufgabenliste'), 'maxlength' => 100, 'required' => true, 'aria-label' => Yii::t('TodoModule.base', 'Name der neuen Aufgabenliste')]) ?>
             <?= Html::submitButton('<i class="fa fa-plus"></i> Hinzufügen', ['class' => 'btn btn-success']) ?>
         <?= Html::endForm() ?>
     </div>

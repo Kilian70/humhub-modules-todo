@@ -8,7 +8,7 @@ use humhub\modules\space\models\Space;
 
 <div class="panel panel-default">
     <div class="panel-heading">
-        <strong><i class="fa fa-check-square-o"></i> Meine ToDos</strong>
+        <strong><i class="fa fa-check-square-o"></i> <?= Yii::t('TodoModule.base', 'Meine ToDos') ?></strong>
         <span class="pull-right">
             <?= Html::a('Zeige alle', ['/todo/overview/index'], ['class' => 'small']) ?>
         </span>
@@ -27,7 +27,7 @@ use humhub\modules\space\models\Space;
                 <div>
                     <strong><?= Html::encode($task->title) ?></strong>
                     <?php if ($isOverdue): ?>
-                        <span class="label label-danger">ÜBERFÄLLIG</span>
+                        <span class="label label-danger"><?= Yii::t('TodoModule.base', 'ÜBERFÄLLIG') ?></span>
                     <?php endif; ?>
                 </div>
                 <div class="small text-muted">

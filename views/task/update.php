@@ -243,7 +243,7 @@ JS;
         <!-- Beschreibung -->
         <?= $form->field($model, 'description')->textarea([
             'rows' => 4,
-            'placeholder' => 'Beschreibung der Aufgabe'
+            'placeholder' => Yii::t('TodoModule.base', 'Beschreibung der Aufgabe')
         ]) ?>
 
 
@@ -371,7 +371,7 @@ JS); ?>
                     'disabled' => !$model->calendar_entry_id && !CalendarSyncService::canCreate($contentContainer),
                 ]) ?>
                 <?php if (!$model->calendar_entry_id && !CalendarSyncService::canCreate($contentContainer)): ?>
-                    <div class="form-text">Für einen neuen Kalendereintrag fehlt dir das Kalender-Recht «Termin erstellen».</div>
+                    <div class="form-text"><?= Yii::t('TodoModule.base', 'Für einen neuen Kalendereintrag fehlt dir das Kalender-Recht «Termin erstellen».') ?></div>
                 <?php endif; ?>
             </div>
         <?php endif; ?>
@@ -380,7 +380,7 @@ JS); ?>
         <!-- Zuständig -->
         <div class="mt-3">
 
-            <strong>Zuständig</strong>
+            <strong><?= Yii::t('TodoModule.base', 'Zuständig') ?></strong>
 
             <div class="mt-2">
 

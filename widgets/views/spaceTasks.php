@@ -8,7 +8,7 @@ use humhub\helpers\Html;
 
 <div class="panel panel-default">
     <div class="panel-heading">
-        <strong><i class="fa fa-check-square-o"></i> ToDo – Aufgaben</strong>
+        <strong><i class="fa fa-check-square-o"></i> <?= Yii::t('TodoModule.base', 'ToDo – Aufgaben') ?></strong>
         <span class="pull-right">
             <?= Html::a('Zeige alle', $space->createUrl('/todo/task/index'), ['class' => 'small']) ?>
         </span>
@@ -21,11 +21,11 @@ use humhub\helpers\Html;
                 <div>
                     <strong><?= Html::encode($task->title) ?></strong>
                     <?php if ($isOverdue): ?>
-                        <span class="label label-danger">ÜBERFÄLLIG</span>
+                        <span class="label label-danger"><?= Yii::t('TodoModule.base', 'ÜBERFÄLLIG') ?></span>
                     <?php endif; ?>
                 </div>
                 <?php if ($task->due_date): ?>
-                    <div class="small text-muted">Frist <?= Yii::$app->formatter->asDate($task->due_date, 'short') ?></div>
+                    <div class="small text-muted"><?= Yii::t('TodoModule.base', 'Frist') ?> <?= Yii::$app->formatter->asDate($task->due_date, 'short') ?></div>
                 <?php endif; ?>
             </a>
         <?php endforeach; ?>

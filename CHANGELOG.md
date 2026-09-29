@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.37.0 - 2026-09-29
+
+- zentrale Aufgabenansicht vollständig für Deutsch und Englisch vorbereitet
+- Checklisten, Abhängigkeiten, Dateien und Verlauf übersetzt
+- Dashboard- und Space-Widgets übersetzt
+- Suche, Aufgabenlistenverwaltung und Konfigurationshinweise übersetzt
+- Beschriftungen für Tastatur- und Screenreader-Nutzung ebenfalls lokalisiert
+- Übersetzungsabdeckung für alle neuen Texte geprüft
+
 ## 1.36.0 - 2026-09-29
 
 - mehrteilige Datenbankänderungen einer Aufgabe transaktional abgesichert

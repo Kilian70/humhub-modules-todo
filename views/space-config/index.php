@@ -25,7 +25,7 @@ $this->title = 'ToDo – Space-Einstellungen';
         <div class="row">
             <div class="col-md-6">
                 <?= $form->field($model, 'widgetSortOrder')->input('number', ['min' => 0, 'max' => 10000]) ?>
-                <div class="form-text text-muted">Kleinere Zahl = weiter oben, grössere Zahl = weiter unten.</div>
+                <div class="form-text text-muted"><?= Yii::t('TodoModule.base', 'Kleinere Zahl = weiter oben, grössere Zahl = weiter unten.') ?></div>
             </div>
             <div class="col-md-6">
                 <?= $form->field($model, 'widgetLimit')->input('number', ['min' => 1, 'max' => 20]) ?>
