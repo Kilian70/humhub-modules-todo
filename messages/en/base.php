@@ -345,4 +345,11 @@ return [
     'Ungültige Richtung.' => 'Invalid direction.',
     'Keine Berechtigung zum Erstellen einer Aufgabenliste.' => 'You do not have permission to create a task list.',
     'Mindestens eine ausgewählte Person ist ungültig.' => 'At least one selected person is invalid.',
+    'Unteraufgabe erstellen' => 'Create subtask',
+    'Öffnen' => 'Open',
+    'Download' => 'Download',
+    'Datei' => 'File',
+    'Aufgabe in dieser Liste erstellen' => 'Create a task in this list',
+    'Unsortierte Aufgabe erstellen' => 'Create an unsorted task',
+    'Nachrichten, Rückfragen und Absprachen zu dieser Aufgabe.' => 'Messages, questions and coordination for this task.',
 ];

@@ -355,19 +355,19 @@ $kanbanCard = function ($task) use ($contentContainer, $blockedTaskIds) {
                         <span class="d-flex align-items-center gap-1">
                             <?php if ($contentContainer->permissionManager->can(new \humhub\modules\todo\permissions\CreateTasks())): ?>
                             <?= Html::a(
-                                '<i class="fa fa-plus"></i>',
+                                '<i class="fa fa-plus" aria-hidden="true"></i>',
                                 $list
                                     ? $contentContainer->createUrl('/todo/task/create', ['list_id' => $list->id])
                                     : $contentContainer->createUrl('/todo/task/create'),
                                 [
                                     'class' => 'btn btn-xs btn-success',
-                                    'title' => $list ? 'Aufgabe in dieser Liste erstellen' : 'Unsortierte Aufgabe erstellen',
-                                    'aria-label' => $list ? 'Aufgabe in dieser Liste erstellen' : 'Unsortierte Aufgabe erstellen',
+                                    'title' => $list ? Yii::t('TodoModule.base', 'Aufgabe in dieser Liste erstellen') : Yii::t('TodoModule.base', 'Unsortierte Aufgabe erstellen'),
+                                    'aria-label' => $list ? Yii::t('TodoModule.base', 'Aufgabe in dieser Liste erstellen') : Yii::t('TodoModule.base', 'Unsortierte Aufgabe erstellen'),
                                     'onclick' => 'event.stopPropagation();',
                                 ]
                             ) ?>
                             <?php endif; ?>
-                            <i class="fa fa-chevron-down text-muted"></i>
+                            <i class="fa fa-chevron-down text-muted" aria-hidden="true"></i>
                         </span>
                     </summary>
                     <div class="panel-body p-0">
@@ -416,6 +416,10 @@ $this->registerCss(<<<CSS
 .todo-list-row:focus-visible,
 .todo-kanban-card:focus-visible,
 .todo-kanban-card:focus-within {
+    outline:3px solid var(--hh-text-color-highlight,#16788a);
+    outline-offset:2px;
+}
+.panel-body details > summary:focus-visible {
     outline:3px solid var(--hh-text-color-highlight,#16788a);
     outline-offset:2px;
 }

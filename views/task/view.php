@@ -250,7 +250,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
         <details class="card mb-4" <?= empty($subtasks) ? '' : 'open' ?>>
             <summary class="card-header py-2" style="cursor:pointer;list-style:none;">
                 <span class="d-flex justify-content-between align-items-center">
-                    <strong><i class="fa fa-sitemap"></i> <?= Yii::t('TodoModule.base', 'Unteraufgaben') ?></strong>
+                    <strong><i class="fa fa-sitemap" aria-hidden="true"></i> <?= Yii::t('TodoModule.base', 'Unteraufgaben') ?></strong>
                     <span class="badge bg-secondary"><?= $completedSubtasks ?> / <?= count($subtasks) ?></span>
                 </span>
             </summary>
@@ -262,15 +262,15 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                         <?php foreach ($subtasks as $subtask): ?>
                             <?php
                             $subtaskStatus = match ($subtask->status) {
-                                'geschlossen' => ['success', 'Erledigt'],
-                                'in_bearbeitung' => ['info', 'In Bearbeitung'],
-                                default => ['secondary', 'Offen'],
+                                'geschlossen' => ['success', Yii::t('TodoModule.base', 'Erledigt')],
+                                'in_bearbeitung' => ['info', Yii::t('TodoModule.base', 'In Bearbeitung')],
+                                default => ['secondary', Yii::t('TodoModule.base', 'Offen')],
                             };
                             ?>
                             <?= Html::a(
                                 '<span>' . Html::encode($subtask->title) . '</span>'
                                 . '<span class="ms-2">'
-                                . ($subtask->due_date ? '<small class="text-muted me-2"><i class="fa fa-calendar"></i> ' . Yii::$app->formatter->asDate($subtask->due_date) . '</small>' : '')
+                                . ($subtask->due_date ? '<small class="text-muted me-2"><i class="fa fa-calendar" aria-hidden="true"></i> ' . Yii::$app->formatter->asDate($subtask->due_date) . '</small>' : '')
                                 . '<span class="badge bg-' . $subtaskStatus[0] . '">' . $subtaskStatus[1] . '</span></span>',
                                 $contentContainer->createUrl('/todo/task/view', ['id' => $subtask->id]),
                                 ['class' => 'list-group-item list-group-item-action d-flex justify-content-between align-items-center']
@@ -280,7 +280,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                 <?php endif; ?>
                 <?php if ($canCreateSubtasks): ?>
                     <?= Html::a(
-                        '<i class="fa fa-plus"></i> Unteraufgabe erstellen',
+                        '<i class="fa fa-plus" aria-hidden="true"></i> ' . Yii::t('TodoModule.base', 'Unteraufgabe erstellen'),
                         $contentContainer->createUrl('/todo/task/create', ['parent_id' => $task->id]),
                         ['class' => 'btn btn-sm btn-primary']
                     ) ?>
@@ -739,7 +739,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                             <?php else: ?>
                                 <div class="flex-shrink-0 d-flex align-items-center justify-content-center bg-light rounded"
                                      style="width:70px;height:70px;font-size:28px;">
-                                    <i class="fa fa-file-o text-muted"></i>
+                                    <i class="fa fa-file-o text-muted" aria-hidden="true"></i>
                                 </div>
                             <?php endif; ?>
 
@@ -768,7 +768,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                                         'aria-label' => Yii::t('TodoModule.base', 'Titel oder Beschreibung der Datei'),
                                     ]) ?>
                                     <?= Html::submitButton(
-                                        '<i class="fa fa-save"></i>',
+                                        '<i class="fa fa-save" aria-hidden="true"></i>',
                                         [
                                             'class' => 'btn btn-sm btn-outline-secondary',
                                             'title' => Yii::t('TodoModule.base', 'Titel speichern'),
@@ -780,7 +780,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
 
                                 <div class="d-flex gap-1 flex-wrap">
                                     <?= Html::a(
-                                        $isImage ? 'Öffnen' : 'Download',
+                                        $isImage ? Yii::t('TodoModule.base', 'Öffnen') : Yii::t('TodoModule.base', 'Download'),
                                         $file->getUrl($isImage ? [] : ['download' => 1], false),
                                         [
                                             'class' => 'btn btn-sm btn-outline-primary',
@@ -791,7 +791,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
 
                                     <?php if ($canEditTask): ?>
                                         <?= Html::a(
-                                            'Löschen',
+                                            Yii::t('TodoModule.base', 'Löschen'),
                                             $contentContainer->createUrl('/todo/task/delete-file', [
                                                 'id' => $task->id,
                                                 'guid' => $file->guid,
@@ -817,7 +817,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
         <?php if ($canEditTask): ?>
             <div class="mt-4">
                 <?= Html::button(
-                    '<i class="fa fa-paperclip"></i> Datei hinzufügen',
+                    '<i class="fa fa-paperclip" aria-hidden="true"></i> ' . Yii::t('TodoModule.base', 'Datei hinzufügen'),
                     [
                         'class' => 'btn btn-sm btn-outline-secondary',
                         'type' => 'button',
@@ -845,7 +845,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                     ) ?>
 
                     <div class="mb-3">
-                        <?= Html::label('Datei', 'todo-upload-file', ['class' => 'form-label fw-semibold']) ?>
+                        <?= Html::label(Yii::t('TodoModule.base', 'Datei'), 'todo-upload-file', ['class' => 'form-label fw-semibold']) ?>
                         <?= Html::fileInput('uploadFile', null, [
                             'id' => 'todo-upload-file',
                             'class' => 'form-control',
@@ -1020,7 +1020,7 @@ JS
         <div class="mt-4" id="todo-communication">
             <strong><?= Yii::t('TodoModule.base', 'Kommunikation') ?></strong>
             <div class="small text-muted mt-1">
-                Nachrichten, Rückfragen und Absprachen zu dieser Aufgabe.
+                <?= Yii::t('TodoModule.base', 'Nachrichten, Rückfragen und Absprachen zu dieser Aufgabe.') ?>
             </div>
 
             <div class="todo-communication-comments mt-2">
@@ -1047,6 +1047,10 @@ JS
             }
             #todo-communication .comment-container:empty {
                 display: none !important;
+            }
+            .panel-body details > summary:focus-visible {
+                outline: 3px solid var(--hh-text-color-highlight, #16788a);
+                outline-offset: 2px;
             }
         </style>
 

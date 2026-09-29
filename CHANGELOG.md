@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.38.0 - 2026-09-29
+
+- sichtbare Tastaturfokusse für alle einklappbaren Bereiche ergänzt
+- dekorative Symbole für Screenreader ausgeblendet
+- Symbolschaltflächen und Schnellaktionen verständlich beschriftet
+- Unteraufgaben, Dateiaktionen und Kommunikation vollständig lokalisiert
+- praktische Benachrichtigungsprüfung mit zwei Konten unter HumHub 1.19 durchgeführt
+
 ## 1.37.2 - 2026-09-29
 
 - verbleibende Validierungs- und Fehlermeldungen der Aufgabenverwaltung übersetzt

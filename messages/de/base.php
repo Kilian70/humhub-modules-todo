@@ -345,4 +345,11 @@ return [
     'Ungültige Richtung.' => 'Ungültige Richtung.',
     'Keine Berechtigung zum Erstellen einer Aufgabenliste.' => 'Keine Berechtigung zum Erstellen einer Aufgabenliste.',
     'Mindestens eine ausgewählte Person ist ungültig.' => 'Mindestens eine ausgewählte Person ist ungültig.',
+    'Unteraufgabe erstellen' => 'Unteraufgabe erstellen',
+    'Öffnen' => 'Öffnen',
+    'Download' => 'Download',
+    'Datei' => 'Datei',
+    'Aufgabe in dieser Liste erstellen' => 'Aufgabe in dieser Liste erstellen',
+    'Unsortierte Aufgabe erstellen' => 'Unsortierte Aufgabe erstellen',
+    'Nachrichten, Rückfragen und Absprachen zu dieser Aufgabe.' => 'Nachrichten, Rückfragen und Absprachen zu dieser Aufgabe.',
 ];
