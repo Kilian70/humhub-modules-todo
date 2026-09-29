@@ -12,6 +12,7 @@ use humhub\modules\space\models\Membership;
 use humhub\modules\user\widgets\UserPickerField;
 use yii\helpers\Url;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 ?>
 
@@ -487,9 +488,9 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                         'value',
                         $task->status,
                         [
-                            'offen' => 'Offen',
-                            'in_bearbeitung' => 'In Bearbeitung',
-                            'geschlossen' => 'Geschlossen',
+                            'offen' => Yii::t('TodoModule.base', 'Offen'),
+                            'in_bearbeitung' => Yii::t('TodoModule.base', 'In Bearbeitung'),
+                            'geschlossen' => Yii::t('TodoModule.base', 'Geschlossen'),
                         ],
                         [
                             'class' => 'form-control input-sm',
@@ -503,9 +504,9 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                 <?php else: ?>
                     <?php
                     $statusText = match ($task->status) {
-                        'in_bearbeitung' => 'In Bearbeitung',
-                        'geschlossen' => 'Geschlossen',
-                        default => 'Offen',
+                        'in_bearbeitung' => Yii::t('TodoModule.base', 'In Bearbeitung'),
+                        'geschlossen' => Yii::t('TodoModule.base', 'Geschlossen'),
+                        default => Yii::t('TodoModule.base', 'Offen'),
                     };
                     ?>
                     <?= Html::encode($statusText) ?>
@@ -1055,15 +1056,20 @@ JS
 
 </div>
 <?php
-$this->registerJs(<<<'JS'
+$checklistPointLabel = Json::htmlEncode(Yii::t('TodoModule.base', 'Checklistenpunkt'));
+$checklistPointsLabel = Json::htmlEncode(Yii::t('TodoModule.base', 'Checklistenpunkte'));
+$openChecklistConfirm = Json::htmlEncode(Yii::t('TodoModule.base', 'Diese Aufgabe enthält noch {count} offene {label}. Trotzdem schliessen?'));
+$this->registerJs(<<<JS
 window.todoConfirmClose = function (select, openChecklistCount) {
     if (select.value !== 'geschlossen' || openChecklistCount < 1) {
         select.form.submit();
         return true;
     }
 
-    var label = openChecklistCount === 1 ? 'Checklistenpunkt' : 'Checklistenpunkte';
-    var message = 'Diese Aufgabe enthält noch ' + openChecklistCount + ' offene ' + label + '. Trotzdem schliessen?';
+    var label = openChecklistCount === 1 ? {$checklistPointLabel} : {$checklistPointsLabel};
+    var message = {$openChecklistConfirm}
+        .replace('{count}', openChecklistCount)
+        .replace('{label}', label);
 
     if (window.confirm(message)) {
         var confirmField = select.form.querySelector('.js-confirm-open-checklist');

@@ -120,9 +120,9 @@ final class TaskExportService
     public static function statusLabel(string $status): string
     {
         return Yii::t('TodoModule.base', match ($status) {
-            'in_bearbeitung' => 'In Bearbeitung',
-            'geschlossen' => 'Geschlossen',
-            default => 'Offen',
+            'in_bearbeitung' => Yii::t('TodoModule.base', 'In Bearbeitung'),
+            'geschlossen' => Yii::t('TodoModule.base', 'Geschlossen'),
+            default => Yii::t('TodoModule.base', 'Offen'),
         });
     }
 

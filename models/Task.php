@@ -170,14 +170,14 @@ class Task extends ContentActiveRecord implements ViewableInterface
             return;
         }
         if ($this->id && (int) $this->$attribute === (int) $this->id) {
-            $this->addError($attribute, 'Eine Aufgabe kann nicht ihre eigene Hauptaufgabe sein.');
+            $this->addError($attribute, Yii::t('TodoModule.base', 'Eine Aufgabe kann nicht ihre eigene Hauptaufgabe sein.'));
             return;
         }
 
         $parent = self::findOne((int) $this->$attribute);
         $containerId = $this->content ? (int) $this->content->contentcontainer_id : 0;
         if (!$parent || !$parent->content || (int) $parent->content->contentcontainer_id !== $containerId) {
-            $this->addError($attribute, 'Die Hauptaufgabe gehört nicht zu diesem Space.');
+            $this->addError($attribute, Yii::t('TodoModule.base', 'Die Hauptaufgabe gehört nicht zu diesem Space.'));
             return;
         }
 
@@ -185,7 +185,7 @@ class Task extends ContentActiveRecord implements ViewableInterface
         $seen = $this->id ? [(int) $this->id => true] : [];
         while ($parent) {
             if (isset($seen[(int) $parent->id])) {
-                $this->addError($attribute, 'Die Aufgabenhierarchie darf keinen Kreis enthalten.');
+                $this->addError($attribute, Yii::t('TodoModule.base', 'Die Aufgabenhierarchie darf keinen Kreis enthalten.'));
                 return;
             }
             $seen[(int) $parent->id] = true;
@@ -199,7 +199,7 @@ class Task extends ContentActiveRecord implements ViewableInterface
             return;
         }
         if ($this->getBlockingTasks()->andWhere(['<>', 'todo_task.status', 'geschlossen'])->exists()) {
-            $this->addError($attribute, 'Die Aufgabe ist noch durch eine offene Voraussetzung blockiert.');
+            $this->addError($attribute, Yii::t('TodoModule.base', 'Die Aufgabe ist noch durch eine offene Voraussetzung blockiert.'));
         }
     }
 

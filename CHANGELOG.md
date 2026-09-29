@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.37.2 - 2026-09-29
+
+- verbleibende Validierungs- und Fehlermeldungen der Aufgabenverwaltung übersetzt
+- Statusbezeichnungen in Detailansicht und CSV-Export lokalisiert
+- Sicherheitsabfrage für offene Checklistenpunkte im Browser übersetzt
+- seltene Rückmeldungen für Dateien, Checklisten, Aufgabenlisten und Zuständigkeiten lokalisiert
+
 ## 1.37.1 - 2026-09-29
 
 - Erinnerungs- und Konfigurationstexte vollständig lokalisiert

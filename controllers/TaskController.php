@@ -458,7 +458,7 @@ public function actionUpdate($id)
             if ($openChecklistCount > 0) {
                 Yii::$app->session->setFlash(
                     'warning',
-                    'Diese Aufgabe enthält noch ' . $openChecklistCount . ' offene Checklistenpunkte. Bitte schliesse sie in der Detailansicht, wenn du trotzdem fortfahren möchtest.'
+                    Yii::t('TodoModule.base', 'Diese Aufgabe enthält noch {count} offene Checklistenpunkte. Bitte schliesse sie in der Detailansicht, wenn du trotzdem fortfahren möchtest.', ['count' => $openChecklistCount])
                 );
                 $model->status = $oldStatus;
             } else {
@@ -539,7 +539,7 @@ public function actionQuickUpdate($id)
                 if ($openChecklistCount > 0 && !$confirmed) {
                     Yii::$app->session->setFlash(
                         'warning',
-                        'Diese Aufgabe enthält noch ' . $openChecklistCount . ' offene Checklistenpunkte.'
+                        Yii::t('TodoModule.base', 'Diese Aufgabe enthält noch {count} offene Checklistenpunkte.', ['count' => $openChecklistCount])
                     );
 
                     return $this->redirect(
@@ -782,7 +782,7 @@ public function actionDelete($id)
 {
 
 	if (!$this->contentContainer) {
-		throw new HttpException(404, 'Kein Space gefunden.');
+		throw new HttpException(404, Yii::t('TodoModule.base', 'Kein Space gefunden.'));
 	}
 
     $model = Task::find()
@@ -791,7 +791,7 @@ public function actionDelete($id)
         ->one();
 
     if (!$model) {
-        throw new HttpException(404, 'Task nicht gefunden.');
+        throw new HttpException(404, Yii::t('TodoModule.base', 'Aufgabe nicht gefunden.'));
     }
 
     if (!$model->canDelete()) {
@@ -886,7 +886,7 @@ private function findTaskForArchive(int $id): Task
 public function actionDuplicate($id)
 {
     if (!$this->contentContainer) {
-        throw new HttpException(404, 'Kein Space gefunden.');
+        throw new HttpException(404, Yii::t('TodoModule.base', 'Kein Space gefunden.'));
     }
     if (!$this->contentContainer->permissionManager->can(new CreateTasks())) {
         throw new \yii\web\ForbiddenHttpException();
@@ -914,7 +914,7 @@ public function actionView($id)
 {
 
 	if (!$this->contentContainer) {
-		throw new HttpException(404, 'Kein Space gefunden.');
+		throw new HttpException(404, Yii::t('TodoModule.base', 'Kein Space gefunden.'));
 	}
     // 🔐 Permission prüfen
     if (!$this->contentContainer->permissionManager->can(new ViewTasks())) {
@@ -1000,7 +1000,7 @@ public function actionDependencyRemove($id, $blockingTaskId)
 public function actionDeleteFile($id, $guid)
 {
     if (!$this->contentContainer) {
-        throw new HttpException(404, 'Kein Space gefunden.');
+        throw new HttpException(404, Yii::t('TodoModule.base', 'Kein Space gefunden.'));
     }
 
     $model = Task::find()
@@ -1041,7 +1041,7 @@ public function actionDeleteFile($id, $guid)
 public function actionUploadFile($id)
 {
     if (!$this->contentContainer) {
-        throw new HttpException(404, 'Kein Space gefunden.');
+        throw new HttpException(404, Yii::t('TodoModule.base', 'Kein Space gefunden.'));
     }
 
     $model = Task::find()
@@ -1103,7 +1103,7 @@ public function actionUploadFile($id)
 public function actionUpdateFileTitle($id, $guid)
 {
     if (!$this->contentContainer) {
-        throw new HttpException(404, 'Kein Space gefunden.');
+        throw new HttpException(404, Yii::t('TodoModule.base', 'Kein Space gefunden.'));
     }
 
     $model = Task::find()
@@ -1126,7 +1126,7 @@ public function actionUpdateFileTitle($id, $guid)
 
     $title = trim((string) Yii::$app->request->post('title'));
     if (mb_strlen($title) > 255) {
-        throw new HttpException(400, 'Der Dateititel darf höchstens 255 Zeichen lang sein.');
+        throw new HttpException(400, Yii::t('TodoModule.base', 'Der Dateititel darf höchstens 255 Zeichen lang sein.'));
     }
 
     if ($title === '') {
@@ -1180,7 +1180,7 @@ public function actionUpdateFileTitle($id, $guid)
             $transaction = Yii::$app->db->beginTransaction();
             try {
                 if (!$item->save()) {
-                    throw new HttpException(400, 'Checklistenpunkt konnte nicht gespeichert werden.');
+                    throw new HttpException(400, Yii::t('TodoModule.base', 'Checklistenpunkt konnte nicht gespeichert werden.'));
                 }
 
                 $this->syncChecklistAssignees(
@@ -1214,7 +1214,7 @@ public function actionUpdateFileTitle($id, $guid)
         $title = trim((string) Yii::$app->request->post('title'));
 
         if ($title === '') {
-            throw new HttpException(400, 'Der Checklistenpunkt darf nicht leer sein.');
+            throw new HttpException(400, Yii::t('TodoModule.base', 'Der Checklistenpunkt darf nicht leer sein.'));
         }
 
         $dueDate = trim((string) Yii::$app->request->post('due_date'));
@@ -1226,7 +1226,7 @@ public function actionUpdateFileTitle($id, $guid)
         $transaction = Yii::$app->db->beginTransaction();
         try {
             if (!$item->save()) {
-                throw new HttpException(400, 'Checklistenpunkt konnte nicht gespeichert werden.');
+                throw new HttpException(400, Yii::t('TodoModule.base', 'Checklistenpunkt konnte nicht gespeichert werden.'));
             }
 
             $this->syncChecklistAssignees(
@@ -1291,7 +1291,7 @@ public function actionUpdateFileTitle($id, $guid)
         $item = $this->findChecklistItem($task, $itemId);
 
         if (!in_array($direction, ['up', 'down'], true)) {
-            throw new HttpException(400, 'Ungültige Richtung.');
+            throw new HttpException(400, Yii::t('TodoModule.base', 'Ungültige Richtung.'));
         }
 
         $query = ChecklistItem::find()->where(['task_id' => $task->id]);
@@ -1353,12 +1353,12 @@ public function actionUpdateFileTitle($id, $guid)
                 : $model->canManage();
 
             if (!$canCreateList) {
-                throw new \yii\web\ForbiddenHttpException('Keine Berechtigung zum Erstellen einer Aufgabenliste.');
+                throw new \yii\web\ForbiddenHttpException(Yii::t('TodoModule.base', 'Keine Berechtigung zum Erstellen einer Aufgabenliste.'));
             }
 
             $list = TaskList::findOrCreateForSpace((int) $this->contentContainer->id, $name);
             if (!$list) {
-                throw new HttpException(400, 'Aufgabenliste konnte nicht erstellt werden.');
+                throw new HttpException(400, Yii::t('TodoModule.base', 'Aufgabenliste konnte nicht erstellt werden.'));
             }
         }
 
@@ -1368,7 +1368,7 @@ public function actionUpdateFileTitle($id, $guid)
     private function findTaskForChecklist($id): Task
     {
         if (!$this->contentContainer) {
-            throw new HttpException(404, 'Kein Space gefunden.');
+            throw new HttpException(404, Yii::t('TodoModule.base', 'Kein Space gefunden.'));
         }
 
         $task = Task::find()
@@ -1390,7 +1390,7 @@ public function actionUpdateFileTitle($id, $guid)
     private function findManageableTask($id): Task
     {
         if (!$this->contentContainer) {
-            throw new HttpException(404, 'Kein Space gefunden.');
+            throw new HttpException(404, Yii::t('TodoModule.base', 'Kein Space gefunden.'));
         }
         $task = Task::find()
             ->contentContainer($this->contentContainer)
@@ -1419,7 +1419,7 @@ public function actionUpdateFileTitle($id, $guid)
         if ($userGuids) {
             $users = User::find()->where(['guid' => $userGuids])->all();
             if (count($users) !== count($userGuids)) {
-                throw new HttpException(400, 'Mindestens eine ausgewählte Person ist ungültig.');
+                throw new HttpException(400, Yii::t('TodoModule.base', 'Mindestens eine ausgewählte Person ist ungültig.'));
             }
 
             $userIds = array_map(static fn(User $user) => (int) $user->id, $users);
@@ -1430,7 +1430,7 @@ public function actionUpdateFileTitle($id, $guid)
             ])->count();
 
             if ($memberCount !== count($userIds)) {
-                throw new HttpException(400, 'Zuständig können nur Mitglieder dieses Spaces sein.');
+                throw new HttpException(400, Yii::t('TodoModule.base', 'Zuständig können nur Mitglieder dieses Spaces sein.'));
             }
         }
 
