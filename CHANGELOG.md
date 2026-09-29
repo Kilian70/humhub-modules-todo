@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.36.0 - 2026-09-29
+
+- mehrteilige Datenbankänderungen einer Aufgabe transaktional abgesichert
+- Änderungen bei einem Fehler vollständig zurückgerollt statt teilweise gespeichert
+- Zuständigkeit serverseitig auf Mitglieder des aktuellen Spaces begrenzt
+- Labels serverseitig auf den aktuellen Space begrenzt
+- Fehler beim Speichern von Zuständigkeiten nicht mehr stillschweigend ignoriert
+- automatische Prüfungen der neuen Datenkonsistenzregeln ergänzt
+
 ## 1.35.0 - 2026-09-29
 
 - Schreibaktionen konsequent auf aktive Aufgaben im aktuell geöffneten Space begrenzt

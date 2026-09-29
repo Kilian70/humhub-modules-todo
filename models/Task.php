@@ -7,6 +7,7 @@ use humhub\modules\content\components\ContentActiveRecord;
 use humhub\modules\todo\notifications\TaskAssigned;
 use humhub\modules\todo\notifications\TaskUnblocked;
 use humhub\modules\user\models\User;
+use humhub\modules\space\models\Membership;
 use humhub\modules\activity\models\Activity;
 use humhub\interfaces\ViewableInterface;
 use humhub\modules\file\components\FileManager;
@@ -88,6 +89,8 @@ class Task extends ContentActiveRecord implements ViewableInterface
 
             [['user_ids'], 'each', 'rule' => ['string', 'max' => 36]],
             [['label_ids'], 'each', 'rule' => ['integer']],
+            [['user_ids'], 'validateAssignees'],
+            [['label_ids'], 'validateTaskLabels'],
 
             [['uploadFiles'], 'file',
                 'maxFiles' => 10,
@@ -102,6 +105,45 @@ class Task extends ContentActiveRecord implements ViewableInterface
     public function optimisticLock(): string
     {
         return 'lock_version';
+    }
+
+    public function transactions(): array
+    {
+        return [self::SCENARIO_DEFAULT => self::OP_ALL];
+    }
+
+    public function validateAssignees(string $attribute): void
+    {
+        $guids = array_values(array_unique(array_filter(array_map('strval', (array) $this->$attribute))));
+        if ($guids === []) {
+            return;
+        }
+
+        $spaceId = (int) ($this->content?->container?->id ?? 0);
+        $userIds = User::find()->select('id')->where(['guid' => $guids])->column();
+        $memberCount = $spaceId > 0 ? (int) Membership::find()->where([
+            'space_id' => $spaceId,
+            'user_id' => array_map('intval', $userIds),
+            'status' => Membership::STATUS_MEMBER,
+        ])->count() : 0;
+
+        if (count($userIds) !== count($guids) || $memberCount !== count($userIds)) {
+            $this->addError($attribute, Yii::t('TodoModule.base', 'Zuständig können nur Mitglieder dieses Spaces sein.'));
+        }
+    }
+
+    public function validateTaskLabels(string $attribute): void
+    {
+        $labelIds = array_values(array_unique(array_filter(array_map('intval', (array) $this->$attribute), static fn(int $id): bool => $id > 0)));
+        if ($labelIds === []) {
+            return;
+        }
+
+        $spaceId = (int) ($this->content?->container?->id ?? 0);
+        $validCount = $spaceId > 0 ? (int) TaskLabel::find()->where(['space_id' => $spaceId, 'id' => $labelIds])->count() : 0;
+        if ($validCount !== count($labelIds)) {
+            $this->addError($attribute, Yii::t('TodoModule.base', 'Mindestens ein ausgewähltes Label gehört nicht zu diesem Space.'));
+        }
     }
 
     public function validateUploadTotalSize(string $attribute): void
@@ -503,7 +545,9 @@ public function afterSave($insert, $changedAttributes)
                 $rel = new TaskUser();
                 $rel->task_id = $this->id;
                 $rel->user_id = $user->id;
-                $rel->save();
+                if (!$rel->save()) {
+                    throw new \RuntimeException('Could not save ToDo assignee: ' . implode('; ', $rel->getErrorSummary(true)));
+                }
 
                 $newUserIds[] = $user->id;
             }

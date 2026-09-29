@@ -202,6 +202,12 @@ if (!str_contains($taskSource, "function optimisticLock()")
     fwrite(STDERR, "Missing concurrent task edit protection\n");
     exit(1);
 }
+foreach (["function transactions()", "self::OP_ALL", "validateAssignees", "Membership::STATUS_MEMBER", "validateTaskLabels", "Could not save ToDo assignee"] as $dataIntegrityGuard) {
+    if (!str_contains($taskSource, $dataIntegrityGuard)) {
+        fwrite(STDERR, "Missing task data-integrity guard: {$dataIntegrityGuard}\n");
+        exit(1);
+    }
+}
 foreach (["de", "en"] as $language) {
     $messages = require "messages/{$language}/base.php";
     if (!is_array($messages) || $messages === []) {

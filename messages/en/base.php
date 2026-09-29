@@ -232,6 +232,8 @@ return [
     'Label löschen' => 'Delete label',
     'Dateien hinzufügen' => 'Add files',
     'Diese Aufgabe wurde inzwischen von einer anderen Person geändert. Deine Eingaben wurden nicht gespeichert. Prüfe sie bitte und speichere danach erneut.' => 'This task has been changed by someone else. Your entries were not saved. Please review them and save again.',
+    'Zuständig können nur Mitglieder dieses Spaces sein.' => 'Only members of this space can be assigned.',
+    'Mindestens ein ausgewähltes Label gehört nicht zu diesem Space.' => 'At least one selected label does not belong to this space.',
     'Die Upload-Anfrage ist zu groß. Alle ausgewählten Dateien zusammen dürfen höchstens {size} groß sein.' => 'The upload request is too large. All selected files together may not exceed {size}.',
     'Die Upload-Anfrage ist zu groß. Die Datei darf höchstens {size} groß sein.' => 'The upload request is too large. The file may not exceed {size}.',
     'Alle ausgewählten Dateien zusammen dürfen höchstens {size} groß sein.' => 'All selected files together may not exceed {size}.',
