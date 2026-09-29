@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.35.0 - 2026-09-29
+
+- Schreibaktionen konsequent auf aktive Aufgaben im aktuell geöffneten Space begrenzt
+- direkte Änderungen an archivierten oder gelöschten Aufgaben verhindert
+- Archivieren, Wiederherstellen und Papierkorb-Wiederherstellung gegen ungültige Zustände abgesichert
+- Abhängigkeiten nur noch zwischen aktiven Aufgaben desselben Spaces veränderbar
+- Aufgaben für neue Abhängigkeiten um archivierte und gelöschte Einträge bereinigt
+- automatische Sicherheitsprüfung der Controller-Grenzen ergänzt
+
 ## 1.34.0 - 2026-09-29
 
 - gleichzeitige Bearbeitung einer Aufgabe durch mehrere Personen abgesichert

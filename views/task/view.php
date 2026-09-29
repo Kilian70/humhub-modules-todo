@@ -16,8 +16,10 @@ use yii\helpers\ArrayHelper;
 ?>
 
 <?php
-$canEditTask = $task->canManage();
-$canWorkOnTask = $task->canWorkOn();
+$canManageTask = $task->canManage();
+$isActiveTask = $task->deleted_at === null && $task->archived_at === null;
+$canEditTask = $isActiveTask && $canManageTask;
+$canWorkOnTask = $isActiveTask && $task->canWorkOn();
 $canCreateTask = $contentContainer->permissionManager->can(new \humhub\modules\todo\permissions\CreateTasks());
 $notificationMode = TaskNotificationPreferenceService::getOverrideMode((int) $task->id, (int) Yii::$app->user->id);
 $notificationDefault = TaskNotificationPreferenceService::getDefaultMode((int) Yii::$app->user->id);
@@ -47,7 +49,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                 ) ?>
             <?php endif; ?>
 
-            <?php if ($canEditTask && $task->archived_at): ?>
+            <?php if ($canManageTask && $task->archived_at && $task->deleted_at === null): ?>
                 <?= Html::beginForm($contentContainer->createUrl('/todo/task/restore', ['id' => $task->id]), 'post', ['class' => 'd-inline']) ?>
                 <?= Html::submitButton('<i class="fa fa-undo"></i> ' . Yii::t('TodoModule.base', 'Wiederherstellen'), ['class' => 'btn btn-sm btn-success']) ?>
                 <?= Html::endForm() ?>
@@ -242,7 +244,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
         <?php
         $subtasks = $task->subtasks;
         $completedSubtasks = count(array_filter($subtasks, static fn($subtask) => $subtask->status === 'geschlossen'));
-        $canCreateSubtasks = $canCreateTask;
+        $canCreateSubtasks = $canCreateTask && $isActiveTask;
         ?>
         <details class="card mb-4" <?= empty($subtasks) ? '' : 'open' ?>>
             <summary class="card-header py-2" style="cursor:pointer;list-style:none;">

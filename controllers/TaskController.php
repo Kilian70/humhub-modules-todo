@@ -363,7 +363,7 @@ public function actionCreate()
     if ($parentId > 0) {
         $parentTask = Task::find()
             ->contentContainer($this->contentContainer)
-            ->andWhere(['todo_task.id' => $parentId])
+            ->andWhere(['todo_task.id' => $parentId, 'todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
             ->one();
         if (!$parentTask) {
             throw new NotFoundHttpException('Hauptaufgabe nicht gefunden.');
@@ -386,7 +386,7 @@ public function actionCreate()
         if ($model->parent_task_id) {
             $parentTask = Task::find()
                 ->contentContainer($this->contentContainer)
-                ->andWhere(['todo_task.id' => (int) $model->parent_task_id])
+                ->andWhere(['todo_task.id' => (int) $model->parent_task_id, 'todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
                 ->one();
             if (!$parentTask) {
                 throw new HttpException(400, 'Ungültige Hauptaufgabe.');
@@ -429,7 +429,7 @@ public function actionUpdate($id)
 	
     $model = Task::find()
         ->contentContainer($this->contentContainer)
-        ->andWhere(['todo_task.id' => $id, 'todo_task.deleted_at' => null])
+        ->andWhere(['todo_task.id' => $id, 'todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
         ->one();
 
     if (!$model) {
@@ -507,7 +507,7 @@ public function actionQuickUpdate($id)
 
     $model = Task::find()
         ->contentContainer($this->contentContainer)
-        ->andWhere(['todo_task.id' => (int) $id])
+        ->andWhere(['todo_task.id' => (int) $id, 'todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
         ->one();
 
     if (!$model) {
@@ -615,7 +615,7 @@ public function actionChangeStatus($id)
 
     $model = Task::find()
         ->contentContainer($this->contentContainer)
-        ->andWhere(['todo_task.id' => (int) $id])
+        ->andWhere(['todo_task.id' => (int) $id, 'todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
         ->one();
 
     if (!$model) {
@@ -673,7 +673,12 @@ public function actionKanbanStatus($id)
 
     $model = Task::find()
         ->contentContainer($this->contentContainer)
-        ->andWhere(['todo_task.id' => (int) $id, 'todo_task.parent_task_id' => null])
+        ->andWhere([
+            'todo_task.id' => (int) $id,
+            'todo_task.parent_task_id' => null,
+            'todo_task.deleted_at' => null,
+            'todo_task.archived_at' => null,
+        ])
         ->one();
 
     if (!$model) {
@@ -810,7 +815,7 @@ public function actionDelete($id)
 public function actionRestoreTrash($id)
 {
     $model = $this->findTaskForArchive((int) $id);
-    if (!$model->canDelete()) {
+    if (!$model->canDelete() || $model->deleted_at === null) {
         throw new \yii\web\ForbiddenHttpException();
     }
     if ($model->deleted_at !== null) {
@@ -833,7 +838,7 @@ public function actionPermanentDelete($id)
 public function actionArchive($id)
 {
     $model = $this->findTaskForArchive((int) $id);
-    if (!$model->canManage()) {
+    if (!$model->canManage() || $model->deleted_at !== null) {
         throw new \yii\web\ForbiddenHttpException();
     }
     if ($model->status !== 'geschlossen') {
@@ -853,7 +858,7 @@ public function actionArchive($id)
 public function actionRestore($id)
 {
     $model = $this->findTaskForArchive((int) $id);
-    if (!$model->canManage()) {
+    if (!$model->canManage() || $model->deleted_at !== null || $model->archived_at === null) {
         throw new \yii\web\ForbiddenHttpException();
     }
     if ($model->archived_at !== null) {
@@ -931,6 +936,7 @@ public function actionView($id)
         'dependencyCandidates' => Task::find()
             ->contentContainer($this->contentContainer)
             ->andWhere(['<>', 'todo_task.id', $task->id])
+            ->andWhere(['todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
             ->andWhere(['not in', 'todo_task.id', $task->getBlockingTasks()->select('todo_task.id')])
             ->orderBy(['todo_task.title' => SORT_ASC])
             ->limit(200)
@@ -963,7 +969,7 @@ public function actionDependencyAdd($id)
     $blockingTaskId = (int) Yii::$app->request->post('blocking_task_id');
     $blockingTask = Task::find()
         ->contentContainer($this->contentContainer)
-        ->andWhere(['todo_task.id' => $blockingTaskId])
+        ->andWhere(['todo_task.id' => $blockingTaskId, 'todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
         ->one();
 
     if (!$blockingTask || TaskDependencyService::wouldCreateCycle((int) $task->id, $blockingTaskId)) {
@@ -981,7 +987,10 @@ public function actionDependencyAdd($id)
 public function actionDependencyRemove($id, $blockingTaskId)
 {
     $task = $this->findManageableTask($id);
-    $blockingTask = Task::findOne((int) $blockingTaskId);
+    $blockingTask = Task::find()
+        ->contentContainer($this->contentContainer)
+        ->andWhere(['todo_task.id' => (int) $blockingTaskId])
+        ->one();
     if (TaskDependency::deleteAll(['task_id' => $task->id, 'blocking_task_id' => (int) $blockingTaskId])) {
         TaskHistoryService::record($task, 'dependency_removed', 'Voraussetzung entfernt: ' . ($blockingTask?->title ?? '#' . $blockingTaskId));
     }
@@ -996,7 +1005,7 @@ public function actionDeleteFile($id, $guid)
 
     $model = Task::find()
         ->contentContainer($this->contentContainer)
-        ->andWhere(['todo_task.id' => (int) $id])
+        ->andWhere(['todo_task.id' => (int) $id, 'todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
         ->one();
 
     if (!$model) {
@@ -1037,7 +1046,7 @@ public function actionUploadFile($id)
 
     $model = Task::find()
         ->contentContainer($this->contentContainer)
-        ->andWhere(['todo_task.id' => (int) $id])
+        ->andWhere(['todo_task.id' => (int) $id, 'todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
         ->one();
 
     if (!$model) {
@@ -1099,7 +1108,7 @@ public function actionUpdateFileTitle($id, $guid)
 
     $model = Task::find()
         ->contentContainer($this->contentContainer)
-        ->andWhere(['todo_task.id' => (int) $id])
+        ->andWhere(['todo_task.id' => (int) $id, 'todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
         ->one();
 
     if (!$model) {
@@ -1364,7 +1373,7 @@ public function actionUpdateFileTitle($id, $guid)
 
         $task = Task::find()
             ->contentContainer($this->contentContainer)
-            ->andWhere(['todo_task.id' => $id])
+            ->andWhere(['todo_task.id' => $id, 'todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
             ->one();
 
         if (!$task) {
@@ -1385,7 +1394,7 @@ public function actionUpdateFileTitle($id, $guid)
         }
         $task = Task::find()
             ->contentContainer($this->contentContainer)
-            ->andWhere(['todo_task.id' => (int) $id])
+            ->andWhere(['todo_task.id' => (int) $id, 'todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
             ->one();
         if (!$task) {
             throw new NotFoundHttpException();

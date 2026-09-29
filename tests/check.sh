@@ -54,6 +54,17 @@ if (preg_match("/->contentContainer\\([^)]*\\)\\s*->where\\(/", $taskController)
     fwrite(STDERR, "A task query overwrites its content-container scope with where()\n");
     exit(1);
 }
+if (substr_count($taskController, "todo_task.archived_at") < 12
+    || !str_contains($taskController, "archived_at === null")
+    || preg_match("/actionDependencyRemove[\\s\\S]*?Task::findOne\\(/", $taskController)) {
+    fwrite(STDERR, "Task mutations are not consistently scoped to active tasks and the current Space\n");
+    exit(1);
+}
+$taskViewSource = file_get_contents("views/task/view.php");
+if (!str_contains($taskViewSource, "isActiveTask") || !str_contains($taskViewSource, "canCreateTask && \$isActiveTask")) {
+    fwrite(STDERR, "Archived task mutation controls are still visible\n");
+    exit(1);
+}
 $overviewSources = file_get_contents("services/OverviewTaskService.php") . file_get_contents("views/overview/index.php");
 if (str_contains($overviewSources, "getOpenBlockingTasks()->exists()")) {
     fwrite(STDERR, "Overview contains a per-task blocker query\n");
