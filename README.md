@@ -8,6 +8,9 @@ ToDo ist ein Space-basiertes HumHub-Modul für Aufgaben, Checklisten und Pendenz
 Aufgaben können Personen und Aufgabenlisten zugeordnet, kommentiert, terminiert und
 über einen einfachen Status-Workflow bearbeitet werden.
 
+> **Hinweis:** Dies ist ein unabhängig entwickeltes Community-Modul und kein
+> offizielles Modul des HumHub-Projekts.
+
 ## Oberfläche
 
 Das Modul bietet eine kompakte Listenansicht und ein Kanban-Board mit den Spalten
