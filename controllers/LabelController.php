@@ -24,7 +24,7 @@ class LabelController extends ContentContainerController
 
     private function requirePermission(): void
     {
-        if (!$this->contentContainer) throw new HttpException(404, 'Kein Space gefunden.');
+        if (!$this->contentContainer) throw new HttpException(404, Yii::t('TodoModule.base', 'Kein Space gefunden.'));
         if (!$this->contentContainer->permissionManager->can(new EditTasks())) throw new ForbiddenHttpException();
     }
 

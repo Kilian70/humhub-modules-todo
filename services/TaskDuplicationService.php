@@ -53,8 +53,8 @@ final class TaskDuplicationService
             CalendarSyncService::syncChecklistItem($itemCopy);
         }
 
-        TaskHistoryService::record($source, 'duplicate_created', 'Aufgabe dupliziert: ' . $copy->title);
-        TaskHistoryService::record($copy, 'duplicated', 'Als Kopie von «' . $source->title . '» erstellt');
+        TaskHistoryService::record($source, 'duplicate_created', Yii::t('TodoModule.base', 'Aufgabe dupliziert: {title}', ['title' => $copy->title]));
+        TaskHistoryService::record($copy, 'duplicated', Yii::t('TodoModule.base', 'Als Kopie von «{title}» erstellt', ['title' => $source->title]));
         return $copy;
     }
 }

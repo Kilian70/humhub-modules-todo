@@ -35,9 +35,9 @@ class SettingsForm extends Model
             'dashboardWidgetLimit' => 'Anzahl Aufgaben im Dashboard',
             'remindersEnabled' => 'Erinnerungen aktivieren',
             'reminderDaysBefore' => 'Vorwarnung in Tagen',
-            'upcomingReminderEnabled' => 'Vor Fälligkeit erinnern',
-            'dueReminderEnabled' => 'Am Fälligkeitstag erinnern',
-            'overdueReminderEnabled' => 'Einmal bei Überfälligkeit erinnern',
+            'upcomingReminderEnabled' => Yii::t('TodoModule.base', 'Vor Fälligkeit erinnern'),
+            'dueReminderEnabled' => Yii::t('TodoModule.base', 'Am Fälligkeitstag erinnern'),
+            'overdueReminderEnabled' => Yii::t('TodoModule.base', 'Einmal bei Überfälligkeit erinnern'),
         ];
     }
 

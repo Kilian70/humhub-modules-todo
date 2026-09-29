@@ -571,19 +571,19 @@ public function afterSave($insert, $changedAttributes)
     }
 
     if ($insert) {
-        TaskHistoryService::record($this, 'created', 'Aufgabe erstellt');
+        TaskHistoryService::record($this, 'created', Yii::t('TodoModule.base', 'Aufgabe erstellt'));
         if ($this->parentTask) {
-            TaskHistoryService::record($this->parentTask, 'subtask_created', 'Unteraufgabe erstellt: ' . $this->title);
+            TaskHistoryService::record($this->parentTask, 'subtask_created', Yii::t('TodoModule.base', 'Unteraufgabe erstellt: {title}', ['title' => $this->title]));
         }
     } else {
         $labels = [
-            'title' => 'Titel geändert',
-            'description' => 'Beschreibung geändert',
-            'priority' => 'Priorität geändert',
-            'status' => 'Status geändert',
-            'due_date' => 'Fälligkeit geändert',
-            'task_list_id' => 'Aufgabenliste geändert',
-            'sync_to_calendar' => 'Kalendersynchronisierung geändert',
+            'title' => Yii::t('TodoModule.base', 'Titel geändert'),
+            'description' => Yii::t('TodoModule.base', 'Beschreibung geändert'),
+            'priority' => Yii::t('TodoModule.base', 'Priorität geändert'),
+            'status' => Yii::t('TodoModule.base', 'Status geändert'),
+            'due_date' => Yii::t('TodoModule.base', 'Fälligkeit geändert'),
+            'task_list_id' => Yii::t('TodoModule.base', 'Aufgabenliste geändert'),
+            'sync_to_calendar' => Yii::t('TodoModule.base', 'Kalendersynchronisierung geändert'),
         ];
         foreach ($labels as $attribute => $message) {
             if (array_key_exists($attribute, $changedAttributes) && $changedAttributes[$attribute] != $this->$attribute) {
@@ -595,16 +595,16 @@ public function afterSave($insert, $changedAttributes)
     $addedUserIds = array_diff($newUserIds, $oldUserIds);
     $removedUserIds = array_diff($oldUserIds, $newUserIds);
     foreach (User::findAll(['id' => $addedUserIds]) as $user) {
-        TaskHistoryService::record($this, 'assignee_added', $user->displayName . ' wurde zugewiesen');
+        TaskHistoryService::record($this, 'assignee_added', Yii::t('TodoModule.base', '{user} wurde zugewiesen', ['user' => $user->displayName]));
     }
     foreach (User::findAll(['id' => $removedUserIds]) as $user) {
-        TaskHistoryService::record($this, 'assignee_removed', $user->displayName . ' wurde entfernt');
+        TaskHistoryService::record($this, 'assignee_removed', Yii::t('TodoModule.base', '{user} wurde entfernt', ['user' => $user->displayName]));
     }
     if (!$insert && (
         array_values(array_diff($oldLabelIds, $newLabelIds)) !== []
         || array_values(array_diff($newLabelIds, $oldLabelIds)) !== []
     )) {
-        TaskHistoryService::record($this, 'labels_updated', 'Labels geändert');
+        TaskHistoryService::record($this, 'labels_updated', Yii::t('TodoModule.base', 'Labels geändert'));
     }
 
 

@@ -68,7 +68,7 @@ class TaskController extends ContentContainerController
 public function actionIndex()
 {
     if (!$this->contentContainer) {
-        throw new HttpException(404, 'Kein Space gefunden.');
+        throw new HttpException(404, Yii::t('TodoModule.base', 'Kein Space gefunden.'));
     }
 
     // 🔐 Zugriff prüfen (nur Anzeige-Recht nötig)
@@ -340,7 +340,7 @@ public function actionPrint()
 public function actionCreate()
 {
     if (!$this->contentContainer) {
-        throw new HttpException(404, 'Kein Space gefunden.');
+        throw new HttpException(404, Yii::t('TodoModule.base', 'Kein Space gefunden.'));
     }
 
     // 🔐 Permission prüfen
@@ -366,7 +366,7 @@ public function actionCreate()
             ->andWhere(['todo_task.id' => $parentId, 'todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
             ->one();
         if (!$parentTask) {
-            throw new NotFoundHttpException('Hauptaufgabe nicht gefunden.');
+            throw new NotFoundHttpException(Yii::t('TodoModule.base', 'Hauptaufgabe nicht gefunden.'));
         }
         $model->parent_task_id = $parentTask->id;
         $model->task_list_id = $parentTask->task_list_id;
@@ -389,7 +389,7 @@ public function actionCreate()
                 ->andWhere(['todo_task.id' => (int) $model->parent_task_id, 'todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
                 ->one();
             if (!$parentTask) {
-                throw new HttpException(400, 'Ungültige Hauptaufgabe.');
+                throw new HttpException(400, Yii::t('TodoModule.base', 'Ungültige Hauptaufgabe.'));
             }
         }
 
@@ -424,7 +424,7 @@ public function actionUpdate($id)
 {
 
 	if (!$this->contentContainer) {
-		throw new HttpException(404, 'Kein Space gefunden.');
+		throw new HttpException(404, Yii::t('TodoModule.base', 'Kein Space gefunden.'));
 	}
 	
     $model = Task::find()
@@ -433,7 +433,7 @@ public function actionUpdate($id)
         ->one();
 
     if (!$model) {
-        throw new HttpException(404, 'Task nicht gefunden.');
+        throw new HttpException(404, Yii::t('TodoModule.base', 'Aufgabe nicht gefunden.'));
     }
 
     if (!$model->canManage()) {
@@ -502,7 +502,7 @@ public function actionUpdate($id)
 public function actionQuickUpdate($id)
 {
     if (!$this->contentContainer) {
-        throw new HttpException(404, 'Kein Space gefunden.');
+        throw new HttpException(404, Yii::t('TodoModule.base', 'Kein Space gefunden.'));
     }
 
     $model = Task::find()
@@ -524,7 +524,7 @@ public function actionQuickUpdate($id)
             }
             $value = (string) $value;
             if (!in_array($value, ['offen', 'in_bearbeitung', 'geschlossen'], true)) {
-                throw new HttpException(400, 'Ungültiger Status.');
+                throw new HttpException(400, Yii::t('TodoModule.base', 'Ungültiger Status.'));
             }
 
             $oldStatus = $model->status;
@@ -565,7 +565,7 @@ public function actionQuickUpdate($id)
             }
             $value = (string) $value;
             if (!in_array($value, ['niedrig', 'mittel', 'hoch'], true)) {
-                throw new HttpException(400, 'Ungültige Priorität.');
+                throw new HttpException(400, Yii::t('TodoModule.base', 'Ungültige Priorität.'));
             }
             $model->priority = $value;
             break;
@@ -585,14 +585,14 @@ public function actionQuickUpdate($id)
                     ($errors !== false && (($errors['warning_count'] ?? 0) > 0 || ($errors['error_count'] ?? 0) > 0)) ||
                     $date->format('Y-m-d') !== $value
                 ) {
-                    throw new HttpException(400, 'Ungültiges Fälligkeitsdatum.');
+                    throw new HttpException(400, Yii::t('TodoModule.base', 'Ungültiges Fälligkeitsdatum.'));
                 }
                 $model->due_date = $value;
             }
             break;
 
         default:
-            throw new HttpException(400, 'Dieses Feld kann nicht direkt geändert werden.');
+            throw new HttpException(400, Yii::t('TodoModule.base', 'Dieses Feld kann nicht direkt geändert werden.'));
     }
 
     if (!$model->save()) {
@@ -610,7 +610,7 @@ public function actionQuickUpdate($id)
 public function actionChangeStatus($id)
 {
     if (!$this->contentContainer) {
-        throw new HttpException(404, 'Kein Space gefunden.');
+        throw new HttpException(404, Yii::t('TodoModule.base', 'Kein Space gefunden.'));
     }
 
     $model = Task::find()
@@ -628,7 +628,7 @@ public function actionChangeStatus($id)
 
     $newStatus = (string) Yii::$app->request->post('status');
     if (!in_array($newStatus, ['offen', 'in_bearbeitung', 'geschlossen'], true)) {
-        throw new HttpException(400, 'Ungültiger Status.');
+        throw new HttpException(400, Yii::t('TodoModule.base', 'Ungültiger Status.'));
     }
 
     $oldStatus = $model->status;
@@ -902,11 +902,11 @@ public function actionDuplicate($id)
 
     $copy = TaskDuplicationService::duplicate($source);
     if (!$copy) {
-        Yii::$app->session->setFlash('error', 'Die Aufgabe konnte nicht dupliziert werden.');
+        Yii::$app->session->setFlash('error', Yii::t('TodoModule.base', 'Die Aufgabe konnte nicht dupliziert werden.'));
         return $this->redirect($this->contentContainer->createUrl('/todo/task/view', ['id' => $source->id]));
     }
 
-    Yii::$app->session->setFlash('success', 'Aufgabe wurde als offene Kopie erstellt.');
+    Yii::$app->session->setFlash('success', Yii::t('TodoModule.base', 'Aufgabe wurde als offene Kopie erstellt.'));
     return $this->redirect($this->contentContainer->createUrl('/todo/task/view', ['id' => $copy->id]));
 }
 
@@ -973,7 +973,7 @@ public function actionDependencyAdd($id)
         ->one();
 
     if (!$blockingTask || TaskDependencyService::wouldCreateCycle((int) $task->id, $blockingTaskId)) {
-        Yii::$app->session->setFlash('error', 'Diese Abhängigkeit ist ungültig oder würde einen Kreis erzeugen.');
+        Yii::$app->session->setFlash('error', Yii::t('TodoModule.base', 'Diese Abhängigkeit ist ungültig oder würde einen Kreis erzeugen.'));
     } else {
         $dependency = new TaskDependency(['task_id' => $task->id, 'blocking_task_id' => $blockingTaskId]);
         if ($dependency->save()) {

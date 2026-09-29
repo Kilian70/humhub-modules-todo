@@ -31,7 +31,7 @@ class TaskListController extends ContentContainerController
     private function requireManagePermission(): void
     {
         if (!$this->contentContainer) {
-            throw new HttpException(404, 'Kein Space gefunden.');
+            throw new HttpException(404, Yii::t('TodoModule.base', 'Kein Space gefunden.'));
         }
         if (!$this->contentContainer->permissionManager->can(new EditTasks())) {
             throw new ForbiddenHttpException();
@@ -63,9 +63,9 @@ class TaskListController extends ContentContainerController
 
         $name = trim((string) Yii::$app->request->post('name'));
         if ($name === '') {
-            Yii::$app->session->setFlash('error', 'Bitte einen Namen eingeben.');
+            Yii::$app->session->setFlash('error', Yii::t('TodoModule.base', 'Bitte einen Namen eingeben.'));
         } elseif (!TaskList::findOrCreateForSpace((int) $this->contentContainer->id, $name)) {
-            Yii::$app->session->setFlash('error', 'Aufgabenliste konnte nicht erstellt werden.');
+            Yii::$app->session->setFlash('error', Yii::t('TodoModule.base', 'Aufgabenliste konnte nicht erstellt werden.'));
         }
 
         return $this->redirect($this->contentContainer->createUrl('/todo/task-list/index'));

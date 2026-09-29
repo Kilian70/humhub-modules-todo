@@ -22,7 +22,7 @@ class SpaceConfigController extends ContentContainerController
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             $model->saveSettings($space);
-            Yii::$app->session->setFlash('success', 'ToDo-Einstellungen für diesen Space gespeichert.');
+            Yii::$app->session->setFlash('success', Yii::t('TodoModule.base', 'ToDo-Einstellungen für diesen Space gespeichert.'));
             return $this->refresh();
         }
 

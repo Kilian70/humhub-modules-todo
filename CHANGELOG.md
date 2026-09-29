@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.37.1 - 2026-09-29
+
+- Erinnerungs- und Konfigurationstexte vollständig lokalisiert
+- Rückmeldungen der Aufgabenlisten- und Space-Konfiguration übersetzt
+- Validierungsfehler für Hauptaufgabe, Status, Priorität und Fälligkeit übersetzt
+- Rückmeldungen für Duplizieren und Abhängigkeiten lokalisiert
+- verbleibende Platzhalter der Datei- und Aufgabenformulare übersetzt
+
 ## 1.37.0 - 2026-09-29
 
 - zentrale Aufgabenansicht vollständig für Deutsch und Englisch vorbereitet

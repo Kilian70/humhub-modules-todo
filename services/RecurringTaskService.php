@@ -30,7 +30,7 @@ final class RecurringTaskService
         $source->recurrence_generated_at = $generatedAt;
 
         if (!RecurrencePolicy::isWithinEndDate($nextDate, $source->recurrence_end_date)) {
-            TaskHistoryService::record($source, 'recurrence_ended', 'Wiederholung beendet: Enddatum erreicht');
+            TaskHistoryService::record($source, 'recurrence_ended', Yii::t('TodoModule.base', 'Wiederholung beendet: Enddatum erreicht'));
             return null;
         }
 
@@ -59,8 +59,8 @@ final class RecurringTaskService
         }
 
         self::copyChecklist($source, $next);
-        TaskHistoryService::record($source, 'recurrence_created', 'Folgeaufgabe für ' . $nextDate . ' erstellt');
-        TaskHistoryService::record($next, 'recurrence_created', 'Aus wiederkehrender Aufgabe erstellt');
+        TaskHistoryService::record($source, 'recurrence_created', Yii::t('TodoModule.base', 'Folgeaufgabe für {date} erstellt', ['date' => $nextDate]));
+        TaskHistoryService::record($next, 'recurrence_created', Yii::t('TodoModule.base', 'Aus wiederkehrender Aufgabe erstellt'));
         return $next;
     }
 

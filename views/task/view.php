@@ -869,7 +869,7 @@ $uploadMaxFileSize = UploadLimitService::maxFileSize();
                             'id' => 'todo-upload-title',
                             'class' => 'form-control',
                             'maxlength' => 255,
-                            'placeholder' => 'z.B. Bühne vor dem Aufbau',
+                            'placeholder' => Yii::t('TodoModule.base', 'z.B. Bühne vor dem Aufbau'),
                         ]) ?>
                         <div class="small text-muted mt-1"><?= Yii::t('TodoModule.base', 'Ohne Titel wird automatisch der Dateiname verwendet.') ?></div>
                     </div>

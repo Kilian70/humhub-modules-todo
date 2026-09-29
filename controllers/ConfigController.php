@@ -15,7 +15,7 @@ class ConfigController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             $model->saveSettings();
-            Yii::$app->session->setFlash('success', 'ToDo-Einstellungen gespeichert.');
+            Yii::$app->session->setFlash('success', Yii::t('TodoModule.base', 'ToDo-Einstellungen gespeichert.'));
             return $this->refresh();
         }
 
