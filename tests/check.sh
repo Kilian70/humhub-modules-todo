@@ -64,6 +64,12 @@ if (!str_contains($reminderSource, "Atomically claim this reminder stage") || !s
     fwrite(STDERR, "Missing concurrent reminder claim protection\n");
     exit(1);
 }
+if (!str_contains($reminderSource, "BATCH_SIZE = 100")
+    || !str_contains($reminderSource, "->each(self::BATCH_SIZE)")
+    || str_contains($reminderSource, "->all();")) {
+    fwrite(STDERR, "Reminder processing is not memory-bounded\n");
+    exit(1);
+}
 $reminderNotificationSource = file_get_contents("notifications/TaskReminder.php");
 if (!str_contains($reminderNotificationSource, "public \$suppressSendToOriginator = false;")) {
     fwrite(STDERR, "Task reminders would be suppressed for a creator represented by the system originator\n");
@@ -158,11 +164,19 @@ foreach ([
     "models/TaskNotificationPreference.php",
     "services/TaskNotificationPreferenceService.php",
     "migrations/m260929_030000_task_notification_preferences.php",
+    "migrations/m260929_050000_performance_indexes.php",
     "services/TaskExportService.php",
     "views/task/print.php",
 ] as $file) {
     if (!is_file($file)) {
         fwrite(STDERR, "Missing task history component: {$file}\n");
+        exit(1);
+    }
+}
+$performanceMigration = file_get_contents("migrations/m260929_050000_performance_indexes.php");
+foreach (["idx_todo_task_active_due", "idx_todo_task_auto_archive", "idx_todo_task_user_user_task", "idx_todo_task_label_map_label_task"] as $index) {
+    if (!str_contains($performanceMigration, $index)) {
+        fwrite(STDERR, "Missing performance index: {$index}\n");
         exit(1);
     }
 }

@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.32.1 - 2026-09-29
+
+- fällige Erinnerungen in speicherschonenden Stapeln zu je 100 Aufgaben verarbeitet
+- unbegrenztes gleichzeitiges Laden aller Erinnerungskandidaten entfernt
+- Hintergrundverarbeitung für große Aufgabenbestände abgesichert
+- automatische Prüfung der Stapelverarbeitung ergänzt
+
+## 1.32.0 - 2026-09-29
+
+- kombinierte Datenbankindizes für aktive Aufgaben, Fälligkeit und Erinnerungen ergänzt
+- automatische Archivierung abgeschlossener Aufgaben beschleunigt
+- Filter nach zuständiger Person und Label mit Rückwärtsindizes optimiert
+- neue Indizes vollständig update- und rückbaubar umgesetzt
+
 ## 1.31.1 - 2026-09-29
 
 - Blockierungsstatus aller sichtbaren Kanban-Karten in einer gemeinsamen Datenbankabfrage geladen

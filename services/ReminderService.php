@@ -10,6 +10,8 @@ use Yii;
 
 class ReminderService
 {
+    private const BATCH_SIZE = 100;
+
     public static function run(): void
     {
         $settings = Yii::$app->getModule('todo')->settings;
@@ -27,7 +29,7 @@ class ReminderService
             ->andWhere(['!=', 'todo_task.status', 'geschlossen'])
             ->andWhere(['not', ['todo_task.due_date' => null]])
             ->andWhere(['<=', 'todo_task.due_date', $latestDueDate])
-            ->all();
+            ->each(self::BATCH_SIZE);
 
         foreach ($tasks as $task) {
             $type = ReminderPolicy::determine(
