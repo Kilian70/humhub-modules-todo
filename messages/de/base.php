@@ -240,5 +240,6 @@ return [
     'Status von {title}' => 'Status von {title}',
     'Kanban-Aufgaben' => 'Kanban-Aufgaben',
     '{count} Aufgaben' => '{count} Aufgaben',
+    'Aufgaben {first}–{last} von {total}' => 'Aufgaben {first}–{last} von {total}',
     'Öffne eine Aufgabe mit der Eingabetaste. Ändere ihren Status über das Auswahlfeld. Mit der Maus können bearbeitbare Aufgaben zusätzlich verschoben werden.' => 'Öffne eine Aufgabe mit der Eingabetaste. Ändere ihren Status über das Auswahlfeld. Mit der Maus können bearbeitbare Aufgaben zusätzlich verschoben werden.',
 ];

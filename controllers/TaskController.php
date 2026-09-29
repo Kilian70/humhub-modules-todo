@@ -217,6 +217,20 @@ public function actionIndex()
         ->limit($pagination->limit)
         ->all();
 
+    // Resolve all blocked cards with one query instead of one query per Kanban card.
+    $blockedTaskIds = [];
+    if ($viewMode === 'kanban' && $tasks) {
+        $taskIds = array_map(static fn(Task $task): int => (int) $task->id, $tasks);
+        $blockedTaskIds = array_fill_keys(array_map('intval', TaskDependency::find()
+            ->alias('dependency')
+            ->select('dependency.task_id')
+            ->innerJoin(['blocking_task' => Task::tableName()], 'blocking_task.id = dependency.blocking_task_id')
+            ->where(['dependency.task_id' => $taskIds])
+            ->andWhere(['<>', 'blocking_task.status', 'geschlossen'])
+            ->distinct()
+            ->column()), true);
+    }
+
     if ($viewMode === 'kanban' && !Yii::$app->user->isGuest && $tasks) {
         $defaultPositions = array_flip(array_map(static fn($task) => (int) $task->id, $tasks));
         $positionRows = (new \yii\db\Query())
@@ -288,6 +302,7 @@ public function actionIndex()
         'taskLabels' => TaskLabel::findForSpace((int) $this->contentContainer->id),
         'showArchive' => $showArchive,
         'showTrash' => $showTrash,
+        'blockedTaskIds' => $blockedTaskIds,
     ]);
 }
 

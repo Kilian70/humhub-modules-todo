@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.31.1 - 2026-09-29
+
+- Blockierungsstatus aller sichtbaren Kanban-Karten in einer gemeinsamen Datenbankabfrage geladen
+- eine zusätzliche Datenbankabfrage pro Kanban-Karte vermieden
+- sichtbaren Aufgabenbereich und Gesamtzahl unter Liste und Kanban angezeigt
+- Schutzprüfung gegen die erneute Einführung des Kanban-Abfrageproblems ergänzt
+
 ## 1.31.0 - 2026-09-29
 
 - verständliche Größenangaben bei Einzel- und Mehrfachuploads ergänzt

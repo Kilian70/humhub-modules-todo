@@ -11,6 +11,7 @@ $currentDone = Yii::$app->request->get('done');
 $viewMode = $viewMode ?? 'list';
 $showArchive = $showArchive ?? false;
 $showTrash = $showTrash ?? false;
+$blockedTaskIds = $blockedTaskIds ?? [];
 $filterParams = [
     'my' => $isMy,
     'priority' => Yii::$app->request->get('priority'),
@@ -155,7 +156,7 @@ $taskRow = function ($task, bool $showUsers = true) use ($contentContainer, $cur
     <?php
 };
 
-$kanbanCard = function ($task) use ($contentContainer) {
+$kanbanCard = function ($task) use ($contentContainer, $blockedTaskIds) {
     $isOverdue = !empty($task->due_date) && $task->due_date < date('Y-m-d') && $task->status !== 'geschlossen';
     $priorityClass = match ($task->priority) {
         'hoch' => 'bg-danger',
@@ -179,7 +180,7 @@ $kanbanCard = function ($task) use ($contentContainer) {
         <div class="d-flex flex-wrap gap-1 mt-2">
             <span class="badge <?= $priorityClass ?>"><?= Html::encode(Yii::t('TodoModule.base', ucfirst($task->priority))) ?></span>
             <?php if ($isOverdue): ?><span class="badge bg-danger"><?= Yii::t('TodoModule.base', 'ÜBERFÄLLIG') ?></span><?php endif; ?>
-            <?php if ($task->getOpenBlockingTasks()->exists()): ?><span class="badge bg-warning text-dark"><?= Yii::t('TodoModule.base', 'BLOCKIERT') ?></span><?php endif; ?>
+            <?php if (isset($blockedTaskIds[(int) $task->id])): ?><span class="badge bg-warning text-dark"><?= Yii::t('TodoModule.base', 'BLOCKIERT') ?></span><?php endif; ?>
             <?php foreach ($task->taskLabels as $label): ?>
                 <span class="badge" style="background:<?= Html::encode($label->color) ?>;color:<?= Html::encode($label->textColor) ?>;"><?= Html::encode($label->name) ?></span>
             <?php endforeach; ?>
@@ -396,6 +397,15 @@ $kanbanCard = function ($task) use ($contentContainer) {
     </div>
 </div>
 
+<?php if ($pagination->totalCount > 0): ?>
+    <div class="text-muted small text-center mt-3" role="status">
+        <?= Yii::t('TodoModule.base', 'Aufgaben {first}–{last} von {total}', [
+            'first' => $pagination->offset + 1,
+            'last' => min($pagination->offset + $pagination->limit, $pagination->totalCount),
+            'total' => $pagination->totalCount,
+        ]) ?>
+    </div>
+<?php endif; ?>
 <?= LinkPager::widget(['pagination' => $pagination]) ?>
 
 <?php

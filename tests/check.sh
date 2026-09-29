@@ -91,6 +91,11 @@ if (!str_contains($taskIndexSource, "todo-kanban-status")
     fwrite(STDERR, "Missing accessible keyboard alternative or status feedback in Kanban\n");
     exit(1);
 }
+if (str_contains($taskIndexSource, "getOpenBlockingTasks()->exists()")
+    || !str_contains(file_get_contents("controllers/TaskController.php"), "blockedTaskIds")) {
+    fwrite(STDERR, "Kanban contains a per-card blocker query\n");
+    exit(1);
+}
 $taskFormSources = file_get_contents("views/task/create.php") . file_get_contents("views/task/update.php");
 if (substr_count($taskFormSources, "combobox") < 2
     || substr_count($taskFormSources, "ArrowDown") < 2) {
