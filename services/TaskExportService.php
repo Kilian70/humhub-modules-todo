@@ -7,11 +7,25 @@ use Yii;
 
 final class TaskExportService
 {
+    private const BATCH_SIZE = 100;
+    private const TEMP_MEMORY_LIMIT = 2097152;
+
     public static function export($contentContainer, array $filters): string
     {
-        $tasks = self::findTasks($contentContainer, $filters);
+        $stream = self::exportToStream($contentContainer, $filters);
+        $content = stream_get_contents($stream);
+        fclose($stream);
+        return $content;
+    }
 
-        $stream = fopen('php://temp', 'w+');
+    /** @return resource */
+    public static function exportToStream($contentContainer, array $filters)
+    {
+        // Keep small exports in memory and transparently spill larger ones to disk.
+        $stream = fopen('php://temp/maxmemory:' . self::TEMP_MEMORY_LIMIT, 'w+');
+        if ($stream === false) {
+            throw new \RuntimeException('Could not create temporary CSV export stream.');
+        }
         fwrite($stream, "\xEF\xBB\xBF");
         fputcsv($stream, array_map([self::class, 'safe'], [
             Yii::t('TodoModule.base', 'Titel'),
@@ -25,7 +39,10 @@ final class TaskExportService
             Yii::t('TodoModule.base', 'Erstellt am'),
         ]), ';');
 
-        foreach ($tasks as $task) {
+        foreach (self::createQuery($contentContainer, $filters)->each(self::BATCH_SIZE) as $task) {
+            if (!$task->canView()) {
+                continue;
+            }
             fputcsv($stream, array_map([self::class, 'safe'], [
                 $task->title,
                 $task->taskList?->name ?? '',
@@ -40,12 +57,18 @@ final class TaskExportService
         }
 
         rewind($stream);
-        $content = stream_get_contents($stream);
-        fclose($stream);
-        return $content;
+        return $stream;
     }
 
     public static function findTasks($contentContainer, array $filters): array
+    {
+        return array_values(array_filter(
+            self::createQuery($contentContainer, $filters)->all(),
+            static fn($task) => $task->canView()
+        ));
+    }
+
+    private static function createQuery($contentContainer, array $filters)
     {
         $query = Task::find()
             ->contentContainer($contentContainer)
@@ -88,11 +111,10 @@ final class TaskExportService
             $query->joinWith('taskLabels')->andWhere(['todo_task_label.id' => (int) $filters['label_id']]);
         }
 
-        $tasks = $query->distinct()->orderBy([
+        return $query->distinct()->orderBy([
             'todo_task.due_date' => SORT_ASC,
             'todo_task.created_at' => SORT_DESC,
-        ])->all();
-        return array_values(array_filter($tasks, static fn($task) => $task->canView()));
+        ]);
     }
 
     public static function statusLabel(string $status): string

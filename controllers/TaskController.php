@@ -313,10 +313,10 @@ public function actionExport()
         throw new \yii\web\ForbiddenHttpException();
     }
 
-    $content = TaskExportService::export($this->contentContainer, Yii::$app->request->get());
+    $stream = TaskExportService::exportToStream($this->contentContainer, Yii::$app->request->get());
     $spaceName = preg_replace('/[^a-z0-9_-]+/i', '-', (string) $this->contentContainer->name);
     $filename = 'todo-' . trim($spaceName, '-') . '-' . date('Y-m-d') . '.csv';
-    return Yii::$app->response->sendContentAsFile($content, $filename, [
+    return Yii::$app->response->sendStreamAsFile($stream, $filename, [
         'mimeType' => 'text/csv; charset=UTF-8',
         'inline' => false,
     ]);

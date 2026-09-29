@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.33.0 - 2026-09-29
+
+- CSV-Export in Stapeln zu je 100 Aufgaben verarbeitet
+- große Exporte nach 2 MiB automatisch in eine temporäre Datei ausgelagert
+- CSV-Dateien direkt als Datenstrom an den Browser übertragen
+- Filter, Berechtigungsprüfung und Schutz vor Tabellenformeln beibehalten
+- automatische Prüfung der speicherschonenden Exportstrecke ergänzt
+
 ## 1.32.1 - 2026-09-29
 
 - fällige Erinnerungen in speicherschonenden Stapeln zu je 100 Aufgaben verarbeitet
