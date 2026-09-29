@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.39.1 - 2026-09-29
+
+- Kommentarbereich übersichtlicher gestaltet
+- verschachtelte Antwortfelder werden erst nach einem Klick auf „Antworten“ angezeigt
+- HumHubs vorhandene Steuerung der Antwortfelder nicht mehr durch eine globale CSS-Regel überschrieben
+
 ## 1.39.0 - 2026-09-29
 
 - feste Begrenzung der globalen Übersicht auf 500 Aufgaben entfernt

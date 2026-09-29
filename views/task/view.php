@@ -1040,12 +1040,12 @@ JS
         <style>
             /* The standard HumHub comment widget is collapsed in wall-preview mode.
                On the dedicated ToDo detail page communication should always be visible. */
-            #todo-communication .comment-container {
+            #todo-communication .todo-communication-comments > .comment-container {
                 display: block !important;
                 margin-top: .5rem !important;
                 border-radius: 6px;
             }
-            #todo-communication .comment-container:empty {
+            #todo-communication .todo-communication-comments > .comment-container:empty {
                 display: none !important;
             }
             .panel-body details > summary:focus-visible {
