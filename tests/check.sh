@@ -15,6 +15,7 @@ php tests/reminder-policy.php
 php tests/recurrence-policy.php
 php tests/translation-coverage.php
 php tests/export-policy.php
+php tests/upload-limit.php
 
 if grep -RInE "due_date = ['\"]{2}|->isModuleEnabled\(|MenuLink::isActiveState\(" --include='*.php' .; then
     echo "Obsolete HumHub API usage or invalid DATE comparison found" >&2
@@ -95,6 +96,17 @@ if (substr_count($taskFormSources, "combobox") < 2
     || substr_count($taskFormSources, "ArrowDown") < 2) {
     fwrite(STDERR, "Task-list picker is missing accessible combobox keyboard handling\n");
     exit(1);
+}
+$uploadSources = file_get_contents("services/UploadLimitService.php")
+    . file_get_contents("models/Task.php")
+    . file_get_contents("controllers/TaskController.php")
+    . $taskFormSources
+    . file_get_contents("views/task/view.php");
+foreach (["maxTotalFileSize", "requestExceedsPostLimit", "data-max-file-size", "data-max-total-size", "setCustomValidity"] as $requiredUploadProtection) {
+    if (!str_contains($uploadSources, $requiredUploadProtection)) {
+        fwrite(STDERR, "Missing upload protection: {$requiredUploadProtection}\n");
+        exit(1);
+    }
 }
 foreach (["README.md", "CHANGELOG.md", "LICENSE", "SECURITY.md", "CONTRIBUTING.md"] as $file) {
     if (!is_file($file) || filesize($file) === 0) {

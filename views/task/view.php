@@ -5,6 +5,7 @@ use humhub\modules\user\widgets\Image as UserImage;
 use humhub\modules\user\models\User;
 use humhub\modules\todo\services\CalendarSyncService;
 use humhub\modules\todo\services\TaskNotificationPreferenceService;
+use humhub\modules\todo\services\UploadLimitService;
 use humhub\modules\comment\widgets\Comments;
 
 use humhub\modules\space\models\Membership;
@@ -20,6 +21,7 @@ $canWorkOnTask = $task->canWorkOn();
 $canCreateTask = $contentContainer->permissionManager->can(new \humhub\modules\todo\permissions\CreateTasks());
 $notificationMode = TaskNotificationPreferenceService::getOverrideMode((int) $task->id, (int) Yii::$app->user->id);
 $notificationDefault = TaskNotificationPreferenceService::getDefaultMode((int) Yii::$app->user->id);
+$uploadMaxFileSize = UploadLimitService::maxFileSize();
 ?>
 
 <div class="panel panel-default">
@@ -845,9 +847,18 @@ $notificationDefault = TaskNotificationPreferenceService::getDefaultMode((int) Y
                             'id' => 'todo-upload-file',
                             'class' => 'form-control',
                             'accept' => '.png,.jpg,.jpeg,.pdf,.doc,.docx,.xlsx',
+                            'data-max-file-size' => $uploadMaxFileSize,
+                            'data-error-file' => Yii::t('TodoModule.base', 'Die Datei «{name}» ist größer als das erlaubte Limit von {size}.'),
+                            'aria-describedby' => 'todo-upload-file-help todo-upload-file-error',
                             'required' => true,
                         ]) ?>
+                        <div id="todo-upload-file-help" class="small text-muted mt-1">
+                            <?= Yii::t('TodoModule.base', 'Maximale Dateigröße: {size}. Erlaubt: PNG, JPG, PDF, DOC, DOCX und XLSX.', [
+                                'size' => Yii::$app->formatter->asShortSize($uploadMaxFileSize),
+                            ]) ?>
+                        </div>
                         <div id="todo-upload-file-name" class="small text-muted mt-1"></div>
+                        <div id="todo-upload-file-error" class="small text-danger" aria-live="polite"></div>
                     </div>
 
                     <div class="mb-3">
@@ -892,7 +903,8 @@ $notificationDefault = TaskNotificationPreferenceService::getDefaultMode((int) Y
                     width: min(520px, 100%);
                     max-height: calc(100vh - 40px);
                     overflow: auto;
-                    background: #fff;
+                    background: var(--hh-background-color-main, #fff);
+                    color: var(--hh-text-color-main, inherit);
                     border-radius: 6px;
                     padding: 18px;
                     box-shadow: 0 10px 35px rgba(0, 0, 0, .25);
@@ -908,6 +920,7 @@ $notificationDefault = TaskNotificationPreferenceService::getDefaultMode((int) Y
     const cancelButton = document.getElementById('todo-file-upload-cancel');
     const fileInput = document.getElementById('todo-upload-file');
     const fileName = document.getElementById('todo-upload-file-name');
+    const fileError = document.getElementById('todo-upload-file-error');
     const titleInput = document.getElementById('todo-upload-title');
 
     if (!backdrop || !openButton) {
@@ -923,6 +936,8 @@ $notificationDefault = TaskNotificationPreferenceService::getDefaultMode((int) Y
         backdrop.hidden = true;
         if (fileInput) fileInput.value = '';
         if (fileName) fileName.textContent = '';
+        if (fileError) fileError.textContent = '';
+        if (fileInput) fileInput.setCustomValidity('');
         if (titleInput) titleInput.value = '';
         openButton.focus();
     };
@@ -944,7 +959,14 @@ $notificationDefault = TaskNotificationPreferenceService::getDefaultMode((int) Y
     });
 
     fileInput && fileInput.addEventListener('change', function () {
-        fileName.textContent = fileInput.files && fileInput.files[0] ? fileInput.files[0].name : '';
+        const file = fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+        const maxFile = Number(fileInput.dataset.maxFileSize || 0);
+        const message = file && maxFile > 0 && file.size > maxFile
+            ? fileInput.dataset.errorFile.replace('{name}', file.name).replace('{size}', (maxFile / 1024 / 1024).toLocaleString(undefined, {maximumFractionDigits: 2}) + ' MB')
+            : '';
+        fileName.textContent = file ? file.name : '';
+        fileInput.setCustomValidity(message);
+        if (fileError) fileError.textContent = message;
     });
 })();
 JS

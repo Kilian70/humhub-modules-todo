@@ -26,6 +26,7 @@ use humhub\modules\todo\services\TaskHistoryService;
 use humhub\modules\todo\services\TaskDependencyService;
 use humhub\modules\todo\services\TaskDuplicationService;
 use humhub\modules\todo\services\TaskNotificationPreferenceService;
+use humhub\modules\todo\services\UploadLimitService;
 use humhub\modules\todo\services\TaskExportService;
 
 class TaskController extends ContentContainerController
@@ -333,6 +334,12 @@ public function actionCreate()
 
     $model = new Task();
 
+    if (UploadLimitService::requestExceedsPostLimit()) {
+        $model->addError('uploadFiles', Yii::t('TodoModule.base', 'Die Upload-Anfrage ist zu groß. Alle ausgewählten Dateien zusammen dürfen höchstens {size} groß sein.', [
+            'size' => Yii::$app->formatter->asShortSize(UploadLimitService::maxRequestSize()),
+        ]));
+    }
+
     $model->content->container = $this->contentContainer;
 
     $parentTask = null;
@@ -415,6 +422,12 @@ public function actionUpdate($id)
 
     if (!$model->canManage()) {
         throw new \yii\web\ForbiddenHttpException();
+    }
+
+    if (UploadLimitService::requestExceedsPostLimit()) {
+        $model->addError('uploadFiles', Yii::t('TodoModule.base', 'Die Upload-Anfrage ist zu groß. Alle ausgewählten Dateien zusammen dürfen höchstens {size} groß sein.', [
+            'size' => Yii::$app->formatter->asShortSize(UploadLimitService::maxRequestSize()),
+        ]));
     }
 
     $oldStatus = $model->status;
@@ -1015,7 +1028,12 @@ public function actionUploadFile($id)
     $title = trim((string) Yii::$app->request->post('title'));
 
     if (!$uploadedFile) {
-        Yii::$app->session->setFlash('error', Yii::t('TodoModule.base', 'Bitte eine Datei auswählen.'));
+        $message = UploadLimitService::requestExceedsPostLimit()
+            ? Yii::t('TodoModule.base', 'Die Upload-Anfrage ist zu groß. Die Datei darf höchstens {size} groß sein.', [
+                'size' => Yii::$app->formatter->asShortSize(UploadLimitService::maxFileSize()),
+            ])
+            : Yii::t('TodoModule.base', 'Bitte eine Datei auswählen.');
+        Yii::$app->session->setFlash('error', $message);
         return $this->redirect($this->contentContainer->createUrl('/todo/task/view', ['id' => $model->id]));
     }
 

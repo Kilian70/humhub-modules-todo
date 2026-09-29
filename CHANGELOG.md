@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.31.0 - 2026-09-29
+
+- verständliche Größenangaben bei Einzel- und Mehrfachuploads ergänzt
+- große Dateien bereits vor dem Absenden im Browser geprüft
+- serverseitige Prüfung an HumHub-, PHP- und Anfragegrenzen angeglichen
+- zu große Einzeldateien und zu große Gesamtauswahlen mit klaren Meldungen abgewiesen
+- Uploaddialog an den hellen und dunklen Modus angepasst
+- Grenzwerttests unter HumHub 1.19 mit einer separaten Modulkopie erfolgreich durchgeführt
+
 ## 1.30.2 - 2026-09-28
 
 - offenen Status in der Aufgabenliste im dunklen Modus wieder lesbar gemacht

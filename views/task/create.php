@@ -4,8 +4,13 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use humhub\modules\user\widgets\UserPickerField;
 use humhub\modules\todo\services\CalendarSyncService;
+use humhub\modules\todo\services\UploadLimitService;
 use humhub\modules\todo\models\TaskList;
 use humhub\modules\todo\models\TaskLabel;
+
+$uploadMaxFileSize = UploadLimitService::maxFileSize();
+$uploadMaxTotalSize = UploadLimitService::maxTotalFileSize();
+$uploadHelpId = 'todo-create-upload-help';
 
 ?>
 
@@ -245,10 +250,51 @@ JS;
             <label class="control-label" for="<?= Html::getInputId($model, 'uploadFiles') ?>"><?= Yii::t('TodoModule.base', 'Dateien hinzufügen') ?></label>
             <div class="mt-2">
                 <?= $form->field($model, 'uploadFiles[]')
-                    ->fileInput(['multiple' => true])
+                    ->fileInput([
+                        'multiple' => true,
+                        'accept' => '.png,.jpg,.jpeg,.pdf,.doc,.docx,.xlsx',
+                        'data-todo-upload-input' => true,
+                        'data-max-file-size' => $uploadMaxFileSize,
+                        'data-max-total-size' => $uploadMaxTotalSize,
+                        'data-error-file' => Yii::t('TodoModule.base', 'Die Datei «{name}» ist größer als das erlaubte Limit von {size}.'),
+                        'data-error-total' => Yii::t('TodoModule.base', 'Alle ausgewählten Dateien zusammen dürfen höchstens {size} groß sein.'),
+                        'aria-describedby' => $uploadHelpId,
+                    ])
                     ->label(false) ?>
+                <div id="<?= $uploadHelpId ?>" class="small text-muted">
+                    <?= Yii::t('TodoModule.base', 'Maximal {count} Dateien; pro Datei {fileSize}, zusammen {totalSize}. Erlaubt: PNG, JPG, PDF, DOC, DOCX und XLSX.', [
+                        'count' => 10,
+                        'fileSize' => Yii::$app->formatter->asShortSize($uploadMaxFileSize),
+                        'totalSize' => Yii::$app->formatter->asShortSize($uploadMaxTotalSize),
+                    ]) ?>
+                </div>
+                <div class="small text-danger" data-todo-upload-error aria-live="polite"></div>
             </div>
         </div>
+
+        <?php $this->registerJs(<<<'JS'
+document.querySelectorAll('[data-todo-upload-input]').forEach(function (input) {
+    input.addEventListener('change', function () {
+        const files = Array.from(input.files || []);
+        const maxFile = Number(input.dataset.maxFileSize || 0);
+        const maxTotal = Number(input.dataset.maxTotalSize || 0);
+        const oversized = maxFile > 0 ? files.find(function (file) { return file.size > maxFile; }) : null;
+        const total = files.reduce(function (sum, file) { return sum + file.size; }, 0);
+        let message = '';
+        if (oversized) {
+            message = input.dataset.errorFile.replace('{name}', oversized.name).replace('{size}', formatBytes(maxFile));
+        } else if (maxTotal > 0 && total > maxTotal) {
+            message = input.dataset.errorTotal.replace('{size}', formatBytes(maxTotal));
+        }
+        input.setCustomValidity(message);
+        const output = input.closest('.mb-4').querySelector('[data-todo-upload-error]');
+        if (output) output.textContent = message;
+    });
+});
+function formatBytes(bytes) {
+    return (bytes / 1024 / 1024).toLocaleString(undefined, {maximumFractionDigits: 2}) + ' MB';
+}
+JS); ?>
 
 
         <!-- META GRID -->

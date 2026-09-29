@@ -27,7 +27,7 @@ Aufgaben können Personen und Aufgabenlisten zugeordnet, kommentiert, terminiert
 - mehrere zuständige Personen pro Aufgabe
 - Checklisten mit mehreren Zuständigen
 - frei verwaltbare und sortierbare Aufgabenlisten
-- Kommentare, Dateianhänge und Benachrichtigungen
+- Kommentare, Dateianhänge mit verständlicher Größenprüfung und Benachrichtigungen
 - Dashboard- und Space-Widgets
 - Suche nach Aufgaben
 - Erinnerungen über den stündlichen HumHub-Cronjob
@@ -72,7 +72,7 @@ php protected/yii cron/run
 
 ## Version
 
-Aktuelle Modulversion: **1.30.2**. Änderungen sind im [CHANGELOG.md](CHANGELOG.md)
+Aktuelle Modulversion: **1.31.0**. Änderungen sind im [CHANGELOG.md](CHANGELOG.md)
 dokumentiert.
 
 ## Mitwirken und Sicherheit

@@ -20,6 +20,7 @@ use humhub\modules\todo\services\TaskAuthorizationService;
 use humhub\modules\todo\services\TaskHistoryService;
 use humhub\modules\todo\services\RecurringTaskService;
 use humhub\modules\todo\services\TaskNotificationPreferenceService;
+use humhub\modules\todo\services\UploadLimitService;
 use humhub\modules\todo\models\TaskList;
 use humhub\modules\user\helpers\UserHelper;
 use yii\helpers\FileHelper;
@@ -89,10 +90,30 @@ class Task extends ContentActiveRecord implements ViewableInterface
 
             [['uploadFiles'], 'file',
                 'maxFiles' => 10,
+                'maxSize' => UploadLimitService::maxFileSize(),
                 'extensions' => ['png','jpg','jpeg','pdf','doc','docx','xlsx'],
                 'skipOnEmpty' => true
             ],
+            [['uploadFiles'], 'validateUploadTotalSize', 'skipOnEmpty' => true],
         ];
+    }
+
+    public function validateUploadTotalSize(string $attribute): void
+    {
+        if (!is_array($this->$attribute)) {
+            return;
+        }
+
+        $limit = UploadLimitService::maxTotalFileSize();
+        $total = array_sum(array_map(
+            static fn($file): int => $file instanceof UploadedFile ? (int) $file->size : 0,
+            $this->$attribute
+        ));
+        if ($limit > 0 && $total > $limit) {
+            $this->addError($attribute, Yii::t('TodoModule.base', 'Alle ausgewählten Dateien zusammen dürfen höchstens {size} groß sein.', [
+                'size' => Yii::$app->formatter->asShortSize($limit),
+            ]));
+        }
     }
 
     public function validateParentTask(string $attribute): void
