@@ -5,22 +5,29 @@ namespace humhub\modules\todo\services;
 use humhub\modules\space\models\Space;
 use humhub\modules\todo\models\Task;
 use humhub\modules\todo\models\TaskDependency;
+use humhub\modules\todo\permissions\ViewTasks;
 use Yii;
+use yii\data\Pagination;
 use yii\db\Expression;
 
 final class OverviewTaskService
 {
-    public const MAX_RESULTS = 500;
+    public const PAGE_SIZE = 25;
 
     public static function getOverview(array $filters): array
     {
         $filters = self::normalizeFilters($filters);
         $userId = (int) Yii::$app->user->id;
+        $spaces = self::getVisibleSpaces();
+        $contentContainerIds = array_map(
+            static fn(Space $space): int => (int) $space->contentcontainer_id,
+            $spaces
+        );
         $query = Task::find()
-            ->joinWith('content')
+            ->readable()
             ->leftJoin('todo_task_user overview_tu', 'overview_tu.task_id = todo_task.id')
-            ->with(['users', 'parentTask'])
             ->andWhere(['todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
+            ->andWhere(['content.contentcontainer_id' => $contentContainerIds ?: [-1]])
             ->distinct();
 
         if ($filters['scope'] === 'assigned') {
@@ -32,7 +39,8 @@ final class OverviewTaskService
         }
 
         if ($filters['space_id']) {
-            $query->andWhere(['content.contentcontainer_id' => $filters['space_id']]);
+            $selectedSpace = $spaces[$filters['space_id']] ?? null;
+            $query->andWhere(['content.contentcontainer_id' => $selectedSpace ? (int) $selectedSpace->contentcontainer_id : -1]);
         }
         if ($filters['status'] === 'active') {
             $query->andWhere(['<>', 'todo_task.status', 'geschlossen']);
@@ -47,45 +55,43 @@ final class OverviewTaskService
             $query->andWhere(['or', ['like', 'todo_task.title', $filters['keyword']], ['like', 'todo_task.description', $filters['keyword']]]);
         }
 
-        $query->orderBy(new Expression(
+        $stats = self::getStats($query);
+        self::applyFocus($query, $filters['focus']);
+        $totalCount = (int) (clone $query)->count();
+        $pagination = new Pagination([
+            'totalCount' => $totalCount,
+            'pageSize' => self::PAGE_SIZE,
+            'pageSizeLimit' => [1, 100],
+        ]);
+
+        $tasks = $query->with(['users', 'parentTask'])->orderBy(new Expression(
             "CASE WHEN todo_task.status = 'geschlossen' THEN 1 ELSE 0 END ASC, " .
             'CASE WHEN todo_task.due_date IS NULL THEN 1 ELSE 0 END ASC, ' .
             'todo_task.due_date ASC, todo_task.id DESC'
-        ))->limit(self::MAX_RESULTS);
-
-        $baseTasks = [];
-        foreach ($query->all() as $task) {
-            if ($task->canView()) {
-                $baseTasks[] = $task;
-            }
-        }
-        $blockedTaskIds = self::getBlockedTaskIds($baseTasks);
-        $tasks = array_values(array_filter(
-            $baseTasks,
-            static fn(Task $task) => self::matchesFocus($task, $filters['focus'], $blockedTaskIds)
-        ));
+        ))->offset($pagination->offset)->limit($pagination->limit)->all();
 
         return [
             'tasks' => $tasks,
-            'spaces' => self::getVisibleSpaces($userId),
+            'spaces' => $spaces,
             'filters' => $filters,
-            'stats' => self::getStats($baseTasks, $blockedTaskIds),
-            'blockedTaskIds' => $blockedTaskIds,
-            'truncated' => count($baseTasks) >= self::MAX_RESULTS,
+            'stats' => $stats,
+            'blockedTaskIds' => self::getBlockedTaskIds($tasks),
+            'pagination' => $pagination,
+            'totalCount' => $totalCount,
         ];
     }
 
-    private static function getVisibleSpaces(int $userId): array
+    private static function getVisibleSpaces(): array
     {
-        $tasks = Task::find()->joinWith('content')->andWhere(['todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
-            ->leftJoin('todo_task_user overview_space_tu', 'overview_space_tu.task_id = todo_task.id')
-            ->andWhere(['or', ['overview_space_tu.user_id' => $userId], ['content.created_by' => $userId]])
-            ->distinct()->limit(self::MAX_RESULTS)->all();
+        $spaceIds = Task::find()->readable()
+            ->select('content.contentcontainer_id')
+            ->andWhere(['todo_task.deleted_at' => null, 'todo_task.archived_at' => null])
+            ->distinct()->column();
         $spaces = [];
-        foreach ($tasks as $task) {
-            $space = $task->content ? $task->content->container : null;
-            if ($space instanceof Space && $task->canView()) {
-                $spaces[$space->id] = $space;
+        $spaceModels = Space::find()->where(['contentcontainer_id' => array_map('intval', $spaceIds)])->all();
+        foreach ($spaceModels as $space) {
+            if ($space->getPermissionManager()->can(new ViewTasks())) {
+                $spaces[(int) $space->id] = $space;
             }
         }
         uasort($spaces, static fn(Space $a, Space $b) => strcasecmp($a->name, $b->name));
@@ -111,36 +117,47 @@ final class OverviewTaskService
         return array_fill_keys(array_map('intval', $ids), true);
     }
 
-    private static function getStats(array $tasks, array $blockedTaskIds): array
+    private static function getStats($query): array
     {
         $today = date('Y-m-d');
-        $soon = date('Y-m-d', strtotime('+7 days'));
-        $stats = ['total' => count($tasks), 'overdue' => 0, 'soon' => 0, 'blocked' => 0];
-        foreach ($tasks as $task) {
-            if ($task->status !== 'geschlossen' && $task->due_date && $task->due_date < $today) $stats['overdue']++;
-            if ($task->status !== 'geschlossen' && $task->due_date && $task->due_date >= $today && $task->due_date <= $soon) $stats['soon']++;
-            if ($task->status !== 'geschlossen' && isset($blockedTaskIds[(int) $task->id])) $stats['blocked']++;
-        }
-        return $stats;
+        $active = ['<>', 'todo_task.status', 'geschlossen'];
+        return [
+            'total' => (int) (clone $query)->count(),
+            'overdue' => (int) (clone $query)->andWhere($active)
+                ->andWhere(['<', 'todo_task.due_date', $today])->count(),
+            'soon' => (int) (clone $query)->andWhere($active)
+                ->andWhere(['between', 'todo_task.due_date', $today, date('Y-m-d', strtotime('+7 days'))])->count(),
+            'blocked' => (int) (clone $query)->andWhere($active)
+                ->andWhere(self::blockedCondition())->count(),
+        ];
     }
 
-    private static function matchesFocus(Task $task, string $focus, array $blockedTaskIds): bool
+    private static function applyFocus($query, string $focus): void
     {
         $today = date('Y-m-d');
         if ($focus === 'overdue') {
-            return $task->status !== 'geschlossen' && $task->due_date && $task->due_date < $today;
+            $query->andWhere(['<>', 'todo_task.status', 'geschlossen'])
+                ->andWhere(['<', 'todo_task.due_date', $today]);
+        } elseif ($focus === 'soon') {
+            $query->andWhere(['<>', 'todo_task.status', 'geschlossen'])
+                ->andWhere(['between', 'todo_task.due_date', $today, date('Y-m-d', strtotime('+7 days'))]);
+        } elseif ($focus === 'blocked') {
+            $query->andWhere(['<>', 'todo_task.status', 'geschlossen'])
+                ->andWhere(self::blockedCondition());
+        } elseif ($focus === 'subtasks') {
+            $query->andWhere(['not', ['todo_task.parent_task_id' => null]]);
         }
-        if ($focus === 'soon') {
-            return $task->status !== 'geschlossen' && $task->due_date && $task->due_date >= $today
-                && $task->due_date <= date('Y-m-d', strtotime('+7 days'));
-        }
-        if ($focus === 'blocked') {
-            return $task->status !== 'geschlossen' && isset($blockedTaskIds[(int) $task->id]);
-        }
-        if ($focus === 'subtasks') {
-            return !empty($task->parent_task_id);
-        }
-        return true;
+    }
+
+    private static function blockedCondition(): array
+    {
+        $subQuery = TaskDependency::find()
+            ->alias('overview_dependency')
+            ->select(new Expression('1'))
+            ->innerJoin('todo_task overview_blocker', 'overview_blocker.id = overview_dependency.blocking_task_id')
+            ->where(new Expression('overview_dependency.task_id = todo_task.id'))
+            ->andWhere(['<>', 'overview_blocker.status', 'geschlossen']);
+        return ['exists', $subQuery];
     }
 
     private static function normalizeFilters(array $input): array

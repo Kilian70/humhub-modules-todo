@@ -22,6 +22,7 @@ Aufgaben können Personen und Aufgabenlisten zugeordnet, kommentiert, terminiert
 - automatische Benachrichtigung, sobald eine blockierte Aufgabe freigegeben wird
 - Aufgaben samt Zuständigen und Checkliste duplizieren oder als Vorlage speichern
 - persönliche Aufgabenübersicht über alle sichtbaren Spaces mit Suche und Filtern
+- skalierbare Seitennavigation in der persönlichen Aufgabenübersicht
 - persönlicher Hauptmenüpunkt „Meine ToDos“ mit wählbarer Sichtbarkeit und Position
 - zentrale deutsche und englische Übersetzungen für die Hauptoberflächen
 - mehrere zuständige Personen pro Aufgabe
@@ -72,7 +73,7 @@ php protected/yii cron/run
 
 ## Version
 
-Aktuelle Modulversion: **1.38.0**. Änderungen sind im [CHANGELOG.md](CHANGELOG.md)
+Aktuelle Modulversion: **1.39.0**. Änderungen sind im [CHANGELOG.md](CHANGELOG.md)
 dokumentiert.
 
 ## Mitwirken und Sicherheit

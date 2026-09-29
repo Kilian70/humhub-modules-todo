@@ -4,6 +4,7 @@ use humhub\helpers\Html;
 use humhub\modules\space\models\Space;
 use humhub\modules\user\widgets\Image as UserImage;
 use yii\helpers\Url;
+use yii\widgets\LinkPager;
 
 $this->title = Yii::t('TodoModule.base', 'Aufgabenübersicht');
 $filterUrl = static fn(array $changes = []) => array_merge(['/todo/overview/index'], $filters, $changes);
@@ -14,7 +15,7 @@ $priorityLabels = ['niedrig' => Yii::t('TodoModule.base', 'Niedrig'), 'mittel' =
 <div class="panel panel-default">
     <div class="panel-heading d-flex flex-wrap justify-content-between align-items-center gap-2">
         <strong><i class="fa fa-tasks"></i> <?= Yii::t('TodoModule.base', 'Aufgabenübersicht über alle Spaces') ?></strong>
-        <span class="text-muted small"><?= Yii::t('TodoModule.base', '{count} Treffer', ['count' => (int) $stats['total']]) ?></span>
+        <span class="text-muted small"><?= Yii::t('TodoModule.base', '{count} Treffer', ['count' => (int) $totalCount]) ?></span>
     </div>
     <div class="panel-body">
         <form method="get" action="<?= Url::to(['/todo/overview/index']) ?>">
@@ -120,9 +121,16 @@ $priorityLabels = ['niedrig' => Yii::t('TodoModule.base', 'Niedrig'), 'mittel' =
     <?php endif; ?>
 </div>
 
-<?php if ($truncated): ?>
-    <div class="alert alert-info"><?= Yii::t('TodoModule.base', 'Es werden höchstens {count} Aufgaben angezeigt. Bitte Filter verwenden.', ['count' => \humhub\modules\todo\services\OverviewTaskService::MAX_RESULTS]) ?></div>
+<?php if ($pagination->totalCount > 0): ?>
+    <div class="text-muted small text-center mt-3" role="status">
+        <?= Yii::t('TodoModule.base', 'Aufgaben {first}–{last} von {total}', [
+            'first' => $pagination->offset + 1,
+            'last' => min($pagination->offset + $pagination->limit, $pagination->totalCount),
+            'total' => $pagination->totalCount,
+        ]) ?>
+    </div>
 <?php endif; ?>
+<?= LinkPager::widget(['pagination' => $pagination]) ?>
 
 <?php $this->registerCss(<<<CSS
 .todo-dark-default {

@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.39.0 - 2026-09-29
+
+- feste Begrenzung der globalen Übersicht auf 500 Aufgaben entfernt
+- echte Seitennavigation mit 25 Aufgaben pro Seite ergänzt
+- Filter für überfällige, anstehende, blockierte und untergeordnete Aufgaben in die Datenbank verlagert
+- Gesamtzahlen über alle Treffer statt nur über den geladenen Ausschnitt berechnet
+- sichtbare Spaces unter Beachtung von Inhaltszugriff und ToDo-Berechtigung ermittelt
+- automatische Prüfung gegen eine erneute feste Ergebnisbegrenzung ergänzt
+
 ## 1.38.0 - 2026-09-29
 
 - sichtbare Tastaturfokusse für alle einklappbaren Bereiche ergänzt
