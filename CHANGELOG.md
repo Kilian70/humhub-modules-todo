@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.40.0 - 2026-09-29
+
+- aktuellen Funktionsumfang und Bedienkonzept in der README übersichtlich dokumentiert
+- Modulbild in die GitHub-Dokumentation aufgenommen
+- geprüfte Kompatibilität mit HumHub 1.18 und 1.19 dokumentiert
+- erfolgreiche Installations-, Deinstallations-, Darstellungs- und Belastungstests zusammengefasst
+- stabilen Entwicklungsstand als Version 1.40.0 gekennzeichnet
+
 ## 1.39.2 - 2026-09-29
 
 - Benachrichtigungseinstellung „Stumm“ verständlicher in „Nur Kommunikation“ umbenannt

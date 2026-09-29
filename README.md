@@ -1,8 +1,23 @@
 # ToDo – Aufgabenmodul für HumHub
 
+<p align="center">
+  <img src="resources/module_image.png" alt="ToDo-Modulbild" width="180">
+</p>
+
 ToDo ist ein Space-basiertes HumHub-Modul für Aufgaben, Checklisten und Pendenzen.
 Aufgaben können Personen und Aufgabenlisten zugeordnet, kommentiert, terminiert und
 über einen einfachen Status-Workflow bearbeitet werden.
+
+## Oberfläche
+
+Das Modul bietet eine kompakte Listenansicht und ein Kanban-Board mit den Spalten
+**Offen**, **In Bearbeitung** und **Geschlossen**. Aufgaben lassen sich per
+Drag-and-drop oder über eine barrierefreie Statusauswahl verschieben. Umfangreiche
+Verwaltungs- und Exportfunktionen sind platzsparend in Menüs zusammengefasst.
+
+Die persönliche Übersicht **Meine ToDos** bündelt Aufgaben aus allen sichtbaren
+Spaces. Suche, Zuständigkeit, Space, Status, Priorität sowie Ansichten für fällige,
+blockierte und untergeordnete Aufgaben helfen beim Eingrenzen großer Datenmengen.
 
 ## Voraussetzungen
 
@@ -59,6 +74,16 @@ Vor einer Aktualisierung sollte ein Backup der Datenbank und der HumHub-Dateien
 erstellt werden. Anschliessend den Modulordner aktualisieren; HumHub führt die
 enthaltenen Migrationen beim Modul-Upgrade aus.
 
+## Geprüfte Kompatibilität
+
+- Installation und Aufgabenverwaltung unter HumHub 1.18
+- Installation und Aufgabenverwaltung unter HumHub 1.19
+- Aktivierung, Deaktivierung und vollständige Deinstallation
+- helle und dunkle HumHub-Darstellung
+- Desktop- und mobile Darstellung
+- Belastungstest mit 10.000 Aufgaben, 80.000 Checklistenpunkten, 50.000 Kommentaren,
+  20.000 Zuständigkeiten und 30.000 simulierten Anhängen
+
 ## Konfiguration
 
 Globale Einstellungen befinden sich in der Modulkonfiguration im
@@ -73,7 +98,7 @@ php protected/yii cron/run
 
 ## Version
 
-Aktuelle Modulversion: **1.39.0**. Änderungen sind im [CHANGELOG.md](CHANGELOG.md)
+Aktuelle Modulversion: **1.40.0**. Änderungen sind im [CHANGELOG.md](CHANGELOG.md)
 dokumentiert.
 
 ## Mitwirken und Sicherheit
