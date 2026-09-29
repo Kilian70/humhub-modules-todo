@@ -231,6 +231,7 @@ return [
     'Farbe des Labels' => 'Farbe des Labels',
     'Label löschen' => 'Label löschen',
     'Dateien hinzufügen' => 'Dateien hinzufügen',
+    'Diese Aufgabe wurde inzwischen von einer anderen Person geändert. Deine Eingaben wurden nicht gespeichert. Prüfe sie bitte und speichere danach erneut.' => 'Diese Aufgabe wurde inzwischen von einer anderen Person geändert. Deine Eingaben wurden nicht gespeichert. Prüfe sie bitte und speichere danach erneut.',
     'Die Upload-Anfrage ist zu groß. Alle ausgewählten Dateien zusammen dürfen höchstens {size} groß sein.' => 'Die Upload-Anfrage ist zu groß. Alle ausgewählten Dateien zusammen dürfen höchstens {size} groß sein.',
     'Die Upload-Anfrage ist zu groß. Die Datei darf höchstens {size} groß sein.' => 'Die Upload-Anfrage ist zu groß. Die Datei darf höchstens {size} groß sein.',
     'Alle ausgewählten Dateien zusammen dürfen höchstens {size} groß sein.' => 'Alle ausgewählten Dateien zusammen dürfen höchstens {size} groß sein.',

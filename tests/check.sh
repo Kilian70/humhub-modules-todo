@@ -165,6 +165,7 @@ foreach ([
     "services/TaskNotificationPreferenceService.php",
     "migrations/m260929_030000_task_notification_preferences.php",
     "migrations/m260929_050000_performance_indexes.php",
+    "migrations/m260929_060000_task_optimistic_lock.php",
     "services/TaskExportService.php",
     "views/task/print.php",
 ] as $file) {
@@ -179,6 +180,16 @@ foreach (["idx_todo_task_active_due", "idx_todo_task_auto_archive", "idx_todo_ta
         fwrite(STDERR, "Missing performance index: {$index}\n");
         exit(1);
     }
+}
+$taskSource = file_get_contents("models/Task.php");
+$taskUpdateSource = file_get_contents("views/task/update.php") . file_get_contents("controllers/TaskController.php");
+if (!str_contains($taskSource, "function optimisticLock()")
+    || !str_contains($taskSource, "lock_version")
+    || !str_contains($taskUpdateSource, "StaleObjectException")
+    || !str_contains($taskUpdateSource, "activeHiddenInput")
+    || !str_contains($taskUpdateSource, "lock_version")) {
+    fwrite(STDERR, "Missing concurrent task edit protection\n");
+    exit(1);
 }
 foreach (["de", "en"] as $language) {
     $messages = require "messages/{$language}/base.php";

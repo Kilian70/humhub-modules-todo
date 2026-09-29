@@ -231,6 +231,7 @@ return [
     'Farbe des Labels' => 'Label color',
     'Label löschen' => 'Delete label',
     'Dateien hinzufügen' => 'Add files',
+    'Diese Aufgabe wurde inzwischen von einer anderen Person geändert. Deine Eingaben wurden nicht gespeichert. Prüfe sie bitte und speichere danach erneut.' => 'This task has been changed by someone else. Your entries were not saved. Please review them and save again.',
     'Die Upload-Anfrage ist zu groß. Alle ausgewählten Dateien zusammen dürfen höchstens {size} groß sein.' => 'The upload request is too large. All selected files together may not exceed {size}.',
     'Die Upload-Anfrage ist zu groß. Die Datei darf höchstens {size} groß sein.' => 'The upload request is too large. The file may not exceed {size}.',
     'Alle ausgewählten Dateien zusammen dürfen höchstens {size} groß sein.' => 'All selected files together may not exceed {size}.',

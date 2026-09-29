@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.34.0 - 2026-09-29
+
+- gleichzeitige Bearbeitung einer Aufgabe durch mehrere Personen abgesichert
+- veraltete Formulare überschreiben neuere Änderungen nicht mehr unbemerkt
+- verständliche Konfliktmeldung mit erhaltenen Eingaben ergänzt
+- erneutes Speichern nach bewusster Prüfung ermöglicht
+- Datenbankmigration und automatische Schutzprüfung ergänzt
+
 ## 1.33.0 - 2026-09-29
 
 - CSV-Export in Stapeln zu je 100 Aufgaben verarbeitet

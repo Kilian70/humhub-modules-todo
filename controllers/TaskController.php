@@ -19,6 +19,7 @@ use humhub\modules\file\models\File;
 use yii\web\UploadedFile;
 use yii\filters\VerbFilter;
 use yii\data\Pagination;
+use yii\db\StaleObjectException;
 use humhub\modules\space\models\Membership;
 use humhub\modules\user\models\User;
 use humhub\modules\todo\services\CalendarSyncService;
@@ -474,13 +475,21 @@ public function actionUpdate($id)
         // Uploads VOR save()
         $model->uploadFiles = UploadedFile::getInstances($model, 'uploadFiles');
 
-        if ($model->save()) {
-
-            return $this->redirect(
-                $this->contentContainer->createUrl('/todo/task/view', [
-                    'id' => $model->id
-                ])
-            );
+        try {
+            if ($model->save()) {
+                return $this->redirect(
+                    $this->contentContainer->createUrl('/todo/task/view', [
+                        'id' => $model->id
+                    ])
+                );
+            }
+        } catch (StaleObjectException) {
+            $freshVersion = Task::find()->select('lock_version')->where(['id' => $model->id])->scalar();
+            if ($freshVersion === false) {
+                throw new NotFoundHttpException();
+            }
+            $model->lock_version = (int) $freshVersion;
+            $model->addError('lock_version', Yii::t('TodoModule.base', 'Diese Aufgabe wurde inzwischen von einer anderen Person geändert. Deine Eingaben wurden nicht gespeichert. Prüfe sie bitte und speichere danach erneut.'));
         }
     }
 

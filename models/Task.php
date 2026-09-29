@@ -77,6 +77,7 @@ class Task extends ContentActiveRecord implements ViewableInterface
             [['closed_at', 'archived_at', 'deleted_at'], 'safe'],
             [['sync_to_calendar'], 'boolean'],
             [['task_list_id', 'parent_task_id'], 'integer'],
+            [['lock_version'], 'integer', 'min' => 0],
             [['parent_task_id'], 'validateParentTask'],
             [['recurrence_interval'], 'default', 'value' => 1],
             [['recurrence_interval'], 'integer', 'min' => 1, 'max' => 365],
@@ -96,6 +97,11 @@ class Task extends ContentActiveRecord implements ViewableInterface
             ],
             [['uploadFiles'], 'validateUploadTotalSize', 'skipOnEmpty' => true],
         ];
+    }
+
+    public function optimisticLock(): string
+    {
+        return 'lock_version';
     }
 
     public function validateUploadTotalSize(string $attribute): void

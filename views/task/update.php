@@ -45,6 +45,15 @@ $uploadHelpId = 'todo-update-upload-help';
             ]
         ]); ?>
 
+        <?= Html::activeHiddenInput($model, 'lock_version') ?>
+
+        <?php if ($model->hasErrors('lock_version')): ?>
+            <div class="alert alert-warning" role="alert">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                <?= Html::encode(implode(' ', $model->getErrors('lock_version'))) ?>
+            </div>
+        <?php endif; ?>
+
 
         <!-- Titel -->
         <?= $form->field($model, 'title')->textInput([
