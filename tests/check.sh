@@ -17,6 +17,7 @@ php tests/translation-coverage.php
 php tests/export-policy.php
 php tests/upload-limit.php
 php tests/overview-pagination.php
+php tests/humhub-guidelines.php
 
 if grep -RInE "due_date = ['\"]{2}|->isModuleEnabled\(|MenuLink::isActiveState\(" --include='*.php' .; then
     echo "Obsolete HumHub API usage or invalid DATE comparison found" >&2

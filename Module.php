@@ -6,6 +6,8 @@ use Yii;
 use yii\base\Event;
 use humhub\modules\content\components\ContentContainerModule;
 use humhub\modules\content\components\ContentContainerActiveRecord;
+use humhub\modules\content\components\ContentContainerModuleManager;
+use humhub\modules\content\models\ContentContainerModuleState;
 use humhub\modules\space\models\Space;
 use humhub\modules\space\widgets\Menu;
 use humhub\modules\ui\menu\MenuLink;
@@ -87,6 +89,24 @@ public function init()
         return ['/todo/config/index'];
     }
 
+    /**
+     * Keep new installations opt-in per Space. Existing per-Space states are
+     * not changed when the module is updated.
+     */
+    public function enable()
+    {
+        $result = parent::enable();
+        if ($result !== false) {
+            ContentContainerModuleManager::setDefaultState(
+                Space::class,
+                $this->id,
+                ContentContainerModuleState::STATE_DISABLED
+            );
+        }
+
+        return $result;
+    }
+
 
     public function getContentContainerConfigUrl(ContentContainerActiveRecord $container)
     {
@@ -122,13 +142,13 @@ public function init()
 
     public function getContentContainerName(ContentContainerActiveRecord $container)
     {
-        return 'ToDo';
+        return Yii::t('TodoModule.base', 'ToDo');
     }
 
 
     public function getContentContainerDescription(ContentContainerActiveRecord $container)
     {
-        return 'Pendenzenliste im Space';
+        return Yii::t('TodoModule.base', 'Pendenzenliste im Space');
     }
 
 

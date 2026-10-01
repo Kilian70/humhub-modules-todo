@@ -1,6 +1,15 @@
 <?php
 
 return [
+    'Pendenzenliste im Space' => 'Task list for spaces',
+    'ToDo anzeigen' => 'View ToDo tasks',
+    'Erlaubt das Anzeigen der ToDo-Liste' => 'Allows users to view the ToDo list',
+    'ToDo erstellen' => 'Create ToDo tasks',
+    'Erlaubt das Erstellen neuer Aufgaben' => 'Allows users to create new tasks',
+    'ToDo bearbeiten' => 'Edit ToDo tasks',
+    'Erlaubt das Bearbeiten aller Aufgaben' => 'Allows users to edit all tasks',
+    'ToDo löschen' => 'Delete ToDo tasks',
+    'Erlaubt das Löschen aller Aufgaben' => 'Allows users to delete all tasks',
     'Aktuell gefilterte Aufgaben drucken oder als PDF speichern' => 'Print currently filtered tasks or save them as PDF',
     'Aufgaben' => 'Tasks',
     'Drucken oder als PDF speichern' => 'Print or save as PDF',

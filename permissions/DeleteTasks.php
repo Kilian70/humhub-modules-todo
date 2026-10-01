@@ -4,6 +4,7 @@ namespace humhub\modules\todo\permissions;
 
 use humhub\libs\BasePermission;
 use humhub\modules\space\models\Space;
+use Yii;
 
 class DeleteTasks extends BasePermission
 {
@@ -11,12 +12,18 @@ class DeleteTasks extends BasePermission
 
     protected $id = 'deleteTasks';
 
-    protected $title = 'ToDo löschen';
-
-    protected $description = 'Erlaubt das Löschen aller Aufgaben';
-
     protected $defaultAllowedGroups = [
         Space::USERGROUP_OWNER,
         Space::USERGROUP_ADMIN,
     ];
+
+    public function getTitle()
+    {
+        return Yii::t('TodoModule.base', 'ToDo löschen');
+    }
+
+    public function getDescription()
+    {
+        return Yii::t('TodoModule.base', 'Erlaubt das Löschen aller Aufgaben');
+    }
 }

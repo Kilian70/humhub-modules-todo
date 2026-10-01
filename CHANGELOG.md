@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.41.0 - 2026-10-01
+
+- Modulstruktur weiter an den offiziellen HumHub-Entwicklungsvorgaben ausgerichtet
+- ungenutzte Installerklasse entfernt und Standardzustand für neue Spaces korrekt in `Module::enable()` integriert
+- alle Migrationen auf `humhub\components\Migration` vereinheitlicht
+- Berechtigungsnamen und -beschreibungen vollständig übersetzbar gemacht
+- Modulmetadaten um Suchbegriffe und eine PHP-Anforderungsprüfung ergänzt
+- standardisierte Codeception-Unit-Suite und HumHub-Richtlinienprüfung ergänzt
+- GitHub-Kompatibilitätsworkflow um die Codeception-Tests erweitert
+- bewusste Oberflächenkompatibilität mit HumHub 1.18 und 1.19 dokumentiert
+
 ## 1.40.0 - 2026-09-29
 
 - aktuellen Funktionsumfang und Bedienkonzept in der README übersichtlich dokumentiert

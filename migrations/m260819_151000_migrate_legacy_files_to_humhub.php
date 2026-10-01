@@ -3,7 +3,7 @@
 use humhub\modules\file\components\FileManager;
 use humhub\modules\file\models\File;
 use humhub\modules\todo\models\Task;
-use yii\db\Migration;
+use humhub\components\Migration;
 use yii\helpers\FileHelper;
 
 class m260819_151000_migrate_legacy_files_to_humhub extends Migration

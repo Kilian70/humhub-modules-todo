@@ -1,0 +1,17 @@
+actor: Tester
+namespace: todo
+bootstrap: _bootstrap.php
+
+paths:
+  tests: codeception
+  output: codeception/_output
+  data: codeception/_data
+  support: codeception/_support
+
+settings:
+  colors: true
+  memory_limit: 512M
+  shuffle: false
+
+coverage:
+  enabled: false

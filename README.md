@@ -87,6 +87,30 @@ enthaltenen Migrationen beim Modul-Upgrade aus.
 - Belastungstest mit 10.000 Aufgaben, 80.000 Checklistenpunkten, 50.000 Kommentaren,
   20.000 Zuständigkeiten und 30.000 simulierten Anhängen
 
+Die Ansichten verwenden bewusst die von HumHub 1.18 und 1.19 bereitgestellten
+Kompatibilitätsklassen. Eine ausschliesslich auf den aktuellen Bootstrap-Stand des
+HumHub-`develop`-Zweigs zugeschnittene Oberfläche würde die Unterstützung dieser
+beiden stabilen HumHub-Versionen beeinträchtigen.
+
+## Entwicklung und Tests
+
+Die schnelle Modulprüfung kann im Modulverzeichnis ausgeführt werden:
+
+```bash
+bash tests/check.sh
+```
+
+Zusätzlich steht eine Codeception-Unit-Suite im offiziellen HumHub-Testlayout zur
+Verfügung. Mit einer vorhandenen HumHub-Installation wird sie beispielsweise so
+ausgeführt:
+
+```bash
+php /pfad/zu/humhub/protected/vendor/bin/codecept run unit -c tests/codeception.yml
+```
+
+Die GitHub-Actions prüfen den Modulcode sowie die Kompatibilität mit HumHub 1.18
+und 1.19 regelmäßig.
+
 ## Konfiguration
 
 Globale Einstellungen befinden sich in der Modulkonfiguration im
@@ -101,7 +125,7 @@ php protected/yii cron/run
 
 ## Version
 
-Aktuelle Modulversion: **1.40.0**. Änderungen sind im [CHANGELOG.md](CHANGELOG.md)
+Aktuelle Modulversion: **1.41.0**. Änderungen sind im [CHANGELOG.md](CHANGELOG.md)
 dokumentiert.
 
 ## Mitwirken und Sicherheit

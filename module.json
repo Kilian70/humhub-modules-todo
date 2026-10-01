@@ -2,7 +2,14 @@
   "id": "todo",
   "name": "ToDo",
   "description": "Pendenzenliste im Space",
-  "version": "1.40.0",
+  "keywords": [
+    "tasks",
+    "todo",
+    "checklist",
+    "kanban",
+    "space"
+  ],
+  "version": "1.41.0",
   "class": "humhub\\modules\\todo\\Module",
   "contentContainerTypes": [
     "humhub\\modules\\space\\models\\Space"

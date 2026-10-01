@@ -48,3 +48,6 @@ jobs:
 
       - name: Run compatibility smoke test
         run: php todo/tests/humhub-compatibility.php humhub "${{ matrix.humhub }}"
+
+      - name: Run Codeception unit tests
+        run: php humhub/protected/vendor/bin/codecept run unit -c todo/tests/codeception.yml

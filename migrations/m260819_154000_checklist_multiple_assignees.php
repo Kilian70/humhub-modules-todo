@@ -1,6 +1,6 @@
 <?php
 
-use yii\db\Migration;
+use humhub\components\Migration;
 
 class m260819_154000_checklist_multiple_assignees extends Migration
 {
